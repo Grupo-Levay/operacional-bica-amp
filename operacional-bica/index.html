@@ -865,6 +865,61 @@ input, select, textarea { font-family: var(--sans); }
 .btn-sm.amp { background: var(--amp-dim); border-color: var(--amp-b); color: var(--amp); }
 
 .empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
+
+/* ══════════════════════════════════════
+   ESTOQUE
+══════════════════════════════════════ */
+.est-stats { display:flex; gap:10px; padding:14px 16px 4px; }
+.est-stat { flex:1; background:var(--s2); border-radius:10px; padding:12px; border:1px solid var(--border); text-align:center; }
+.est-stat-num { font-family:var(--syne); font-size:22px; font-weight:800; }
+.est-stat-num.ok { color:var(--ok); }
+.est-stat-num.danger { color:var(--danger); }
+.est-stat-num.warn { color:var(--warn); }
+.est-stat-label { font-size:10px; color:var(--text3); margin-top:3px; text-transform:uppercase; letter-spacing:.05em; }
+
+.est-filter-bar { display:flex; gap:6px; padding:12px 16px 4px; overflow-x:auto; }
+
+.est-alerta { background:var(--danger-dim); border:1px solid rgba(240,100,100,.2); border-radius:var(--r); padding:12px 14px; margin:10px 16px 0; display:none; }
+.est-alerta-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--danger); margin-bottom:8px; }
+.est-alerta-item { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(240,100,100,.1); }
+.est-alerta-item:last-child { border-bottom:none; }
+.est-alerta-nome { font-size:13px; color:var(--text); }
+.est-alerta-meta { font-size:11px; color:var(--text3); }
+.est-alerta-add { font-size:11px; padding:4px 8px; background:var(--danger-dim); border:1px solid rgba(240,100,100,.3); border-radius:20px; color:var(--danger); }
+
+.est-cat { background:var(--s2); border-radius:var(--r); overflow:hidden; margin:10px 16px 0; border:1px solid var(--border); }
+.est-cat-progress { height:3px; background:var(--border); }
+.est-cat-progress-fill { height:100%; background:var(--ok); transition:width .3s; }
+.est-cat-head { display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; user-select:none; }
+.est-cat-emoji { font-size:20px; width:28px; text-align:center; }
+.est-cat-info { flex:1; }
+.est-cat-title { font-family:var(--syne); font-size:14px; font-weight:700; }
+.est-cat-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+.est-cat-arrow { font-size:10px; color:var(--text3); transition:transform .2s; }
+.est-cat.open .est-cat-arrow { transform:rotate(180deg); }
+.est-cat-body { display:none; }
+.est-cat.open .est-cat-body { display:block; }
+
+.est-item { display:flex; align-items:center; gap:12px; padding:11px 14px; border-top:1px solid var(--border); cursor:pointer; transition:background .1s; }
+.est-item:active { background:var(--s3); }
+.est-item-info { flex:1; min-width:0; }
+.est-item-nome { font-size:14px; font-weight:500; color:var(--text); }
+.est-item-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+.est-item-status { display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+.est-qty { font-family:var(--mono); font-size:18px; font-weight:700; }
+.est-qty.ok { color:var(--ok); }
+.est-qty.low { color:var(--danger); }
+.est-qty.warn { color:var(--warn); }
+.est-min-label { font-size:10px; color:var(--text3); }
+
+.est-contagem-btn { display:block; margin:14px 16px; width:calc(100% - 32px); padding:13px; background:var(--s2); border:1px dashed var(--border2); border-radius:var(--r); color:var(--text2); font-size:14px; font-weight:600; text-align:center; }
+.est-contagem-btn:active { background:var(--s3); }
+
+/* Modal Estoque Item */
+.est-modal-qty-row { display:flex; align-items:center; gap:14px; justify-content:center; margin:18px 0; }
+.est-qty-btn { width:44px; height:44px; border-radius:50%; background:var(--s3); border:1px solid var(--border2); font-size:20px; color:var(--text); display:flex; align-items:center; justify-content:center; }
+.est-qty-btn:active { background:var(--border); }
+.est-qty-display { font-family:var(--syne); font-size:36px; font-weight:800; min-width:80px; text-align:center; }
 </style>
 </head>
 <body>
@@ -1138,6 +1193,89 @@ input, select, textarea { font-family: var(--sans); }
   </div>
 </div>
 
+<!-- ════ ESTOQUE ════ -->
+<div id="page-estoque" class="page">
+  <div class="est-stats">
+    <div class="est-stat">
+      <div class="est-stat-num" id="est-total-num">—</div>
+      <div class="est-stat-label">Itens</div>
+    </div>
+    <div class="est-stat">
+      <div class="est-stat-num ok" id="est-ok-num">—</div>
+      <div class="est-stat-label">Ok</div>
+    </div>
+    <div class="est-stat">
+      <div class="est-stat-num danger" id="est-low-num">—</div>
+      <div class="est-stat-label">Baixo</div>
+    </div>
+  </div>
+
+  <div id="est-alerta-box" class="est-alerta">
+    <div class="est-alerta-title">⚠️ Abaixo do mínimo — adicionar à compra</div>
+    <div id="est-alerta-list"></div>
+  </div>
+
+  <div class="est-filter-bar">
+    <button class="cf-btn active-both" onclick="filterEstoque('all',this)">Todos</button>
+    <button class="cf-btn" onclick="filterEstoque('bica',this)">Bica</button>
+    <button class="cf-btn" onclick="filterEstoque('amp',this)">AMP</button>
+    <button class="cf-btn" onclick="filterEstoque('compartilhado',this)">Compartilhado</button>
+  </div>
+
+  <div id="est-cats-container"></div>
+
+  <button class="est-contagem-btn" onclick="abrirContagem()">📋 Iniciar Contagem Semanal</button>
+  <div style="height:80px"></div>
+</div>
+
+<!-- MODAL ITEM ESTOQUE -->
+<div class="overlay" id="modal-estoque-item">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="mei-titulo">Item</div>
+    <div class="modal-sub" id="mei-meta">Fornecedor · Mínimo</div>
+    <div class="est-modal-qty-row">
+      <button class="est-qty-btn" onclick="ajustarQty(-1)">−</button>
+      <div class="est-qty-display" id="mei-qty">0</div>
+      <button class="est-qty-btn" onclick="ajustarQty(1)">+</button>
+    </div>
+    <div class="mfield">
+      <label>Unidade de medida</label>
+      <input type="text" class="minput" id="mei-unidade" placeholder="ex: kg, cx, litro" readonly>
+    </div>
+    <div class="mfield">
+      <label>Mínimo ideal</label>
+      <input type="number" class="minput" id="mei-minimo" placeholder="0" min="0">
+    </div>
+    <div class="mfield">
+      <label>Dono</label>
+      <select class="mselect" id="mei-dono">
+        <option value="bica">Bica Bar</option>
+        <option value="amp">AMP 213</option>
+        <option value="compartilhado">Compartilhado</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn" onclick="fecharModalEstoque()">Cancelar</button>
+      <button class="mbtn primary" onclick="salvarItemEstoque()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTAGEM SEMANAL -->
+<div class="overlay" id="modal-contagem">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📋 Contagem Semanal</div>
+    <div class="modal-sub">Preencha o que você vê fisicamente</div>
+    <div id="contagem-lista" style="margin:16px 0"></div>
+    <div class="modal-actions">
+      <button class="mbtn" onclick="fecharContagem()">Cancelar</button>
+      <button class="mbtn primary" onclick="salvarContagem()">Salvar Contagem</button>
+    </div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="bnav-item active" onclick="showPage('dash',this)">
@@ -1148,6 +1286,9 @@ input, select, textarea { font-family: var(--sans); }
   </button>
   <button class="bnav-item" onclick="showPage('compras',this)">
     <div class="bnav-icon">🛒</div>Compras
+  </button>
+  <button class="bnav-item" onclick="showPage('estoque',this)">
+    <div class="bnav-icon">📦</div>Estoque
   </button>
   <button class="bnav-item" onclick="showPage('escala',this)">
     <div class="bnav-icon">👥</div>Escala
@@ -1469,7 +1610,7 @@ let _modalCheckId='', _modalTipo='', _modalCasa='';
 // ════════════════════════════════════════════════
 // NAV
 // ════════════════════════════════════════════════
-const PAGE_TITLES = {dash:'Hoje',checks:'Checklists',compras:'Compras',escala:'Escala',config:'Config'};
+const PAGE_TITLES = {dash:'Hoje',checks:'Checklists',compras:'Compras',estoque:'Estoque',escala:'Escala',config:'Config'};
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
@@ -1479,6 +1620,7 @@ function showPage(id, btn) {
   if(id==='compras') renderCatAccordions();
   if(id==='checks') renderAccordions();
   if(id==='escala') renderEscala();
+  if(id==='estoque') renderEstoque();
 }
 function goTo(pageId, openAccordion) {
   const navBtn = document.querySelector(`.bnav-item[onclick*="'${pageId}'"]`);
@@ -2201,8 +2343,6 @@ function updateDashStats(){
   loadCompras();
   let urg=0; CATS.forEach(c=>c.items.forEach(i=>{if(i.urg==='Urgente')urg++;}));
   const urgCard=document.getElementById('dc-urgentes');
-  urgCard.className='dash-card'+(urg>0?' danger':'');
-  document.getElementById('dc-urg-num').textContent=urg;
   document.getElementById('dc-chk-num').textContent=`${checksDone}/${checksTotal}`;
   // urgentes list
   const urgDiv=document.getElementById('dash-urgentes');
@@ -2217,6 +2357,18 @@ function updateDashStats(){
       urgDiv.innerHTML+=`<div class="urgente-item"><div class="urgente-icon">${cat.emoji}</div><div><div class="urgente-text">${item.item}</div><div class="urgente-meta">${cat.label} · ${item.qtd||'qtd não definida'}</div></div></div>`;
     }
   }));
+  // estoque baixo
+  const estoqueData=loadEstoque();
+  ESTOQUE_CATS.forEach(cat=>cat.items.forEach(item=>{
+    const d=estoqueData[item.id]||{qty:0};
+    const minimo=d.minimo!==undefined?d.minimo:item.minimo;
+    if(getStatusClass(d.qty,minimo)==='low'){
+      urg++;
+      urgDiv.innerHTML+=`<div class="urgente-item"><div class="urgente-icon">📦</div><div><div class="urgente-text">${item.nome}</div><div class="urgente-meta">Estoque baixo · ${d.qty}/${minimo} ${item.unidade}</div></div></div>`;
+    }
+  }));
+  urgCard.className='dash-card'+(urg>0?' danger':'');
+  document.getElementById('dc-urg-num').textContent=urg;
   if(!urgDiv.innerHTML) urgDiv.innerHTML='<div style="padding:12px 0;font-size:13px;color:var(--text3)">✓ Nenhuma urgência agora</div>';
 }
 
@@ -2269,7 +2421,7 @@ function limparToken(){
   setSyncStatus('','offline');
 }
 function exportBackup(){
-  const data={compras:CATS.map(c=>c.items),checks:{},historico:JSON.parse(localStorage.getItem('chk_historico')||'[]')};
+  const data={compras:CATS.map(c=>c.items),checks:{},historico:JSON.parse(localStorage.getItem('chk_historico')||'[]'),estoque:loadEstoque()};
   CHECKLISTS.forEach(c=>{data.checks[c.id]=JSON.parse(localStorage.getItem('chk_'+c.id)||'{}');});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
@@ -2279,6 +2431,282 @@ function exportBackup(){
 function limparTudo(){
   ['compras_data','chk_historico',...CHECKLISTS.map(c=>'chk_'+c.id)].forEach(k=>localStorage.removeItem(k));
   location.reload();
+}
+
+// ════════════════════════════════════════════════
+// ESTOQUE DATA
+// ════════════════════════════════════════════════
+const ESTOQUE_CATS = [
+  { key:'bebidas', label:'Bebidas', emoji:'🍺', items:[
+    {id:'b1',nome:'Cerveja lata',unidade:'cx 24un',minimo:2,dono:'bica',forn:'Distribuidora'},
+    {id:'b2',nome:'Água mineral',unidade:'fardo 12un',minimo:3,dono:'compartilhado',forn:'Distribuidora'},
+    {id:'b3',nome:'Espumante',unidade:'garrafa',minimo:4,dono:'amp',forn:'Distribuidora'},
+    {id:'b4',nome:'Rum',unidade:'garrafa 1L',minimo:2,dono:'bica',forn:'Distribuidora'},
+    {id:'b5',nome:'Cachaça premium',unidade:'garrafa',minimo:2,dono:'bica',forn:'Distribuidora'},
+    {id:'b6',nome:'Vodka',unidade:'garrafa',minimo:2,dono:'bica',forn:'Distribuidora'},
+  ]},
+  { key:'alimentos', label:'Alimentos', emoji:'🥩', items:[
+    {id:'a1',nome:'Cupim',unidade:'kg',minimo:5,dono:'bica',forn:'Carnes'},
+    {id:'a2',nome:'Queijo coalho',unidade:'kg',minimo:2,dono:'bica',forn:'Laticínios'},
+    {id:'a3',nome:'Limão (tahiti)',unidade:'kg',minimo:3,dono:'compartilhado',forn:'Hortifrútti'},
+    {id:'a4',nome:'Maracujá',unidade:'kg',minimo:2,dono:'bica',forn:'Hortifrútti'},
+    {id:'a5',nome:'Morango',unidade:'kg',minimo:1,dono:'bica',forn:'Hortifrútti'},
+  ]},
+  { key:'bar', label:'Bar & Xaropes', emoji:'🍸', items:[
+    {id:'r1',nome:'Xarope maracujá',unidade:'litro',minimo:2,dono:'bica',forn:'Produção interna'},
+    {id:'r2',nome:'Xarope gengibre',unidade:'litro',minimo:1,dono:'bica',forn:'Produção interna'},
+    {id:'r3',nome:'Limão siciliano',unidade:'kg',minimo:2,dono:'bica',forn:'Hortifrútti'},
+    {id:'r4',nome:'Licor de laranja',unidade:'garrafa',minimo:1,dono:'bica',forn:'Distribuidora'},
+  ]},
+  { key:'limpeza', label:'Limpeza', emoji:'🧹', items:[
+    {id:'l1',nome:'Detergente',unidade:'litro',minimo:2,dono:'compartilhado',forn:'Supermercado'},
+    {id:'l2',nome:'Álcool 70%',unidade:'litro',minimo:2,dono:'compartilhado',forn:'Supermercado'},
+    {id:'l3',nome:'Pano de chão',unidade:'un',minimo:2,dono:'compartilhado',forn:'Supermercado'},
+    {id:'l4',nome:'Luva de borracha',unidade:'par',minimo:2,dono:'compartilhado',forn:'Supermercado'},
+  ]},
+  { key:'descartaveis', label:'Descartáveis', emoji:'🗑️', items:[
+    {id:'d1',nome:'Copos descartáveis',unidade:'pct',minimo:3,dono:'compartilhado',forn:'Limoeiro/Natan'},
+    {id:'d2',nome:'Papel toalha',unidade:'pct',minimo:4,dono:'compartilhado',forn:'Limoeiro/Natan'},
+    {id:'d3',nome:'Embalagem take-away',unidade:'un',minimo:20,dono:'bica',forn:'Limoeiro/Natan'},
+  ]},
+];
+
+let _estFilter='all';
+let _editingItemId='';
+
+function loadEstoque() {
+  return JSON.parse(localStorage.getItem('estoque_data')||'{}');
+}
+function saveEstoque(data) {
+  localStorage.setItem('estoque_data', JSON.stringify(data));
+}
+function getItemData(id) {
+  const d = loadEstoque();
+  return d[id] || {qty:0};
+}
+
+function getStatusClass(qty, minimo) {
+  if(qty===0) return 'low';
+  if(qty < minimo) return 'low';
+  if(qty <= minimo * 1.3) return 'warn';
+  return 'ok';
+}
+
+function renderEstoque(filter) {
+  if(filter!==undefined) _estFilter=filter;
+  const data = loadEstoque();
+  let totalItens=0, okCount=0, lowCount=0;
+  const baixos=[];
+
+  ESTOQUE_CATS.forEach(cat => {
+    cat.items.forEach(item => {
+      const d = data[item.id]||{qty:0};
+      const minimo = d.minimo!==undefined ? d.minimo : item.minimo;
+      totalItens++;
+      const sc = getStatusClass(d.qty, minimo);
+      if(sc==='ok') okCount++;
+      else if(sc==='low') { lowCount++; baixos.push({...item, qty:d.qty, minimo}); }
+    });
+  });
+
+  document.getElementById('est-total-num').textContent=totalItens;
+  document.getElementById('est-ok-num').textContent=okCount;
+  document.getElementById('est-low-num').textContent=lowCount;
+
+  // Alerta box
+  const alertBox=document.getElementById('est-alerta-box');
+  const alertList=document.getElementById('est-alerta-list');
+  if(baixos.length>0){
+    alertBox.style.display='block';
+    alertList.innerHTML=baixos.map(b=>`
+      <div class="est-alerta-item">
+        <div>
+          <div class="est-alerta-nome">${b.nome}</div>
+          <div class="est-alerta-meta">${b.qty} / mín ${b.minimo} ${b.unidade}</div>
+        </div>
+        <button class="est-alerta-add" onclick="adicionarBaixoCompras('${b.id}')">＋ Compras</button>
+      </div>`).join('');
+  } else {
+    alertBox.style.display='none';
+  }
+
+  // Categories
+  const container=document.getElementById('est-cats-container');
+  container.innerHTML='';
+  ESTOQUE_CATS.forEach(cat => {
+    const filteredItems = _estFilter==='all' ? cat.items : cat.items.filter(i=>i.dono===_estFilter||i.dono==='compartilhado'&&_estFilter!=='all');
+    if(_estFilter!=='all' && filteredItems.length===0) return;
+    const itemsToShow = _estFilter==='all' ? cat.items : filteredItems;
+
+    let catOk=0;
+    const itemsHtml = itemsToShow.map(item=>{
+      const d=data[item.id]||{qty:0};
+      const minimo=d.minimo!==undefined?d.minimo:item.minimo;
+      const sc=getStatusClass(d.qty,minimo);
+      if(sc==='ok') catOk++;
+      const donoTag = item.dono==='bica'?'<span class="tag tag-bica" style="font-size:9px">Bica</span>':item.dono==='amp'?'<span class="tag tag-amp" style="font-size:9px">AMP</span>':'<span class="tag tag-both" style="font-size:9px">Ambos</span>';
+      return `<div class="est-item" onclick="abrirItemEstoque('${item.id}')">
+        <div class="est-item-info">
+          <div class="est-item-nome">${item.nome}</div>
+          <div class="est-item-meta">${item.forn} · ${item.unidade} ${donoTag}</div>
+        </div>
+        <div class="est-item-status">
+          <div class="est-qty ${sc}">${d.qty}</div>
+          <div class="est-min-label">mín ${minimo}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const pct = itemsToShow.length ? Math.round(catOk/itemsToShow.length*100) : 100;
+    const el=document.createElement('div');
+    el.className='est-cat';
+    el.innerHTML=`
+      <div class="est-cat-progress"><div class="est-cat-progress-fill" style="width:${pct}%"></div></div>
+      <div class="est-cat-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="est-cat-emoji">${cat.emoji}</div>
+        <div class="est-cat-info">
+          <div class="est-cat-title">${cat.label}</div>
+          <div class="est-cat-sub">${catOk}/${itemsToShow.length} ok</div>
+        </div>
+        <div class="est-cat-arrow">▾</div>
+      </div>
+      <div class="est-cat-body">${itemsHtml}</div>`;
+    container.appendChild(el);
+  });
+}
+
+function filterEstoque(f, btn) {
+  document.querySelectorAll('.est-filter-bar .cf-btn').forEach(b=>b.classList.remove('active-bica','active-amp','active-both'));
+  btn.classList.add(f==='bica'?'active-bica':f==='amp'?'active-amp':'active-both');
+  renderEstoque(f);
+}
+
+function abrirItemEstoque(id) {
+  _editingItemId=id;
+  let item;
+  ESTOQUE_CATS.forEach(c=>c.items.forEach(i=>{if(i.id===id)item=i;}));
+  if(!item) return;
+  const d=loadEstoque();
+  const saved=d[id]||{};
+  const qty=saved.qty!==undefined?saved.qty:0;
+  const minimo=saved.minimo!==undefined?saved.minimo:item.minimo;
+  document.getElementById('mei-titulo').textContent=item.nome;
+  document.getElementById('mei-meta').textContent=`${item.forn}`;
+  document.getElementById('mei-qty').textContent=qty;
+  document.getElementById('mei-unidade').value=item.unidade;
+  document.getElementById('mei-minimo').value=minimo;
+  document.getElementById('mei-dono').value=saved.dono||item.dono;
+  document.getElementById('modal-estoque-item').classList.add('open');
+}
+
+function ajustarQty(delta) {
+  const el=document.getElementById('mei-qty');
+  const v=parseInt(el.textContent)||0;
+  el.textContent=Math.max(0,v+delta);
+}
+
+function salvarItemEstoque() {
+  const data=loadEstoque();
+  data[_editingItemId]={
+    qty:parseInt(document.getElementById('mei-qty').textContent)||0,
+    minimo:parseInt(document.getElementById('mei-minimo').value)||0,
+    dono:document.getElementById('mei-dono').value,
+    lastUpdate:new Date().toISOString()
+  };
+  saveEstoque(data);
+  fecharModalEstoque();
+  renderEstoque();
+  updateDashStats();
+}
+
+function fecharModalEstoque() {
+  document.getElementById('modal-estoque-item').classList.remove('open');
+}
+
+function adicionarBaixoCompras(id) {
+  let item;
+  ESTOQUE_CATS.forEach(c=>c.items.forEach(i=>{if(i.id===id)item=i;}));
+  if(!item) return;
+  loadCompras();
+  // find matching item in CATS or add as urgente
+  let found=false;
+  CATS.forEach(cat=>cat.items.forEach(ci=>{
+    if(ci.item.toLowerCase()===item.nome.toLowerCase()){
+      ci.urg='Urgente'; found=true;
+    }
+  }));
+  if(!found){
+    // add to first matching category or descartaveis
+    const targetCat=CATS.find(c=>c.label.toLowerCase().includes(item.key||''))||CATS[0];
+    targetCat.items.push({item:item.nome,qtd:'',forn:item.forn,urg:'Urgente'});
+  }
+  saveCompras();
+  showSyncBar(`✅ "${item.nome}" adicionado à lista de compras como Urgente`);
+}
+
+function abrirContagem() {
+  const data=loadEstoque();
+  let html='';
+  ESTOQUE_CATS.forEach(cat=>{
+    html+=`<div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px">${cat.emoji} ${cat.label}</div>`;
+    cat.items.forEach(item=>{
+      const d=data[item.id]||{qty:0};
+      html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;font-size:13px">${item.nome} <span style="color:var(--text3);font-size:11px">(${item.unidade})</span></div>
+        <input type="number" class="minput" style="width:70px;text-align:center;font-family:var(--mono);font-size:16px" value="${d.qty}" min="0" data-item-id="${item.id}">
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('contagem-lista').innerHTML=html;
+  document.getElementById('modal-contagem').classList.add('open');
+}
+
+function fecharContagem() {
+  document.getElementById('modal-contagem').classList.remove('open');
+}
+
+function salvarContagem() {
+  const data=loadEstoque();
+  document.querySelectorAll('#contagem-lista input[data-item-id]').forEach(inp=>{
+    const id=inp.dataset.itemId;
+    const qty=parseInt(inp.value)||0;
+    if(!data[id]) data[id]={};
+    data[id].qty=qty;
+    data[id].lastUpdate=new Date().toISOString();
+    // check if below minimum
+    let item;
+    ESTOQUE_CATS.forEach(c=>c.items.forEach(i=>{if(i.id===id)item=i;}));
+    if(item){
+      const minimo=data[id].minimo!==undefined?data[id].minimo:item.minimo;
+      if(qty<minimo){
+        // auto-add to compras
+        adicionarBaixoComprasById(id,item,data[id]);
+      }
+    }
+  });
+  saveEstoque(data);
+  fecharContagem();
+  renderEstoque();
+  updateDashStats();
+  showSyncBar('✅ Contagem salva. Itens abaixo do mínimo adicionados às compras.');
+}
+
+function adicionarBaixoComprasById(id,item,saved){
+  loadCompras();
+  let found=false;
+  CATS.forEach(cat=>cat.items.forEach(ci=>{
+    if(ci.item.toLowerCase()===item.nome.toLowerCase()){
+      if(ci.urg!=='Comprado') ci.urg='Urgente';
+      found=true;
+    }
+  }));
+  if(!found){
+    const targetCat=CATS[0];
+    CATS.forEach(c=>{if(c.label.toLowerCase().includes(item.key||''))targetCat.items.push({item:item.nome,qtd:'',forn:item.forn,urg:'Urgente'});});
+    if(!found) CATS[0].items.push({item:item.nome,qtd:'',forn:item.forn,urg:'Urgente'});
+  }
+  saveCompras();
 }
 
 // ════════════════════════════════════════════════
