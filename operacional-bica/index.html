@@ -5,37 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Operacional — Bica & AMP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════
    TOKENS
 ══════════════════════════════════════ */
 :root {
-  --bg:        #0a0a0b;
-  --s1:        #111113;
-  --s2:        #18181b;
-  --s3:        #222226;
-  --border:    #2c2c32;
-  --border2:   #3e3e46;
-  --text:      #f0f0f2;
-  --text2:     #8a8a9a;
-  --text3:     #4a4a58;
-  --bica:      #e8835a;
-  --bica-dim:  rgba(232,131,90,.12);
-  --bica-b:    rgba(232,131,90,.3);
-  --amp:       #5a8ee8;
-  --amp-dim:   rgba(90,142,232,.12);
-  --amp-b:     rgba(90,142,232,.3);
-  --ok:        #3dd68c;
-  --ok-dim:    rgba(61,214,140,.1);
-  --warn:      #f5c542;
-  --warn-dim:  rgba(245,197,66,.1);
-  --danger:    #f06464;
-  --danger-dim:rgba(240,100,100,.1);
-  --r:         14px;
-  --r-sm:      8px;
+  --bg:        #0c0b09;
+  --s1:        #131210;
+  --s2:        #1a1916;
+  --s3:        #232119;
+  --border:    #2e2c26;
+  --border2:   #423f36;
+  --text:      #f2ede6;
+  --text2:     #8c8679;
+  --text3:     #4e4a40;
+  --bica:      #c4973a;
+  --bica-dim:  rgba(196,151,58,.12);
+  --bica-b:    rgba(196,151,58,.28);
+  --amp:       #c13b2a;
+  --amp-dim:   rgba(193,59,42,.12);
+  --amp-b:     rgba(193,59,42,.28);
+  --ok:        #3d9e6e;
+  --ok-dim:    rgba(61,158,110,.12);
+  --ok-b:      rgba(61,158,110,.28);
+  --warn:      #c49a2a;
+  --warn-dim:  rgba(196,154,42,.1);
+  --warn-b:    rgba(196,154,42,.25);
+  --danger:    #c44040;
+  --danger-dim:rgba(196,64,64,.12);
+  --danger-b:  rgba(196,64,64,.28);
+  --r:         12px;
+  --r-sm:      6px;
   --sans:      'DM Sans', sans-serif;
   --syne:      'Syne', sans-serif;
+  --serif:     'Playfair Display', serif;
   --mono:      'DM Mono', monospace;
   --touch:     52px;
 }
@@ -866,6 +870,66 @@ input, select, textarea { font-family: var(--sans); }
 
 .empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
 
+.section-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--text3);
+  margin-bottom: 12px;
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.compra-qtd-input {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 8px 10px;
+  width: 100%;
+}
+.compra-qtd-input:focus { outline: none; border-color: var(--border2); }
+
+.urgencia-select {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: 12px;
+  padding: 8px 10px;
+  width: 100%;
+}
+.urgencia-select:focus { outline: none; border-color: var(--border2); }
+
+/* ══════════════════════════════════════
+   FICHA TÉCNICA & CMV
+══════════════════════════════════════ */
+.ficha-tab { display: block; }
+
+/* Mais Drawer */
+.mais-drawer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background .1s;
+}
+.mais-drawer-item:active { background: var(--s3); }
+.mais-drawer-icon { font-size: 22px; }
+.mais-drawer-label { font-size: 11px; font-weight: 600; color: var(--text2); }
+
 /* ══════════════════════════════════════
    ESTOQUE
 ══════════════════════════════════════ */
@@ -1193,6 +1257,167 @@ input, select, textarea { font-family: var(--sans); }
   </div>
 </div>
 
+<!-- ════ FICHA TÉCNICA & CMV ════ -->
+<div id="page-ficha" class="page">
+  <div style="padding:16px 16px 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-family:var(--serif);font-size:20px;font-weight:700">Ficha Técnica</div>
+        <div style="font-size:12px;color:var(--text2);font-family:var(--mono)">Custo por prato e drink · CMV</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="showFichaTab('pratos',this)">Pratos</button>
+        <button class="btn-sm" onclick="showFichaTab('drinks',this)">Drinks</button>
+        <button class="btn-sm primary" onclick="showFichaTab('cmv',this)">CMV</button>
+        <button class="btn-sm" onclick="abrirModalNovaFicha()">+ Ficha</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 16px">
+    <div id="ficha-pratos" class="ficha-tab">
+      <div class="section-title" style="margin-top:16px">Pratos do cardápio</div>
+      <div id="lista-fichas-pratos"></div>
+    </div>
+
+    <div id="ficha-drinks" class="ficha-tab" style="display:none">
+      <div class="section-title" style="margin-top:16px">Drinks & coquetelaria</div>
+      <div id="lista-fichas-drinks"></div>
+    </div>
+
+    <div id="ficha-cmv" class="ficha-tab" style="display:none">
+      <div style="margin-top:16px">
+        <div class="section-title">CMV do período</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="background:var(--bica-dim);border:1px solid var(--bica-b);border-radius:var(--r);padding:14px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--bica);margin-bottom:6px">Bica Bar</div>
+            <div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--text)" id="cmv-bica-val">R$ —</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px" id="cmv-bica-pct">— % do fat.</div>
+          </div>
+          <div style="background:var(--amp-dim);border:1px solid var(--amp-b);border-radius:var(--r);padding:14px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amp);margin-bottom:6px">AMP 213</div>
+            <div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--text)" id="cmv-amp-val">R$ —</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px" id="cmv-amp-pct">— % do fat.</div>
+          </div>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:6px">Consolidado</div>
+          <div style="font-family:var(--serif);font-size:28px;font-weight:800;color:var(--text)" id="cmv-total-val">R$ —</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px" id="cmv-total-ref">Referência ideal: ≤ 35% do faturamento</div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Informar faturamento do período</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:4px">Bica Bar (R$)</label>
+              <input type="number" id="fat-bica" class="compra-qtd-input" style="width:100%" placeholder="0,00" oninput="calcularCMV()">
+            </div>
+            <div>
+              <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:4px">AMP 213 (R$)</label>
+              <input type="number" id="fat-amp" class="compra-qtd-input" style="width:100%" placeholder="0,00" oninput="calcularCMV()">
+            </div>
+          </div>
+        </div>
+        <div class="section-title">Compras registradas no período</div>
+        <div id="cmv-compras-lista" style="margin-bottom:16px"></div>
+        <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Registrar compra manual</div>
+          <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end">
+            <input type="text" id="cmv-item-nome" class="compra-qtd-input" style="width:100%" placeholder="Item (ex: Cupim 5kg)">
+            <input type="number" id="cmv-item-val" class="compra-qtd-input" style="width:80px" placeholder="R$">
+            <select id="cmv-item-empresa" class="urgencia-select" style="width:80px">
+              <option value="Bica Bar">Bica</option>
+              <option value="AMP 213">AMP</option>
+              <option value="Compartilhado">Comp.</option>
+            </select>
+          </div>
+          <button class="btn-sm primary" style="margin-top:8px;width:100%" onclick="adicionarCompraManual()">+ Registrar compra</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="height:80px"></div>
+</div>
+
+<!-- Modal nova ficha técnica -->
+<div class="overlay" id="modal-nova-ficha">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nova ficha técnica</div>
+    <div class="modal-sub">Mapeie os insumos e rendimentos</div>
+    <div class="mrow">
+      <div class="mfield" style="flex:2">
+        <label>Nome do prato / drink</label>
+        <input type="text" class="minput" id="ft-nome" placeholder="ex: Puba de Cupim">
+      </div>
+      <div class="mfield">
+        <label>Tipo</label>
+        <select class="mselect" id="ft-tipo">
+          <option value="prato">Prato</option>
+          <option value="drink">Drink</option>
+          <option value="xarope">Xarope</option>
+        </select>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mfield">
+        <label>Empresa</label>
+        <select class="mselect" id="ft-empresa">
+          <option>Bica Bar</option>
+          <option>AMP 213</option>
+          <option>Ambos</option>
+        </select>
+      </div>
+      <div class="mfield">
+        <label>Preço de venda (R$)</label>
+        <input type="number" class="minput" id="ft-preco" placeholder="0,00" step="0.01">
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin:16px 0 8px">Insumos</div>
+    <div id="ft-insumos-lista"></div>
+    <button class="btn-sm" style="width:100%;margin-top:6px" onclick="addInsumoFicha()">+ Adicionar insumo</button>
+    <div style="margin-top:16px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Custo total calculado</div>
+      <div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--bica)" id="ft-custo-total">R$ 0,00</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px" id="ft-margem">Informe o preço de venda para calcular margem</div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="mbtn" onclick="fecharModalFicha()">Cancelar</button>
+      <button class="mbtn primary" onclick="salvarFicha()">Salvar ficha</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalhe ficha -->
+<div class="overlay" id="modal-detalhe-ficha">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="mdf-nome">Ficha</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="mdf-tags"></div>
+    <div id="mdf-insumos"></div>
+    <div style="margin-top:16px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Custo</div>
+          <div style="font-family:var(--serif);font-size:18px;font-weight:700;color:var(--danger)" id="mdf-custo">—</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Venda</div>
+          <div style="font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ok)" id="mdf-venda">—</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Margem</div>
+          <div style="font-family:var(--serif);font-size:18px;font-weight:700" id="mdf-margem">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="mbtn" style="color:var(--danger);border-color:var(--danger-b)" onclick="deletarFicha()">Remover</button>
+      <button class="mbtn primary" onclick="document.getElementById('modal-detalhe-ficha').classList.remove('open')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════ ESTOQUE ════ -->
 <div id="page-estoque" class="page">
   <div class="est-stats">
@@ -1290,13 +1515,30 @@ input, select, textarea { font-family: var(--sans); }
   <button class="bnav-item" onclick="showPage('estoque',this)">
     <div class="bnav-icon">📦</div>Estoque
   </button>
-  <button class="bnav-item" onclick="showPage('escala',this)">
-    <div class="bnav-icon">👥</div>Escala
-  </button>
-  <button class="bnav-item" onclick="showPage('config',this)">
-    <div class="bnav-icon">⚙️</div>Config
+  <button class="bnav-item" id="btn-mais" onclick="toggleMaisDrawer()">
+    <div class="bnav-icon">⋯</div>Mais
   </button>
 </nav>
+
+<!-- Drawer "Mais" -->
+<div id="mais-overlay" onclick="fecharMaisDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:150"></div>
+<div id="mais-drawer" style="position:fixed;bottom:-280px;left:0;right:0;background:var(--s1);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;z-index:160;padding:16px 16px calc(80px + env(safe-area-inset-bottom));transition:bottom .25s cubic-bezier(.4,0,.2,1)">
+  <div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    <div class="mais-drawer-item" onclick="showPageFromDrawer('escala')">
+      <div class="mais-drawer-icon">👥</div>
+      <div class="mais-drawer-label" style="color:var(--amp)">Escala</div>
+    </div>
+    <div class="mais-drawer-item" onclick="showPageFromDrawer('ficha')">
+      <div class="mais-drawer-icon">🍽️</div>
+      <div class="mais-drawer-label" style="color:var(--bica)">Ficha & CMV</div>
+    </div>
+    <div class="mais-drawer-item" onclick="showPageFromDrawer('config')">
+      <div class="mais-drawer-icon">⚙️</div>
+      <div class="mais-drawer-label">Config</div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL REGISTRAR -->
 <div class="overlay" id="modal-registrar">
@@ -1610,7 +1852,7 @@ let _modalCheckId='', _modalTipo='', _modalCasa='';
 // ════════════════════════════════════════════════
 // NAV
 // ════════════════════════════════════════════════
-const PAGE_TITLES = {dash:'Hoje',checks:'Checklists',compras:'Compras',estoque:'Estoque',escala:'Escala',config:'Config'};
+const PAGE_TITLES = {dash:'Hoje',checks:'Checklists',compras:'Compras',estoque:'Estoque',ficha:'Ficha & CMV',escala:'Escala',config:'Config'};
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
@@ -1621,6 +1863,7 @@ function showPage(id, btn) {
   if(id==='checks') renderAccordions();
   if(id==='escala') renderEscala();
   if(id==='estoque') renderEstoque();
+  if(id==='ficha') renderFichas();
 }
 function goTo(pageId, openAccordion) {
   const navBtn = document.querySelector(`.bnav-item[onclick*="'${pageId}'"]`);
@@ -2434,6 +2677,270 @@ function limparTudo(){
 }
 
 // ════════════════════════════════════════════════
+// MAIS DRAWER
+// ════════════════════════════════════════════════
+function toggleMaisDrawer(){
+  const drawer=document.getElementById('mais-drawer');
+  const overlay=document.getElementById('mais-overlay');
+  const isOpen=drawer.style.bottom==='0px';
+  drawer.style.bottom=isOpen?'-280px':'0px';
+  overlay.style.display=isOpen?'none':'block';
+}
+function fecharMaisDrawer(){
+  document.getElementById('mais-drawer').style.bottom='-280px';
+  document.getElementById('mais-overlay').style.display='none';
+}
+function showPageFromDrawer(id){
+  fecharMaisDrawer();
+  // deactivate all nav items
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-mais').classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('topbar-title').textContent=PAGE_TITLES[id]||'';
+  if(id==='escala') renderEscala();
+  if(id==='ficha') renderFichas();
+}
+
+// ════════════════════════════════════════════════
+// FICHA TÉCNICA & CMV
+// ════════════════════════════════════════════════
+const FICHAS_SEED = [
+  {id:1,nome:'Puba de Cupim',tipo:'prato',empresa:'AMP 213',preco:65.00,
+    insumos:[
+      {nome:'Cupim',qtd:0.25,un:'kg',custo:42.00},
+      {nome:'Farinha de milho (puba)',qtd:0.08,un:'kg',custo:8.00},
+      {nome:'Temperos e ervas',qtd:1,un:'porcao',custo:2.50},
+    ]},
+  {id:2,nome:'Drink de Maracujá',tipo:'drink',empresa:'Bica Bar',preco:32.00,
+    insumos:[
+      {nome:'Maracujá (polpa)',qtd:0.08,un:'kg',custo:6.00},
+      {nome:'Gin / Cachaça',qtd:0.06,un:'L',custo:8.50},
+      {nome:'Xarope artesanal',qtd:0.03,un:'L',custo:3.00},
+      {nome:'Gelo',qtd:0.10,un:'kg',custo:0.80},
+    ]},
+  {id:3,nome:'Xarope de Gengibre',tipo:'xarope',empresa:'Bica Bar',preco:0,
+    insumos:[
+      {nome:'Gengibre fresco',qtd:0.20,un:'kg',custo:9.00},
+      {nome:'Açúcar',qtd:0.30,un:'kg',custo:3.50},
+      {nome:'Água',qtd:0.30,un:'L',custo:0.20},
+    ]},
+];
+
+let _fichas=[], _cmvCompras=[], _fichaEditIdx=null, _fichaInsumos=[];
+
+function loadFichas(){
+  const saved=JSON.parse(localStorage.getItem('fichas_tecnicas')||'null');
+  _fichas=saved||JSON.parse(JSON.stringify(FICHAS_SEED));
+  _cmvCompras=JSON.parse(localStorage.getItem('cmv_compras')||'[]');
+}
+function saveFichas(){
+  localStorage.setItem('fichas_tecnicas',JSON.stringify(_fichas));
+  localStorage.setItem('cmv_compras',JSON.stringify(_cmvCompras));
+}
+function custoFicha(f){ return f.insumos.reduce((s,i)=>s+(i.qtd*i.custo),0); }
+function margemFicha(f){
+  if(!f.preco) return null;
+  return ((f.preco-custoFicha(f))/f.preco*100).toFixed(1);
+}
+
+function showFichaTab(tab){
+  document.querySelectorAll('.ficha-tab').forEach(t=>t.style.display='none');
+  document.getElementById('ficha-'+tab).style.display='block';
+  if(tab==='cmv') calcularCMV();
+}
+
+function renderFichas(){
+  loadFichas();
+  renderFichaLista('pratos',f=>f.tipo==='prato');
+  renderFichaLista('drinks',f=>f.tipo==='drink'||f.tipo==='xarope');
+}
+
+function renderFichaLista(containerId,filtro){
+  const container=document.getElementById('lista-fichas-'+containerId);
+  if(!container) return;
+  const fichas=_fichas.filter(filtro);
+  if(!fichas.length){
+    container.innerHTML='<div class="empty" style="padding:24px">Nenhuma ficha ainda.<br>Toque em + Ficha para começar.</div>';
+    return;
+  }
+  container.innerHTML='';
+  fichas.forEach(f=>{
+    const custo=custoFicha(f);
+    const margem=margemFicha(f);
+    const margemOk=margem!==null&&parseFloat(margem)>=60;
+    const card=document.createElement('div');
+    card.style.cssText='background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer';
+    card.onclick=()=>abrirDetalheFicha(_fichas.indexOf(f));
+    card.innerHTML=`
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px">${f.nome}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px;font-family:var(--mono)">${f.empresa} · ${f.insumos.length} insumos</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:13px;font-weight:700;color:var(--danger)">R$ ${custo.toFixed(2)}</div>
+          ${f.preco?`<div style="font-size:11px;color:${margemOk?'var(--ok)':'var(--warn)'};margin-top:2px">${margem}% margem</div>`:'<div style="font-size:11px;color:var(--text3);margin-top:2px">insumo</div>'}
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        ${f.insumos.map(i=>`<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)"><span>${i.nome}</span><span style="font-family:var(--mono)">${i.qtd}${i.un} · R$${(i.qtd*i.custo).toFixed(2)}</span></div>`).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function abrirModalNovaFicha(){
+  _fichaInsumos=[]; _fichaEditIdx=null;
+  document.getElementById('ft-nome').value='';
+  document.getElementById('ft-preco').value='';
+  document.getElementById('ft-tipo').value='prato';
+  document.getElementById('ft-empresa').value='Bica Bar';
+  renderInsumosModal();
+  document.getElementById('modal-nova-ficha').classList.add('open');
+}
+function fecharModalFicha(){ document.getElementById('modal-nova-ficha').classList.remove('open'); }
+
+function addInsumoFicha(){
+  _fichaInsumos.push({nome:'',qtd:0,un:'kg',custo:0});
+  renderInsumosModal();
+}
+
+function renderInsumosModal(){
+  const container=document.getElementById('ft-insumos-lista');
+  if(!_fichaInsumos.length){
+    container.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px 0">Nenhum insumo adicionado.</div>';
+    atualizarCustoFichaModal();
+    return;
+  }
+  container.innerHTML='';
+  _fichaInsumos.forEach((ins,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:grid;grid-template-columns:1fr 60px 50px 70px 24px;gap:6px;margin-bottom:6px;align-items:center';
+    row.innerHTML=`
+      <input class="compra-qtd-input" style="width:100%;font-size:12px" placeholder="Insumo" value="${ins.nome}" oninput="_fichaInsumos[${i}].nome=this.value;atualizarCustoFichaModal()">
+      <input type="number" class="compra-qtd-input" style="width:100%;font-size:12px" placeholder="Qtd" value="${ins.qtd||''}" oninput="_fichaInsumos[${i}].qtd=parseFloat(this.value)||0;atualizarCustoFichaModal()">
+      <select class="urgencia-select" style="font-size:10px" onchange="_fichaInsumos[${i}].un=this.value">
+        ${['kg','g','L','ml','un','porcao'].map(u=>`<option ${ins.un===u?'selected':''}>${u}</option>`).join('')}
+      </select>
+      <input type="number" class="compra-qtd-input" style="width:100%;font-size:12px" placeholder="R$/un" value="${ins.custo||''}" oninput="_fichaInsumos[${i}].custo=parseFloat(this.value)||0;atualizarCustoFichaModal()">
+      <button onclick="_fichaInsumos.splice(${i},1);renderInsumosModal()" style="color:var(--danger);font-size:16px;padding:0;background:none;border:none;cursor:pointer">×</button>`;
+    container.appendChild(row);
+  });
+  atualizarCustoFichaModal();
+}
+
+function atualizarCustoFichaModal(){
+  const custo=_fichaInsumos.reduce((s,i)=>s+(i.qtd*i.custo),0);
+  const preco=parseFloat(document.getElementById('ft-preco').value)||0;
+  document.getElementById('ft-custo-total').textContent=`R$ ${custo.toFixed(2)}`;
+  const el=document.getElementById('ft-margem');
+  if(preco>0){
+    const margem=((preco-custo)/preco*100).toFixed(1);
+    el.textContent=`Margem: ${margem}%`;
+    el.style.color=parseFloat(margem)>=60?'var(--ok)':'var(--warn)';
+  } else {
+    el.textContent='Informe o preço de venda para calcular margem';
+    el.style.color='var(--text2)';
+  }
+}
+
+function salvarFicha(){
+  const nome=document.getElementById('ft-nome').value.trim();
+  if(!nome){alert('Nome obrigatório');return;}
+  if(!_fichaInsumos.length){alert('Adicione pelo menos um insumo');return;}
+  _fichas.push({
+    id:Date.now(),nome,
+    tipo:document.getElementById('ft-tipo').value,
+    empresa:document.getElementById('ft-empresa').value,
+    preco:parseFloat(document.getElementById('ft-preco').value)||0,
+    insumos:JSON.parse(JSON.stringify(_fichaInsumos)),
+  });
+  saveFichas(); fecharModalFicha(); renderFichas();
+  showSyncBar(`✅ ${nome} salvo`);
+}
+
+function abrirDetalheFicha(idx){
+  _fichaEditIdx=idx;
+  const f=_fichas[idx];
+  const custo=custoFicha(f), margem=margemFicha(f);
+  document.getElementById('mdf-nome').textContent=f.nome;
+  document.getElementById('mdf-tags').innerHTML=`
+    <span class="tag ${f.empresa==='Bica Bar'?'tag-bica':f.empresa==='AMP 213'?'tag-amp':'tag-both'}">${f.empresa}</span>
+    <span class="tag tag-both">${f.tipo}</span>`;
+  document.getElementById('mdf-custo').textContent=`R$ ${custo.toFixed(2)}`;
+  document.getElementById('mdf-venda').textContent=f.preco?`R$ ${f.preco.toFixed(2)}`:'—';
+  const mEl=document.getElementById('mdf-margem');
+  mEl.textContent=margem?`${margem}%`:'—';
+  mEl.style.color=margem&&parseFloat(margem)>=60?'var(--ok)':'var(--warn)';
+  document.getElementById('mdf-insumos').innerHTML=`<div style="margin-bottom:12px">
+    ${f.insumos.map(i=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <div><div style="font-weight:500">${i.nome}</div><div style="font-size:11px;color:var(--text3)">${i.qtd} ${i.un}</div></div>
+      <div style="text-align:right"><div style="font-family:var(--mono);font-size:12px;color:var(--text2)">R$${i.custo.toFixed(2)}/${i.un}</div><div style="font-weight:600;color:var(--danger)">R$${(i.qtd*i.custo).toFixed(2)}</div></div>
+    </div>`).join('')}
+  </div>`;
+  document.getElementById('modal-detalhe-ficha').classList.add('open');
+}
+
+function deletarFicha(){
+  if(_fichaEditIdx===null) return;
+  if(!confirm('Remover esta ficha?')) return;
+  _fichas.splice(_fichaEditIdx,1);
+  saveFichas();
+  document.getElementById('modal-detalhe-ficha').classList.remove('open');
+  renderFichas();
+}
+
+function adicionarCompraManual(){
+  const nome=document.getElementById('cmv-item-nome').value.trim();
+  const val=parseFloat(document.getElementById('cmv-item-val').value)||0;
+  const empresa=document.getElementById('cmv-item-empresa').value;
+  if(!nome||!val){alert('Informe o item e o valor');return;}
+  _cmvCompras.push({id:Date.now(),nome,val,empresa,ts:new Date().toISOString()});
+  saveFichas();
+  document.getElementById('cmv-item-nome').value='';
+  document.getElementById('cmv-item-val').value='';
+  calcularCMV();
+}
+
+function calcularCMV(){
+  loadFichas();
+  const fatBica=parseFloat(document.getElementById('fat-bica')?.value)||0;
+  const fatAmp=parseFloat(document.getElementById('fat-amp')?.value)||0;
+  const cmvBica=_cmvCompras.filter(c=>c.empresa==='Bica Bar').reduce((s,c)=>s+c.val,0);
+  const cmvAmp=_cmvCompras.filter(c=>c.empresa==='AMP 213').reduce((s,c)=>s+c.val,0);
+  const cmvComp=_cmvCompras.filter(c=>c.empresa==='Compartilhado').reduce((s,c)=>s+c.val,0)/2;
+  const totalBica=cmvBica+cmvComp, totalAmp=cmvAmp+cmvComp, total=totalBica+totalAmp;
+  const el=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+  el('cmv-bica-val',`R$ ${totalBica.toFixed(2)}`);
+  el('cmv-amp-val',`R$ ${totalAmp.toFixed(2)}`);
+  el('cmv-total-val',`R$ ${total.toFixed(2)}`);
+  if(fatBica>0) el('cmv-bica-pct',`${(totalBica/fatBica*100).toFixed(1)}% do fat.`);
+  if(fatAmp>0)  el('cmv-amp-pct',`${(totalAmp/fatAmp*100).toFixed(1)}% do fat.`);
+  if(fatBica+fatAmp>0){
+    const pct=total/(fatBica+fatAmp)*100;
+    el('cmv-total-ref',`${pct.toFixed(1)}% do faturamento · ${pct<=35?'✅ dentro do ideal':'⚠️ acima de 35%'}`);
+  }
+  const lista=document.getElementById('cmv-compras-lista');
+  if(!lista) return;
+  if(!_cmvCompras.length){
+    lista.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">Nenhuma compra registrada ainda.</div>';
+    return;
+  }
+  lista.innerHTML=_cmvCompras.map((c,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <div>
+        <div style="font-weight:500">${c.nome}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">${c.empresa} · ${new Date(c.ts).toLocaleDateString('pt-BR')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:var(--serif);font-weight:700;color:var(--danger)">R$ ${c.val.toFixed(2)}</span>
+        <button onclick="_cmvCompras.splice(${i},1);saveFichas();calcularCMV()" style="color:var(--text3);font-size:18px;padding:0;background:none;border:none;cursor:pointer">×</button>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════
 // ESTOQUE DATA
 // ════════════════════════════════════════════════
 const ESTOQUE_CATS = [
@@ -2732,6 +3239,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const t=localStorage.getItem('notion_token');
   if(t){document.getElementById('cfg-token').value=t;setSyncStatus('ok','conectado');}
   loadCompras();
+  loadFichas();
   updateDashStats();
   renderAccordions();
 });
