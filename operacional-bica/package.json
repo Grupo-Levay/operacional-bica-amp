@@ -1,0 +1,17 @@
+{
+  "name": "operacional-bica-amp",
+  "version": "1.0.0",
+  "description": "Operacional Bica & AMP",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static HTML - no build needed'"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.12"
+  },
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
