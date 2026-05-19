@@ -24,11 +24,10 @@ async function getUserCasas(): Promise<Casa[]> {
 
 async function switchCasa(formData: FormData) {
   "use server"
-  const casa = formData.get("casa") as Casa
-  if (casa === "bica" || casa === "amp") {
-    await setCurrentCasa(casa)
-    revalidatePath("/", "layout")
-  }
+  const raw = formData.get("casa")
+  if (raw !== "bica" && raw !== "amp") return
+  await setCurrentCasa(raw)
+  revalidatePath("/", "layout")
 }
 
 export async function CasaSwitcher() {

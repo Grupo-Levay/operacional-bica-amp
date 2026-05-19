@@ -1,25 +1,29 @@
 import { CheckSquare } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ChecklistCard } from '@/components/checklists/checklist-card'
+import { getCurrentCasa } from '@/lib/tenant'
+import { getTodayISO } from '@/lib/utils'
 import type { Database } from '@/types/database.types'
 
 type Checklist = Database['public']['Tables']['checklists']['Row']
 type Registro = Database['public']['Tables']['checklist_registros']['Row']
 
-async function getChecklists(): Promise<{ checklists: Checklist[]; registros: Registro[] }> {
+async function getChecklists(casa: string): Promise<{ checklists: Checklist[]; registros: Registro[] }> {
   try {
     const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
-    const hoje = new Date().toISOString().split('T')[0]
+    const hoje = getTodayISO()
 
     const { data: checklists } = await supabase
       .from('checklists')
       .select('*')
+      .eq('casa', casa)
       .order('turno')
 
     const { data: registros } = await supabase
       .from('checklist_registros')
       .select('*')
+      .eq('casa', casa)
       .eq('data', hoje)
 
     return { checklists: checklists ?? [], registros: registros ?? [] }
@@ -38,7 +42,8 @@ function formatarData(date: Date): string {
 }
 
 export default async function ChecklistsPage() {
-  const { checklists, registros } = await getChecklists()
+  const casa = await getCurrentCasa()
+  const { checklists, registros } = await getChecklists(casa)
 
   const registroMap = new Map<string, Registro>()
   for (const reg of registros) {

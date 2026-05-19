@@ -2,3 +2,8 @@
 # XOIA
 .xoia-core/
 .claude/settings.local.json
+
+# Next.js build output
+app/.next/
+.next/
+.vercel/
