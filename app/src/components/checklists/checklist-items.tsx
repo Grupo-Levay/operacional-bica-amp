@@ -6,21 +6,15 @@ import { toggleChecklistItem } from '@/app/actions/checklist'
 
 type Props = {
   checklistId: string
-  turno: string
-  casa: string
   items: string[]
   concluidos: string[]
-  registroId?: string
   casaColor: string
 }
 
 export function ChecklistItems({
   checklistId,
-  turno,
-  casa,
   items,
   concluidos: initialConcluidos,
-  registroId: initialRegistroId,
   casaColor,
 }: Props) {
   const [concluidos, setConcluidos] = useState<Set<string>>(new Set(initialConcluidos))
@@ -38,10 +32,6 @@ export function ChecklistItems({
     startTransition(async () => {
       await toggleChecklistItem({
         checklistId,
-        turno,
-        casa,
-        item,
-        completed: next.has(item),
         currentConcluidos: Array.from(next),
         allDone: next.size === items.length,
       })
@@ -79,7 +69,7 @@ export function ChecklistItems({
                 type="button"
                 onClick={() => toggle(item)}
                 disabled={isPending}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3.5 text-left transition-colors hover:bg-accent active:bg-accent/80"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3.5 text-left transition-colors hover:bg-accent active:bg-accent/80 disabled:opacity-60"
                 style={{ minHeight: 52 }}
               >
                 {done ? (
@@ -92,7 +82,7 @@ export function ChecklistItems({
                   <Circle size={22} className="shrink-0 text-muted-foreground/40" />
                 )}
                 <span
-                  className={`text-sm leading-snug transition-colors ${done ? 'line-through text-muted-foreground' : ''}`}
+                  className={`text-sm leading-snug ${done ? 'line-through text-muted-foreground' : ''}`}
                 >
                   {item}
                 </span>

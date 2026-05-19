@@ -36,5 +36,6 @@ export async function setCurrentCasa(casa: Casa): Promise<void> {
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   })
 }

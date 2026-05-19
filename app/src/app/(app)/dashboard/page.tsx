@@ -8,12 +8,13 @@ import {
 } from "lucide-react"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { getCurrentCasa, CASA_LABELS } from "@/lib/tenant"
+import { getTodayISO } from "@/lib/utils"
 
 async function getDashboardData(casa: string) {
   try {
     const { createClient } = await import("@/lib/supabase/server")
     const supabase = await createClient()
-    const hoje = new Date().toISOString().split("T")[0]
+    const hoje = getTodayISO()
 
     const [pendentes, criticos, rodadas, equipe] = await Promise.all([
       supabase

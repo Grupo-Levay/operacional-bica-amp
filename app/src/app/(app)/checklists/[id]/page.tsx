@@ -2,22 +2,22 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { getCurrentCasa } from '@/lib/tenant'
+import { getTodayISO } from '@/lib/utils'
 import { ChecklistItems } from '@/components/checklists/checklist-items'
 
 async function getChecklistData(id: string, casa: string) {
   try {
     const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
-    const hoje = new Date().toISOString().split('T')[0]
 
     const [{ data: checklist }, { data: registro }] = await Promise.all([
       supabase.from('checklists').select('*').eq('id', id).eq('casa', casa).single(),
       supabase
         .from('checklist_registros')
-        .select('*')
+        .select('itens_concluidos')
         .eq('checklist_id', id)
         .eq('casa', casa)
-        .eq('data', hoje)
+        .eq('data', getTodayISO())
         .maybeSingle(),
     ])
 
@@ -53,30 +53,30 @@ export default async function ChecklistDetailPage({ params }: Props) {
         <Link
           href="/checklists"
           className="flex items-center justify-center size-9 rounded-full border transition-colors hover:bg-accent"
-          aria-label="Voltar"
+          aria-label="Voltar para checklists"
         >
           <ArrowLeft size={18} />
         </Link>
         <div className="min-w-0">
           <h1 className="text-lg font-semibold leading-tight truncate">{checklist.nome}</h1>
-          <p
-            className="text-xs font-medium capitalize"
-            style={{ color: casaColor }}
-          >
+          <p className="text-xs font-medium capitalize" style={{ color: casaColor }}>
             {checklist.turno}
           </p>
         </div>
       </div>
 
-      <ChecklistItems
-        checklistId={id}
-        turno={checklist.turno}
-        casa={casa}
-        items={items}
-        concluidos={concluidos}
-        registroId={registro?.id}
-        casaColor={casaColor}
-      />
+      {items.length === 0 ? (
+        <p className="py-10 text-center text-sm text-muted-foreground">
+          Nenhum item cadastrado neste checklist.
+        </p>
+      ) : (
+        <ChecklistItems
+          checklistId={id}
+          items={items}
+          concluidos={concluidos}
+          casaColor={casaColor}
+        />
+      )}
     </main>
   )
 }

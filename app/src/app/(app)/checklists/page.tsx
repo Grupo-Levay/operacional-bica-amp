@@ -2,6 +2,7 @@ import { CheckSquare } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ChecklistCard } from '@/components/checklists/checklist-card'
 import { getCurrentCasa } from '@/lib/tenant'
+import { getTodayISO } from '@/lib/utils'
 import type { Database } from '@/types/database.types'
 
 type Checklist = Database['public']['Tables']['checklists']['Row']
@@ -11,7 +12,7 @@ async function getChecklists(casa: string): Promise<{ checklists: Checklist[]; r
   try {
     const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
-    const hoje = new Date().toISOString().split('T')[0]
+    const hoje = getTodayISO()
 
     const { data: checklists } = await supabase
       .from('checklists')
