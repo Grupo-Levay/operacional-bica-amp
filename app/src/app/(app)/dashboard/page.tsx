@@ -1,6 +1,7 @@
 import Link from "next/link"
 import {
   AlertTriangle,
+  CalendarCheck,
   CheckSquare,
   Package,
   RefreshCw,
@@ -16,7 +17,7 @@ async function getDashboardData(casa: string) {
     const supabase = await createClient()
     const hoje = getTodayISO()
 
-    const [pendentes, criticos, rodadas, equipe] = await Promise.all([
+    const [pendentes, criticos, rodadas, equipe, reservasPendentes] = await Promise.all([
       supabase
         .from("checklist_registros")
         .select("id", { count: "exact", head: true })
@@ -39,6 +40,12 @@ async function getDashboardData(casa: string) {
         .select("id", { count: "exact", head: true })
         .eq("casa", casa)
         .eq("ativo", true),
+      supabase
+        .from("reservations")
+        .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
+        .eq("reservation_date", hoje)
+        .eq("status", "pendente"),
     ])
 
     return {
@@ -46,9 +53,10 @@ async function getDashboardData(casa: string) {
       criticos: criticos.count ?? 0,
       rodadas: rodadas.count ?? 0,
       equipe: equipe.count ?? 0,
+      reservasPendentes: reservasPendentes.count ?? 0,
     }
   } catch {
-    return { pendentes: 0, criticos: 0, rodadas: 0, equipe: 0 }
+    return { pendentes: 0, criticos: 0, rodadas: 0, equipe: 0, reservasPendentes: 0 }
   }
 }
 
@@ -63,7 +71,7 @@ function formatarDataHoje(): string {
 
 export default async function DashboardPage() {
   const casa = await getCurrentCasa()
-  const { pendentes, criticos, rodadas, equipe } = await getDashboardData(casa)
+  const { pendentes, criticos, rodadas, equipe, reservasPendentes } = await getDashboardData(casa)
 
   const dataHoje = formatarDataHoje()
   const casaColor = casa === "bica" ? "var(--color-bica)" : "var(--color-amp)"
@@ -110,6 +118,15 @@ export default async function DashboardPage() {
             sub="membros ativos"
             icon={<Users />}
           />
+          <Link href="/reservas" className="block">
+            <StatCard
+              label="Reservas Pendentes"
+              value={reservasPendentes}
+              sub={reservasPendentes === 0 ? "nenhuma hoje" : "aguardando confirmação"}
+              accent={reservasPendentes > 0 ? "danger" : undefined}
+              icon={<CalendarCheck />}
+            />
+          </Link>
         </div>
       </section>
 
@@ -148,6 +165,22 @@ export default async function DashboardPage() {
             {criticos > 0 && (
               <span className="ml-1 rounded-full bg-white/25 px-2 py-0.5 text-xs font-bold">
                 {criticos}
+              </span>
+            )}
+          </Link>
+          <Link
+            href="/reservas"
+            className="flex items-center justify-center gap-2 rounded-lg px-4 font-semibold transition-opacity hover:opacity-90 active:opacity-80 border"
+            style={{ height: 56 }}
+          >
+            <CalendarCheck className="size-5" />
+            Reservas de Hoje
+            {reservasPendentes > 0 && (
+              <span
+                className="ml-1 rounded-full px-2 py-0.5 text-xs font-bold text-white"
+                style={{ backgroundColor: "var(--color-amp)" }}
+              >
+                {reservasPendentes}
               </span>
             )}
           </Link>
