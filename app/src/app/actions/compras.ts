@@ -52,6 +52,7 @@ export async function fecharRodada(rodadaId: string) {
     .from('rodada_itens')
     .select('total, preco_unit, quantidade')
     .eq('rodada_id', rodadaId)
+    .eq('casa', casa)
 
   const total = (itens ?? []).reduce((sum, item) => {
     return sum + (item.total ?? (item.preco_unit ?? 0) * (item.quantidade ?? 1))
