@@ -1,6 +1,7 @@
 import { Package } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ItemEstoque } from '@/components/estoque/item-estoque'
+import { AbastecimentoSubnav } from '@/components/layout/abastecimento-subnav'
 import { getCurrentCasa } from '@/lib/tenant'
 import type { Database } from '@/types/database.types'
 
@@ -59,18 +60,16 @@ export default async function EstoquePage({ searchParams }: Props) {
   return (
     <main className="p-4 space-y-5 pb-24">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold" style={{ color: casaColor }}>Estoque</h1>
-          <p className="text-xs text-muted-foreground">
-            {itens.length} {itens.length === 1 ? 'item' : 'itens'} cadastrados
-          </p>
+      <div className="space-y-3">
+        <h1 className="text-xl font-bold" style={{ color: casaColor }}>Abastecimento</h1>
+        <div className="flex items-center justify-between gap-2">
+          <AbastecimentoSubnav casaColor={casaColor} />
+          {criticos.length > 0 && (
+            <Badge variant="destructive" className="shrink-0">
+              {criticos.length} crítico{criticos.length !== 1 ? 's' : ''}
+            </Badge>
+          )}
         </div>
-        {criticos.length > 0 && (
-          <Badge variant="destructive" className="shrink-0 mt-1">
-            {criticos.length} crítico{criticos.length !== 1 ? 's' : ''}
-          </Badge>
-        )}
       </div>
 
       {/* Filtro por categoria — links de URL para manter server-side */}

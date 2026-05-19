@@ -2,15 +2,22 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, CheckSquare, ShoppingCart, Package, Calendar, ChefHat } from "lucide-react"
+import { Home, CheckSquare, Layers, Calendar, ChefHat, CalendarCheck } from "lucide-react"
 
-const tabs = [
-  { href: "/dashboard",   label: "Início",      icon: Home },
-  { href: "/checklists",  label: "Checklists",  icon: CheckSquare },
-  { href: "/compras",     label: "Compras",     icon: ShoppingCart },
-  { href: "/estoque",     label: "Estoque",     icon: Package },
-  { href: "/escala",      label: "Escala",      icon: Calendar },
-  { href: "/fichas",      label: "Fichas",      icon: ChefHat },
+type Tab = {
+  href: string
+  label: string
+  icon: React.ElementType
+  match: (pathname: string) => boolean
+}
+
+const tabs: Tab[] = [
+  { href: "/dashboard",  label: "Início",       icon: Home,          match: (p) => p.startsWith("/dashboard") },
+  { href: "/checklists", label: "Checklists",   icon: CheckSquare,   match: (p) => p.startsWith("/checklists") },
+  { href: "/estoque",    label: "Abastec.",     icon: Layers,        match: (p) => p.startsWith("/estoque") || p.startsWith("/compras") },
+  { href: "/escala",     label: "Escala",       icon: Calendar,      match: (p) => p.startsWith("/escala") },
+  { href: "/fichas",     label: "Fichas",       icon: ChefHat,       match: (p) => p.startsWith("/fichas") },
+  { href: "/reservas",   label: "Reservas",     icon: CalendarCheck, match: (p) => p.startsWith("/reservas") },
 ]
 
 export function BottomNav() {
@@ -22,8 +29,8 @@ export function BottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="flex h-16 items-stretch">
-        {tabs.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href)
+        {tabs.map(({ href, label, icon: Icon, match }) => {
+          const active = match(pathname)
           return (
             <Link
               key={href}

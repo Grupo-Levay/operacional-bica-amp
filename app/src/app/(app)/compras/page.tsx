@@ -1,5 +1,6 @@
 import { RodadaCard } from '@/components/compras/rodada-card'
 import { NovaRodadaBtn } from '@/components/compras/nova-rodada-btn'
+import { AbastecimentoSubnav } from '@/components/layout/abastecimento-subnav'
 import { getCurrentCasa } from '@/lib/tenant'
 import type { Tables } from '@/types/database.types'
 
@@ -50,11 +51,12 @@ export default async function ComprasPage() {
 
   return (
     <main className="p-4 space-y-6 pb-24">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-bold" style={{ color: casaColor }}>
-          Compras
-        </h1>
-        <NovaRodadaBtn />
+      <div className="space-y-3">
+        <h1 className="text-xl font-bold" style={{ color: casaColor }}>Abastecimento</h1>
+        <div className="flex items-center justify-between gap-2">
+          <AbastecimentoSubnav casaColor={casaColor} />
+          <NovaRodadaBtn />
+        </div>
       </div>
 
       <section className="space-y-3">
