@@ -1,6 +1,7 @@
-"use client"
+'use client'
 
-import { Badge } from "@/components/ui/badge"
+import { useState, useTransition } from 'react'
+import { confirmarPresenca } from '@/app/actions/escala'
 
 type Membro = {
   id: string
@@ -28,15 +29,53 @@ type Props = {
 }
 
 const TURNO_LABEL: Record<string, string> = {
-  AB: "AB",
-  FE: "FE",
+  abertura: 'AB',
+  fechamento: 'FE',
+  AB: 'AB',
+  FE: 'FE',
+  manha: 'MH',
+  tarde: 'TD',
+  noite: 'NT',
+  integral: 'IN',
 }
 
 function formatDia(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    weekday: "short",
-    day: "numeric",
+  return new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'short',
+    day: 'numeric',
   }).format(date)
+}
+
+function CelulaEscala({ item }: { item: EscalaItem }) {
+  const [confirmado, setConfirmado] = useState(item.confirmado ?? false)
+  const [isPending, startTransition] = useTransition()
+
+  function handleToggle() {
+    const next = !confirmado
+    setConfirmado(next)
+    startTransition(async () => {
+      await confirmarPresenca(item.id, next)
+    })
+  }
+
+  const label = TURNO_LABEL[item.turno] ?? item.turno.slice(0, 2).toUpperCase()
+
+  return (
+    <button
+      type="button"
+      onClick={handleToggle}
+      disabled={isPending}
+      title={confirmado ? 'Clique para desconfirmar' : 'Clique para confirmar'}
+      className="flex items-center justify-center h-9 w-full rounded text-[10px] font-bold border transition-colors disabled:opacity-60"
+      style={
+        confirmado
+          ? { backgroundColor: 'var(--color-bica)', color: '#fff', borderColor: 'var(--color-bica)' }
+          : { backgroundColor: 'transparent', color: 'hsl(var(--muted-foreground))', borderColor: 'hsl(var(--border))' }
+      }
+    >
+      {label}
+    </button>
+  )
 }
 
 export function EscalaGrid({ membros, escala, dias }: Props) {
@@ -48,7 +87,7 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
     )
   }
 
-  // Index escala por membro_id + data
+  // index: membro_id__data → EscalaItem
   const escalaIndex = new Map<string, EscalaItem>()
   for (const item of escala) {
     if (item.membro_id) {
@@ -56,26 +95,22 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
     }
   }
 
-  const hasEscala = escala.length > 0
-
   return (
     <div>
-      {!hasEscala && (
+      {escala.length === 0 && (
         <p className="text-sm text-muted-foreground mb-4">
           Nenhuma escala para esta semana
         </p>
       )}
 
       <div className="overflow-x-auto -mx-4 px-4">
-        <div className="min-w-[480px]">
-          {/* Header row */}
+        <div className="min-w-[440px]">
+          {/* Header */}
           <div
             className="grid gap-1 mb-1"
-            style={{ gridTemplateColumns: `180px repeat(${dias.length}, 1fr)` }}
+            style={{ gridTemplateColumns: `160px repeat(${dias.length}, 1fr)` }}
           >
-            <div className="text-xs text-muted-foreground font-medium py-1">
-              Membro
-            </div>
+            <div className="text-xs text-muted-foreground font-medium py-1">Membro</div>
             {dias.map((dia) => (
               <div
                 key={dia.toISOString()}
@@ -86,18 +121,15 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
             ))}
           </div>
 
-          {/* Member rows */}
+          {/* Linhas de membros */}
           <div className="flex flex-col gap-1">
             {membros.map((membro) => (
               <div
                 key={membro.id}
                 className="grid gap-1 items-center"
-                style={{
-                  gridTemplateColumns: `180px repeat(${dias.length}, 1fr)`,
-                }}
+                style={{ gridTemplateColumns: `160px repeat(${dias.length}, 1fr)` }}
               >
-                {/* Member info */}
-                <div className="flex flex-col py-2 pr-2">
+                <div className="flex flex-col py-1.5 pr-2">
                   <span className="font-semibold text-sm leading-tight truncate">
                     {membro.nome}
                   </span>
@@ -106,34 +138,16 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
                   </span>
                 </div>
 
-                {/* Day cells */}
                 {dias.map((dia) => {
-                  const dataStr = dia.toISOString().split("T")[0]
+                  const dataStr = dia.toISOString().split('T')[0]
                   const item = escalaIndex.get(`${membro.id}__${dataStr}`)
 
                   return (
-                    <div
-                      key={dataStr}
-                      className="flex items-center justify-center h-10"
-                    >
+                    <div key={dataStr} className="flex items-center justify-center">
                       {item ? (
-                        <Badge
-                          className={
-                            item.confirmado
-                              ? "text-[10px] font-bold px-1.5 h-7 text-white border-0"
-                              : "text-[10px] font-bold px-1.5 h-7 border-0"
-                          }
-                          style={
-                            item.confirmado
-                              ? { backgroundColor: "var(--color-bica)" }
-                              : undefined
-                          }
-                          variant={item.confirmado ? "default" : "secondary"}
-                        >
-                          {TURNO_LABEL[item.turno] ?? item.turno}
-                        </Badge>
+                        <CelulaEscala item={item} />
                       ) : (
-                        <span className="text-xs text-muted-foreground/50">
+                        <span className="text-xs text-muted-foreground/40 text-center w-full block">
                           –
                         </span>
                       )}
@@ -147,22 +161,18 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
       </div>
 
       {/* Legenda */}
-      <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
-        <span>
-          <span className="font-semibold">AB</span> = Abertura
-        </span>
-        <span>
-          <span className="font-semibold">FE</span> = Fechamento
-        </span>
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+        <span><strong>AB</strong> Abertura</span>
+        <span><strong>FE</strong> Fechamento</span>
+        <span><strong>MH</strong> Manhã</span>
+        <span><strong>TD</strong> Tarde</span>
+        <span><strong>NT</strong> Noite</span>
         <span className="flex items-center gap-1">
-          <span
-            className="inline-block w-3 h-3 rounded-sm"
-            style={{ backgroundColor: "var(--color-bica)" }}
-          />
+          <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: 'var(--color-bica)' }} />
           Confirmado
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-sm bg-secondary" />
+          <span className="inline-block w-3 h-3 rounded-sm border" />
           Não confirmado
         </span>
       </div>
