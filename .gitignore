@@ -6,3 +6,4 @@
 # Next.js build output
 app/.next/
 .next/
+.vercel/
