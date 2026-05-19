@@ -544,6 +544,7 @@ export type Database = {
       team_members: {
         Row: {
           active: boolean
+          casas: string[]
           created_at: string
           display_name: string
           email: string
@@ -554,6 +555,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          casas?: string[]
           created_at?: string
           display_name: string
           email: string
@@ -564,6 +566,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          casas?: string[]
           created_at?: string
           display_name?: string
           email?: string
@@ -581,6 +584,7 @@ export type Database = {
     Functions: {
       is_active_team_member: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      member_has_casa: { Args: { p_casa: string }; Returns: boolean }
     }
     Enums: {
       reservation_status: "pendente" | "confirmada" | "cancelada" | "concluida"
