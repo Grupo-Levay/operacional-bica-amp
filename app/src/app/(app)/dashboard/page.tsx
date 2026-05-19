@@ -7,8 +7,9 @@ import {
   Users,
 } from "lucide-react"
 import { StatCard } from "@/components/dashboard/stat-card"
+import { getCurrentCasa, CASA_LABELS } from "@/lib/tenant"
 
-async function getDashboardData() {
+async function getDashboardData(casa: string) {
   try {
     const { createClient } = await import("@/lib/supabase/server")
     const supabase = await createClient()
@@ -18,20 +19,24 @@ async function getDashboardData() {
       supabase
         .from("checklist_registros")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .eq("data", hoje)
         .eq("concluido", false),
       supabase
         .from("estoque_itens")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .filter("atual", "lt", "minimo")
         .eq("ativo", true),
       supabase
         .from("rodadas")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .eq("status", "aberta"),
       supabase
         .from("equipe")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .eq("ativo", true),
     ])
 
@@ -56,16 +61,19 @@ function formatarDataHoje(): string {
 }
 
 export default async function DashboardPage() {
-  const { pendentes, criticos, rodadas, equipe } = await getDashboardData()
+  const casa = await getCurrentCasa()
+  const { pendentes, criticos, rodadas, equipe } = await getDashboardData(casa)
 
   const dataHoje = formatarDataHoje()
+  const casaColor = casa === "bica" ? "var(--color-bica)" : "var(--color-amp)"
+  const casaLabel = CASA_LABELS[casa]
 
   return (
     <main className="p-4 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-bica)" }}>
-          Bica &amp; AMP 213
+        <h1 className="text-xl font-bold" style={{ color: casaColor }}>
+          {casaLabel}
         </h1>
         <p className="text-sm text-muted-foreground capitalize">{dataHoje}</p>
       </div>
