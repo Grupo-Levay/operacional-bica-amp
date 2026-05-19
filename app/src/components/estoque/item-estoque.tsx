@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { registrarContagem } from '@/app/actions/estoque'
+import { useToast } from '@/components/ui/toast'
 
 type ItemEstoqueProps = {
   id: string
@@ -43,6 +44,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo, updatedAt }: Ite
   const [erro, setErro] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const inputRef = useRef<HTMLInputElement>(null)
+  const toast = useToast()
 
   const status = getStatus(atual, minimo)
   const cfg = STATUS_CONFIG[status]
@@ -73,8 +75,10 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo, updatedAt }: Ite
       const result = await registrarContagem(id, qty)
       if (result?.error) {
         setErro(result.error)
+        toast.error(result.error)
       } else {
         setEditando(false)
+        toast.success(`${nome}: contagem salva`)
       }
     })
   }

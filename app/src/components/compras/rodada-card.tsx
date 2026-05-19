@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { Tables } from '@/types/database.types'
 import { toggleItemComprado, fecharRodada } from '@/app/actions/compras'
+import { useToast } from '@/components/ui/toast'
 
 type RodadaItem = Tables<'rodada_itens'>
 type Rodada = Tables<'rodadas'> & { rodada_itens: RodadaItem[] }
@@ -30,6 +31,7 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
   const [togglePending, startToggle] = useTransition()
   const [fechando, setFechando] = useState(false)
   const [fecharPending, startFechar] = useTransition()
+  const toast = useToast()
 
   const totalComprado = Array.from(compradoMap.values()).filter(Boolean).length
 
@@ -45,6 +47,7 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
     startFechar(async () => {
       await fecharRodada(rodada.id)
       setFechando(false)
+      toast.success('Rodada fechada com sucesso')
     })
   }
 

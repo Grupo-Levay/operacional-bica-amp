@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { updateReservaStatus, type ReservaStatus } from '@/app/actions/reservas'
+import { useToast } from '@/components/ui/toast'
 
 type Reserva = {
   id: string
@@ -48,6 +49,7 @@ export function ReservaCard({ reserva, casaColor }: { reserva: Reserva; casaColo
   const [status, setStatus] = useState<ReservaStatus>(reserva.status)
   const [isPending, startTransition] = useTransition()
   const [confirmAction, setConfirmAction] = useState<ReservaStatus | null>(null)
+  const toast = useToast()
 
   function handleStatus(next: ReservaStatus) {
     if (next === 'cancelada' || next === 'concluida') {
@@ -61,7 +63,9 @@ export function ReservaCard({ reserva, casaColor }: { reserva: Reserva; casaColo
     setStatus(next)
     setConfirmAction(null)
     startTransition(async () => {
-      await updateReservaStatus(reserva.id, next)
+      const result = await updateReservaStatus(reserva.id, next)
+      if (result?.error) toast.error(result.error)
+      else toast.success(`Reserva ${STATUS_LABEL[next].toLowerCase()}`)
     })
   }
 

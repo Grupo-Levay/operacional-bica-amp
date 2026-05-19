@@ -3,11 +3,13 @@
 import { useState, useTransition } from 'react'
 import { Plus } from 'lucide-react'
 import { criarRodada } from '@/app/actions/compras'
+import { useToast } from '@/components/ui/toast'
 
 export function NovaRodadaBtn() {
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const toast = useToast()
 
   function handleConfirm() {
     setError(null)
@@ -15,9 +17,11 @@ export function NovaRodadaBtn() {
       const result = await criarRodada()
       if (result?.error) {
         setError(result.error)
+        toast.error(result.error)
         setConfirming(false)
       } else {
         setConfirming(false)
+        toast.success('Rodada criada com itens críticos')
       }
     })
   }

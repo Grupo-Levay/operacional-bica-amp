@@ -9,7 +9,9 @@ async function getEscalaData(casa: string, inicioStr: string, fimStr: string) {
     const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
-    const [{ data: membros }, { data: escala }] = await Promise.all([
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const [{ data: membros }, { data: escala }, { data: member }] = await Promise.all([
       supabase.from('equipe').select('*').eq('casa', casa).eq('ativo', true).order('nome'),
       supabase
         .from('escala')
@@ -17,11 +19,18 @@ async function getEscalaData(casa: string, inicioStr: string, fimStr: string) {
         .eq('casa', casa)
         .gte('data', inicioStr)
         .lte('data', fimStr),
+      user
+        ? supabase.from('team_members').select('role').eq('id', user.id).maybeSingle()
+        : Promise.resolve({ data: null }),
     ])
 
-    return { membros: membros ?? [], escala: escala ?? [] }
+    return {
+      membros: membros ?? [],
+      escala: escala ?? [],
+      isAdmin: member?.role === 'admin',
+    }
   } catch {
-    return { membros: [], escala: [] }
+    return { membros: [], escala: [], isAdmin: false }
   }
 }
 
@@ -64,7 +73,7 @@ export default async function EscalaPage({ searchParams }: Props) {
   const semanaAnterior = addDays(inicioStr, -7)
   const proximaSemana = addDays(inicioStr, 7)
 
-  const { membros, escala } = await getEscalaData(casa, inicioStr, fimStr)
+  const { membros, escala, isAdmin } = await getEscalaData(casa, inicioStr, fimStr)
   const casaColor = casa === 'bica' ? 'var(--color-bica)' : 'var(--color-amp)'
   const dias = buildSemana(inicioStr)
 
@@ -116,7 +125,7 @@ export default async function EscalaPage({ searchParams }: Props) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <EscalaGrid membros={membros} escala={escala} dias={dias} />
+          <EscalaGrid membros={membros} escala={escala} dias={dias} isAdmin={isAdmin} />
         </CardContent>
       </Card>
     </main>
