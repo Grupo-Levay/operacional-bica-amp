@@ -1,0 +1,209 @@
+# squad-design.yaml — gerado por Craft (@squad-creator)
+# Projeto: operacional-bica-amp
+# Data: 2026-05-19
+
+squad:
+  name: operacional-bica-amp-squad
+  description: "Squad operacional para Bica Bar & AMP 213 — checklists, compras, estoque, escala e CMV"
+  domain: gestao-operacional-bar
+
+analysis:
+  entities:
+    - Casa
+    - Checklist
+    - RodadaCompra
+    - ItemCompra
+    - Estoque
+    - Colaborador
+    - Funcao
+    - Fornecedor
+    - FichaTecnica
+    - CMV
+    - RegistroOperacional
+    - TokenNotion
+  workflows:
+    - abertura-fechamento
+    - rodada-compras
+    - contagem-estoque
+    - sync-notion
+    - gestao-escala
+    - ficha-tecnica-cmv
+  integrations:
+    - Notion API
+    - Vercel
+    - localStorage
+  stakeholders:
+    - Lana (operacional diário)
+    - Ruan (estoque semanal)
+    - Thaynan (auditoria)
+    - Erick/Gabriel (estratégico)
+
+recommendations:
+  agents:
+    - id: operacional-manager
+      role: "Orquestra abertura e fechamento das casas, executa checklists e registra turnos no Notion"
+      commands:
+        - abrir-casa
+        - fechar-casa
+        - registrar-turno
+        - reset-checklist
+      confidence: 0.96
+      user_added: false
+      user_modified: false
+
+    - id: compras-manager
+      role: "Gestão da lista semanal e rodadas de compra, controle de status por item e sync com Notion"
+      commands:
+        - nova-rodada
+        - fechar-rodada
+        - atualizar-item
+        - exportar-lista
+        - sync-compras
+      confidence: 0.94
+      user_added: false
+      user_modified: false
+
+    - id: estoque-manager
+      role: "Contagem semanal de insumos, alertas de mínimo e disparo automático para lista de compras"
+      commands:
+        - iniciar-contagem
+        - salvar-contagem
+        - alertas-minimo
+        - adicionar-compras
+      confidence: 0.91
+      user_added: false
+      user_modified: false
+
+    - id: escala-manager
+      role: "Visualização da equipe, funções por colaborador e alertas de conflito de escala"
+      commands:
+        - ver-escala
+        - ver-funcoes
+        - alertas-equipe
+      confidence: 0.88
+      user_added: false
+      user_modified: false
+
+    - id: cmv-manager
+      role: "Fichas técnicas por prato/drink, custo por insumo, CMV semanal e mensal por casa"
+      commands:
+        - nova-ficha
+        - calcular-cmv
+        - relatorio-margem
+        - registrar-compra-nf
+      confidence: 0.87
+      user_added: false
+      user_modified: false
+
+  tasks:
+    # operacional-manager
+    - name: abrir-casa
+      agent: operacional-manager
+      entrada: [casa, responsavel, hora_inicio]
+      saida: [checklist_id, itens_pendentes, registro_notion]
+      confidence: 0.95
+
+    - name: fechar-casa
+      agent: operacional-manager
+      entrada: [casa, responsavel, hora_fim, valor_caixa]
+      saida: [registro_id, itens_nao_concluidos, sync_status]
+      confidence: 0.94
+
+    - name: registrar-turno
+      agent: operacional-manager
+      entrada: [checklist_id, obs, hora_inicio, hora_fim]
+      saida: [notion_page_id, confirmacao]
+      confidence: 0.91
+
+    - name: reset-checklist
+      agent: operacional-manager
+      entrada: [checklist_id]
+      saida: [estado_limpo]
+      confidence: 0.89
+
+    # compras-manager
+    - name: nova-rodada
+      agent: compras-manager
+      entrada: [semana_ref]
+      saida: [rodada_id, itens_pendentes]
+      confidence: 0.93
+
+    - name: fechar-rodada
+      agent: compras-manager
+      entrada: [rodada_id]
+      saida: [resumo_faltantes, historico_salvo]
+      confidence: 0.92
+
+    - name: atualizar-item
+      agent: compras-manager
+      entrada: [item_id, status, forn_alternativo, obs]
+      saida: [item_atualizado, progresso_geral]
+      confidence: 0.95
+
+    - name: exportar-lista
+      agent: compras-manager
+      entrada: [rodada_id, formato]
+      saida: [arquivo_exportado]
+      confidence: 0.90
+
+    - name: sync-compras
+      agent: compras-manager
+      entrada: [semana_ref, token_notion]
+      saida: [itens_sincronizados, erros]
+      confidence: 0.88
+
+    # estoque-manager
+    - name: iniciar-contagem
+      agent: estoque-manager
+      entrada: [data_contagem, responsavel]
+      saida: [formulario_contagem]
+      confidence: 0.92
+
+    - name: salvar-contagem
+      agent: estoque-manager
+      entrada: [quantidades, data]
+      saida: [itens_baixo_minimo, compras_geradas]
+      confidence: 0.94
+
+    - name: alertas-minimo
+      agent: estoque-manager
+      entrada: []
+      saida: [lista_alertas, count_criticos]
+      confidence: 0.90
+
+    # escala-manager
+    - name: ver-funcoes
+      agent: escala-manager
+      entrada: [colaborador]
+      saida: [areas_responsabilidade, alertas]
+      confidence: 0.88
+
+    # cmv-manager
+    - name: nova-ficha
+      agent: cmv-manager
+      entrada: [nome, tipo, insumos, preco_venda]
+      saida: [ficha_id, custo_total, margem]
+      confidence: 0.87
+
+    - name: calcular-cmv
+      agent: cmv-manager
+      entrada: [periodo, casa]
+      saida: [cmv_valor, cmv_pct, faturamento]
+      confidence: 0.89
+
+    - name: relatorio-margem
+      agent: cmv-manager
+      entrada: [periodo]
+      saida: [margem_bica, margem_amp, consolidado]
+      confidence: 0.86
+
+  template: basic
+  config_mode: extend
+
+metadata:
+  created_at: "2026-05-19T00:00:00Z"
+  source_docs:
+    - "./operacional-bica/index.html"
+    - "session-context: operacional-bica-amp"
+  user_adjustments: 0
+  overall_confidence: 0.91

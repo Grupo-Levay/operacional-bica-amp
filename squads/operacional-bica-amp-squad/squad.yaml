@@ -1,0 +1,94 @@
+name: operacional-bica-amp-squad
+version: 1.0.0
+description: "Squad operacional para Bica Bar & AMP 213 — checklists, compras, estoque, escala e CMV"
+domain: gestao-operacional-bar
+author: Grupo Levay
+license: UNLICENSED
+template: basic
+config_mode: extend
+
+agents:
+  - id: operacional-manager
+    file: agents/operacional-manager.md
+  - id: compras-manager
+    file: agents/compras-manager.md
+  - id: estoque-manager
+    file: agents/estoque-manager.md
+  - id: escala-manager
+    file: agents/escala-manager.md
+  - id: cmv-manager
+    file: agents/cmv-manager.md
+
+tasks:
+  - name: abrir-casa
+    agent: operacional-manager
+    file: tasks/abrir-casa.md
+  - name: fechar-casa
+    agent: operacional-manager
+    file: tasks/fechar-casa.md
+  - name: registrar-turno
+    agent: operacional-manager
+    file: tasks/registrar-turno.md
+  - name: reset-checklist
+    agent: operacional-manager
+    file: tasks/reset-checklist.md
+  - name: nova-rodada
+    agent: compras-manager
+    file: tasks/nova-rodada.md
+  - name: fechar-rodada
+    agent: compras-manager
+    file: tasks/fechar-rodada.md
+  - name: atualizar-item
+    agent: compras-manager
+    file: tasks/atualizar-item.md
+  - name: exportar-lista
+    agent: compras-manager
+    file: tasks/exportar-lista.md
+  - name: sync-compras
+    agent: compras-manager
+    file: tasks/sync-compras.md
+  - name: iniciar-contagem
+    agent: estoque-manager
+    file: tasks/iniciar-contagem.md
+  - name: salvar-contagem
+    agent: estoque-manager
+    file: tasks/salvar-contagem.md
+  - name: alertas-minimo
+    agent: estoque-manager
+    file: tasks/alertas-minimo.md
+  - name: ver-funcoes
+    agent: escala-manager
+    file: tasks/ver-funcoes.md
+  - name: nova-ficha
+    agent: cmv-manager
+    file: tasks/nova-ficha.md
+  - name: calcular-cmv
+    agent: cmv-manager
+    file: tasks/calcular-cmv.md
+  - name: relatorio-margem
+    agent: cmv-manager
+    file: tasks/relatorio-margem.md
+
+integrations:
+  - notion-api
+  - vercel
+  - localStorage
+
+stakeholders:
+  - name: Lana
+    role: Gerente Operacional
+    primary_agents: [operacional-manager, compras-manager]
+  - name: Ruan
+    role: Estoque
+    primary_agents: [estoque-manager]
+  - name: Thaynan
+    role: Auditoria
+    primary_agents: [cmv-manager]
+  - name: Erick
+    role: Estratégico
+    primary_agents: [cmv-manager, escala-manager]
+
+metadata:
+  created_at: "2026-05-19T00:00:00Z"
+  blueprint: squads/.designs/operacional-bica-amp-squad-design.yaml
+  overall_confidence: 0.91
