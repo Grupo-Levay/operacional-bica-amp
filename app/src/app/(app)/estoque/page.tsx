@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Package } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ItemEstoque } from '@/components/estoque/item-estoque'
@@ -27,7 +28,12 @@ function isCritico(item: Item): boolean {
   return minimo > 0 && atual < minimo
 }
 
-export default async function EstoquePage() {
+export default async function EstoquePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ categoria?: string }>
+}) {
+  const { categoria } = await searchParams
   const { categorias, itens } = await getEstoqueData()
 
   const criticos = itens.filter(isCritico)
@@ -47,6 +53,14 @@ export default async function EstoquePage() {
   // Itens sem categoria
   const semCategoria = itensPorCategoria.get('__sem_categoria__') ?? []
 
+  // Aplicar filtro
+  const categoriasParaRender = categoria
+    ? categoriasComItens.filter((c) => c.id === categoria)
+    : categoriasComItens
+
+  // Itens sem categoria só mostrar se não tem filtro ativo
+  const semCategoriaFiltrada = categoria ? [] : semCategoria
+
   return (
     <main className="p-4 space-y-6 pb-24">
       {/* Header */}
@@ -64,24 +78,29 @@ export default async function EstoquePage() {
         )}
       </div>
 
-      {/* Filtro visual por categoria */}
+      {/* Filtro por categoria */}
       {categorias.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
-          <button
-            type="button"
-            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent"
-            style={{ backgroundColor: 'var(--color-bica)', color: '#fff' }}
+          <Link
+            href="/estoque"
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border ${
+              !categoria ? 'border-transparent text-white' : 'bg-muted text-muted-foreground border'
+            }`}
+            style={!categoria ? { backgroundColor: 'var(--color-bica)', color: '#fff' } : undefined}
           >
             Todos
-          </button>
+          </Link>
           {categorias.map((cat) => (
-            <button
+            <Link
               key={cat.id}
-              type="button"
-              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border bg-muted text-muted-foreground"
+              href={`/estoque?categoria=${cat.id}`}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border ${
+                categoria === cat.id ? 'border-transparent text-white' : 'bg-muted text-muted-foreground border'
+              }`}
+              style={categoria === cat.id ? { backgroundColor: 'var(--color-bica)', color: '#fff' } : undefined}
             >
               {cat.emoji ? `${cat.emoji} ` : ''}{cat.nome}
-            </button>
+            </Link>
           ))}
         </div>
       )}
@@ -95,15 +114,15 @@ export default async function EstoquePage() {
       )}
 
       {/* Categorias com itens */}
-      {categoriasComItens.map((categoria) => {
-        const itensCategoria = itensPorCategoria.get(categoria.id) ?? []
+      {categoriasParaRender.map((cat) => {
+        const itensCategoria = itensPorCategoria.get(cat.id) ?? []
         return (
-          <section key={categoria.id}>
+          <section key={cat.id}>
             {/* Header da categoria — sticky */}
             <div className="sticky top-0 bg-background z-10 pb-1 mb-1">
               <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                {categoria.emoji && <span>{categoria.emoji}</span>}
-                {categoria.nome}
+                {cat.emoji && <span>{cat.emoji}</span>}
+                {cat.nome}
                 <span className="text-xs font-normal text-muted-foreground ml-1">
                   ({itensCategoria.length})
                 </span>
@@ -129,19 +148,19 @@ export default async function EstoquePage() {
       })}
 
       {/* Itens sem categoria */}
-      {semCategoria.length > 0 && (
+      {semCategoriaFiltrada.length > 0 && (
         <section>
           <div className="sticky top-0 bg-background z-10 pb-1 mb-1">
             <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
               Outros
               <span className="text-xs font-normal text-muted-foreground ml-1">
-                ({semCategoria.length})
+                ({semCategoriaFiltrada.length})
               </span>
             </h2>
             <div className="h-px bg-border mt-1" />
           </div>
           <div className="divide-y divide-border">
-            {semCategoria.map((item) => (
+            {semCategoriaFiltrada.map((item) => (
               <ItemEstoque
                 key={item.id}
                 id={item.id}
