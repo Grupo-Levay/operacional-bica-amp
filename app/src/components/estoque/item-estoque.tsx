@@ -1,8 +1,10 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
+import { useState, useTransition, useRef } from 'react'
+import { atualizarQuantidade } from '@/app/actions/estoque'
 
 type ItemEstoqueProps = {
+  id: string
   nome: string
   unidade: string | null
   atual: number
@@ -15,32 +17,46 @@ function getItemStatus(atual: number, minimo: number) {
   return { label: 'CRÍTICO', color: 'danger' as const }
 }
 
-export function ItemEstoque({ nome, unidade, atual, minimo }: ItemEstoqueProps) {
-  const status = getItemStatus(atual, minimo)
-  const percent = minimo > 0 ? Math.min(100, Math.round((atual / minimo) * 100)) : 100
+export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoqueProps) {
+  const [editando, setEditando] = useState(false)
+  const [valor, setValor] = useState(String(atual))
+  const [quantidade, setQuantidade] = useState(atual)
+  const [, startTransition] = useTransition()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const status = getItemStatus(quantidade, minimo)
+  const percent = minimo > 0 ? Math.min(100, Math.round((quantidade / minimo) * 100)) : 100
 
   const barColor =
-    status.color === 'success'
-      ? '#22c55e'
-      : status.color === 'warning'
-        ? '#eab308'
-        : '#ef4444'
-
+    status.color === 'success' ? '#22c55e' : status.color === 'warning' ? '#eab308' : '#ef4444'
   const badgeBg =
-    status.color === 'success'
-      ? '#dcfce7'
-      : status.color === 'warning'
-        ? '#fef9c3'
-        : '#fee2e2'
-
+    status.color === 'success' ? '#dcfce7' : status.color === 'warning' ? '#fef9c3' : '#fee2e2'
   const badgeText =
-    status.color === 'success'
-      ? '#15803d'
-      : status.color === 'warning'
-        ? '#854d0e'
-        : '#b91c1c'
+    status.color === 'success' ? '#15803d' : status.color === 'warning' ? '#854d0e' : '#b91c1c'
 
   const unidadeLabel = unidade ?? ''
+
+  function handleConfirmar() {
+    const nova = parseFloat(valor)
+    if (isNaN(nova) || nova < 0) {
+      setValor(String(quantidade))
+      setEditando(false)
+      return
+    }
+    setQuantidade(nova)
+    setEditando(false)
+    startTransition(async () => {
+      await atualizarQuantidade(id, nova)
+    })
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') handleConfirmar()
+    if (e.key === 'Escape') {
+      setValor(String(quantidade))
+      setEditando(false)
+    }
+  }
 
   return (
     <div className="py-3 space-y-2">
@@ -49,9 +65,7 @@ export function ItemEstoque({ nome, unidade, atual, minimo }: ItemEstoqueProps) 
         <span className="text-sm font-medium leading-tight">
           {nome}
           {unidadeLabel && (
-            <span className="text-xs text-muted-foreground font-normal ml-1">
-              ({unidadeLabel})
-            </span>
+            <span className="text-xs text-muted-foreground font-normal ml-1">({unidadeLabel})</span>
           )}
         </span>
         <span
@@ -70,10 +84,48 @@ export function ItemEstoque({ nome, unidade, atual, minimo }: ItemEstoqueProps) 
         />
       </div>
 
-      {/* Row 3: valores */}
-      <p className="text-xs text-muted-foreground">
-        {atual} {unidadeLabel} &nbsp;/&nbsp; mín: {minimo} {unidadeLabel}
-      </p>
+      {/* Row 3: valores + edição inline */}
+      <div className="flex items-center justify-between gap-2">
+        {editando ? (
+          <div className="flex items-center gap-2 flex-1">
+            <input
+              ref={inputRef}
+              type="number"
+              min="0"
+              step="0.5"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleConfirmar}
+              autoFocus
+              className="w-20 rounded border border-border bg-background px-2 py-0.5 text-sm tabular-nums focus:outline-none focus:ring-1 focus:ring-[var(--color-bica)]"
+            />
+            <span className="text-xs text-muted-foreground">{unidadeLabel}</span>
+            <button
+              type="button"
+              onClick={handleConfirmar}
+              className="text-xs font-semibold px-2 py-0.5 rounded text-white"
+              style={{ backgroundColor: 'var(--color-bica)' }}
+            >
+              OK
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setEditando(true)
+              setTimeout(() => inputRef.current?.select(), 50)
+            }}
+            className="text-xs text-muted-foreground text-left hover:text-foreground transition-colors"
+          >
+            <span className="font-medium text-foreground">{quantidade}</span>
+            {unidadeLabel && ` ${unidadeLabel}`}
+            &nbsp;/&nbsp;mín: {minimo} {unidadeLabel}
+            <span className="ml-1 opacity-50 text-[10px]">✏️</span>
+          </button>
+        )}
+      </div>
     </div>
   )
 }

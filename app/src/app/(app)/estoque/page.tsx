@@ -115,6 +115,7 @@ export default async function EstoquePage() {
               {itensCategoria.map((item) => (
                 <ItemEstoque
                   key={item.id}
+                  id={item.id}
                   nome={item.nome}
                   unidade={item.unidade}
                   atual={item.atual ?? 0}
@@ -142,6 +143,7 @@ export default async function EstoquePage() {
             {semCategoria.map((item) => (
               <ItemEstoque
                 key={item.id}
+                id={item.id}
                 nome={item.nome}
                 unidade={item.unidade}
                 atual={item.atual ?? 0}

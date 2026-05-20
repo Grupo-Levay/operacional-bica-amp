@@ -72,6 +72,15 @@ commands:
   - name: create-doc
     args: "{template}"
     description: "Create document from template"
+  - name: investigate
+    description: "Root-cause debugging — encontra a causa, não trata o sintoma"
+  - name: checkpoint
+    args: "save|restore|log"
+    description: "Salva/restaura estado da sessão no git"
+  - name: design-shotgun
+    description: "Gera 4 variantes de landing page com CRO scoring"
+  - name: memory
+    description: "Lê/escreve aprendizados persistentes (.xoia-core/memory/)"
   - name: guide
     description: "Show comprehensive usage guide"
   - name: exit
@@ -84,6 +93,13 @@ dependencies:
     - execute-checklist.md
     - analyze-framework.md
     - waves.md
+  commands:
+    - investigate.md
+    - checkpoint.md
+    - design-shotgun.md
+  memory:
+    - docs/xoia-memory/learnings.md
+    - docs/xoia-memory/clients/bica.md
   templates:
     - prd-tmpl.yaml
     - story-tmpl.yaml
@@ -100,6 +116,10 @@ dependencies:
 - `*waves` - Analyze parallel execution opportunities
 - `*task {name}` - Execute specific task
 - `*create-doc {template}` - Create document from template
+- `*investigate` - Root-cause debugging (6 fases)
+- `*checkpoint save|restore|log` - Salva/restaura sessão no git
+- `*design-shotgun` - 4 variantes de landing page com CRO scoring
+- `*memory` - Lê/escreve `.xoia-core/memory/`
 - `*guide` - Comprehensive usage guide
 
 ## Agent Routing
