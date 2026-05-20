@@ -14,16 +14,25 @@ async function getDashboardData() {
     const supabase = await createClient()
     const hoje = new Date().toISOString().split("T")[0]
 
-    const [pendentes, criticos, rodadas, equipe] = await Promise.all([
+    const [
+      { count: totalChecklists },
+      { count: concluidosHoje },
+      { data: estoqueItens },
+      { count: rodadasCount },
+      { count: equipeCount },
+    ] = await Promise.all([
+      supabase
+        .from("checklists")
+        .select("id", { count: "exact", head: true }),
       supabase
         .from("checklist_registros")
         .select("id", { count: "exact", head: true })
         .eq("data", hoje)
-        .eq("concluido", false),
+        .eq("concluido", true),
+      // PostgREST não suporta comparação coluna-vs-coluna — filtra client-side
       supabase
         .from("estoque_itens")
-        .select("id", { count: "exact", head: true })
-        .filter("atual", "lt", "minimo")
+        .select("atual, minimo")
         .eq("ativo", true),
       supabase
         .from("rodadas")
@@ -35,11 +44,17 @@ async function getDashboardData() {
         .eq("ativo", true),
     ])
 
+    const pendentes = Math.max(0, (totalChecklists ?? 0) - (concluidosHoje ?? 0))
+
+    const criticos = (estoqueItens ?? []).filter(
+      (item) => (item.minimo ?? 0) > 0 && (item.atual ?? 0) < (item.minimo ?? 0)
+    ).length
+
     return {
-      pendentes: pendentes.count ?? 0,
-      criticos: criticos.count ?? 0,
-      rodadas: rodadas.count ?? 0,
-      equipe: equipe.count ?? 0,
+      pendentes,
+      criticos,
+      rodadas: rodadasCount ?? 0,
+      equipe: equipeCount ?? 0,
     }
   } catch (e) {
     console.error('[dashboard] getDashboardData error:', e)
@@ -78,7 +93,7 @@ export default async function DashboardPage() {
           <StatCard
             label="Checklists Pendentes"
             value={pendentes}
-            sub={pendentes === 0 ? "Tudo em dia" : "itens abertos hoje"}
+            sub={pendentes === 0 ? "Todos concluídos" : `não concluído${pendentes !== 1 ? 's' : ''} hoje`}
             accent={pendentes > 0 ? "danger" : "success"}
             icon={<CheckSquare />}
           />
