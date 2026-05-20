@@ -23,7 +23,8 @@ async function getChecklists(): Promise<{ checklists: Checklist[]; registros: Re
       .eq('data', hoje)
 
     return { checklists: checklists ?? [], registros: registros ?? [] }
-  } catch {
+  } catch (e) {
+    console.error('[checklists] getChecklists error:', e)
     return { checklists: [], registros: [] }
   }
 }

@@ -28,7 +28,8 @@ async function getEscalaData() {
       inicioStr,
       fimStr,
     }
-  } catch {
+  } catch (e) {
+    console.error('[escala] getEscalaData error:', e)
     return { membros: [], escala: [], inicioStr: "", fimStr: "" }
   }
 }
