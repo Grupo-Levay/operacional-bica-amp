@@ -14,7 +14,8 @@ async function getFichasData() {
       .eq("ativo", true)
       .order("nome")
     return { fichas: fichas ?? [] }
-  } catch {
+  } catch (e) {
+    console.error('[fichas] getFichasData error:', e)
     return { fichas: [] }
   }
 }

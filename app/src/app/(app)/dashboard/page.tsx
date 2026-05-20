@@ -41,7 +41,8 @@ async function getDashboardData() {
       rodadas: rodadas.count ?? 0,
       equipe: equipe.count ?? 0,
     }
-  } catch {
+  } catch (e) {
+    console.error('[dashboard] getDashboardData error:', e)
     return { pendentes: 0, criticos: 0, rodadas: 0, equipe: 0 }
   }
 }

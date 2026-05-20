@@ -30,7 +30,8 @@ async function getComprasData(): Promise<{
       rodadas: (rodadas as Rodada[]) ?? [],
       categorias: (categorias as ComprasCategoria[]) ?? [],
     }
-  } catch {
+  } catch (e) {
+    console.error('[compras] getComprasData error:', e)
     return { rodadas: [], categorias: [] }
   }
 }

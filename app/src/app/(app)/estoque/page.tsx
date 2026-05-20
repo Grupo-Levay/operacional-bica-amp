@@ -15,7 +15,8 @@ async function getEstoqueData(): Promise<{ categorias: Categoria[]; itens: Item[
       supabase.from('estoque_itens').select('*').eq('ativo', true).order('nome'),
     ])
     return { categorias: categorias ?? [], itens: itens ?? [] }
-  } catch {
+  } catch (e) {
+    console.error('[estoque] getEstoqueData error:', e)
     return { categorias: [], itens: [] }
   }
 }
