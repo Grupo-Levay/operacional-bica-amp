@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
 import { RodadaCard } from "@/components/compras/rodada-card"
+import { NovaRodadaButton } from "@/components/compras/nova-rodada-button"
 import { Tables } from "@/types/database.types"
 
 type ComprasCategoria = Tables<"compras_categorias"> & {
@@ -48,17 +48,7 @@ export default async function ComprasPage() {
         <h1 className="text-xl font-bold" style={{ color: "var(--color-bica)" }}>
           Compras
         </h1>
-        <Button
-          disabled
-          size="sm"
-          style={{
-            backgroundColor: "var(--color-bica)",
-            color: "#fff",
-            opacity: 0.6,
-          }}
-        >
-          Nova Rodada
-        </Button>
+        <NovaRodadaButton />
       </div>
 
       {/* Seção 1 — Rodadas */}
