@@ -20,20 +20,28 @@ O usuario NAO precisa digitar comandos. O XOIA detecta o modo e executa.
 
 ## Execucao de Cada Passo
 
+### PRE-CYCLE (automatico)
+- Leia `docs/xoia-memory/learnings.md` se houver entradas relevantes ao pedido
+- Para landing pages/design: leia `docs/xoia-memory/clients/<cliente>.md`
+- Se há WIP checkpoints recentes: `git log --oneline | grep "^[a-f0-9]* WIP:"` para retomar
+
 ### PLAN (automatico)
 - Quick: pula — vai direto para BUILD
 - Standard: cria story em `docs/stories/` com Title, Description, AC, Tasks
 - Deep: cria design doc + story
+- Para landing pages: use `/XOIA:design-shotgun` antes de implementar
 
 ### BUILD (automatico)
 - Implementa codigo seguindo tasks da story (ou direto se Quick)
 - Escreve testes para funcionalidade nova
 - Para landing pages: componentes semanticos, Core Web Vitals budget, A/B scaffolding
 - Faz commits atomicos com conventional commits
+- Em ciclos longos (>30min estimados): salve checkpoint com `/XOIA:checkpoint save`
 
 ### CHECK (automatico)
 - Roda: `npm run lint && npm test && npm run typecheck`
 - Se falhar: corrige e re-executa (max 3 tentativas)
+- Se falhar 3x e causa nao e obvia: use `/XOIA:investigate` antes de tentar de novo
 - Para landing pages: aplica CRO scoring (CCD + MECLABS)
 - Atualiza story checkboxes se aplicavel
 
@@ -41,6 +49,8 @@ O usuario NAO precisa digitar comandos. O XOIA detecta o modo e executa.
 - `git push` para remote
 - Cria PR via `gh pr create` com summary
 - Marca story como `done` se aplicavel
+- Append em `docs/xoia-memory/sessions.jsonl`:
+  `{"date":"YYYY-MM-DD","mode":"quick|standard|deep","story":"S?.?","agent":"dev","check_attempts":N,"status":"shipped"}`
 
 ## Quando Parar e Perguntar
 
