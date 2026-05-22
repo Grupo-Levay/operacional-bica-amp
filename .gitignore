@@ -1,4 +1,3 @@
 
-# XOIA
-.xoia-core/
-.claude/settings.local.json
+# XOIA sessions (runtime data, not committed)
+docs/xoia-memory/sessions/
