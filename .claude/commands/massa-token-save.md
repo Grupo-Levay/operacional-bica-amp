@@ -8,7 +8,7 @@ Instala o sistema de economia de tokens em 3 camadas em qualquer projeto Claude 
 ```yaml
 command: massa-token-save
 icon: "⚡"
-author: Massa
+author: Gabriel Quental (Massa)
 description: |
   Instala 3 camadas de economia de tokens em qualquer projeto:
   A) Comprime arquivos de configuração verbose (CLAUDE.md, rules)
@@ -25,7 +25,7 @@ args:
 
 ## EXECUÇÃO AUTOMÁTICA
 
-Ao ser ativado, execute os 4 passos abaixo em sequência.
+Ao ser ativado, execute os 5 passos abaixo em sequência.
 
 ---
 
@@ -34,7 +34,7 @@ Ao ser ativado, execute os 4 passos abaixo em sequência.
 Colete o estado atual do projeto:
 
 ```bash
-# Estrutura geral
+# Estrutura de config
 find . -name "CLAUDE.md" -not -path "*/node_modules/*" | head -5
 find . -path "*/.claude/rules/*.md" -not -path "*/node_modules/*"
 find . -name "context-snapshot.md" -not -path "*/node_modules/*"
@@ -51,14 +51,14 @@ ls package.json pyproject.toml Cargo.toml go.mod 2>/dev/null | head -3
 
 Com base nos resultados, identifique:
 - **Config files existentes** → candidatos à compressão (Camada A)
-- **Memory dir existente?** → `docs/xoia-memory/` ou equivalente (Camada B)
+- **Memory dir existente?** → `docs/xoia-memory/`, `.claude/memory/` ou equivalente (Camada B)
 - **12% rule já presente?** → grep por "120K" ou "12%" no CLAUDE.md (Camada C)
 
 Reporte o diagnóstico antes de continuar:
 ```
 AUDITORIA:
 ├── Config: X linhas totais em Y arquivos
-├── Memory dir: [existe / não existe]
+├── Memory dir: [existe em <path> / não existe]
 ├── context-snapshot: [existe / não existe]
 ├── sessions.jsonl: [existe / vazio / N entradas]
 └── 12% rule: [presente / ausente]
@@ -75,11 +75,11 @@ AUDITORIA:
 - Seções "O que é" / "Por que usar"
 - Exemplos verbosos quando uma linha basta
 - Headers desnecessários em listas curtas
-- Frases de transição ("Fora dessas situações, o XOIA executa até entregar")
+- Frases de transição sem valor operacional
 
 ### O que NUNCA tocar
 - Comandos bash, paths de arquivo, URLs
-- Tabelas de referência (manter compactas)
+- Tabelas de referência
 - Qualquer regra operacional ("sempre", "nunca", "max N tentativas")
 - Nomes de arquivo, variáveis, aliases
 
@@ -94,39 +94,41 @@ AUDITORIA:
 
 ## PASSO 3 — CAMADA B: CONTEXT-SNAPSHOT
 
-Crie ou atualize `docs/xoia-memory/context-snapshot.md`.
-Se o projeto não usa `docs/xoia-memory/`, crie o diretório mais próximo da convenção do projeto.
+Determine o diretório de memória do projeto:
+- Se existe `.claude/memory/` → use esse
+- Se existe `docs/xoia-memory/` → use esse
+- Se nenhum existe → crie `.claude/memory/`
+
+Crie ou atualize `<memory-dir>/context-snapshot.md` com o template abaixo.
 
 ### Template do snapshot
 
-```markdown
+```
 # Context Snapshot — <nome-do-projeto>
 
-_Atualizado: YYYY-MM-DD | Branch: `<branch-atual>`_
+_Atualizado: YYYY-MM-DD | Branch: <branch-atual>_
 
 ## Projeto
-**App:** <descrição em 1 linha>
-**Stack:** <principais tecnologias>
-**Ambiente:** <local / cloud / container — e limitações relevantes>
+App: <descrição em 1 linha>
+Stack: <principais tecnologias>
+Ambiente: <local / cloud / container — e limitações relevantes>
 
 ## Arquivos críticos
-```
-<path>    # <o que contém>
-<path>    # <o que contém>
-```
+<path>  → <o que contém>
+<path>  → <o que contém>
 
 ## Estado atual
-- ✅ <módulo/feature completa>
-- ✅ <módulo/feature completa>
-- 🔄 <em progresso>
-- ⬜ <pendente>
+✅ <módulo/feature completa>
+✅ <módulo/feature completa>
+🔄 <em progresso>
+⬜ <pendente>
 
 ## Decisões técnicas ativas
-- **<decisão>:** <contexto em 1 linha — por que foi assim>
+- <decisão>: <contexto em 1 linha — por que foi assim>
 
 ## Últimos ships
-1. `<commit msg>` (YYYY-MM-DD)
-2. `<commit msg>`
+1. <commit msg> (YYYY-MM-DD)
+2. <commit msg>
 
 ## Gaps conhecidos
 - <problema ou limitação conhecida>
@@ -136,7 +138,7 @@ _Atualizado: YYYY-MM-DD | Branch: `<branch-atual>`_
 - **Stack:** leia package.json / pyproject.toml / Cargo.toml / go.mod
 - **Arquivos críticos:** `git ls-files | head -30` + julgamento sobre o que é central
 - **Estado:** `git log --oneline -10` para inferir o que foi entregue
-- **Decisões:** leia o CLAUDE.md e learnings.md se existir
+- **Decisões:** leia CLAUDE.md e learnings.md se existir
 - **Gaps:** pergunte ao usuário se não for óbvio pelo código
 
 ---
@@ -148,31 +150,31 @@ _Atualizado: YYYY-MM-DD | Branch: `<branch-atual>`_
 grep -n "120K\|12%\|context.*12\|Regra.*12" .claude/CLAUDE.md 2>/dev/null
 ```
 
-### Se não existir, adicionar ao CLAUDE.md
+### Se não existir, injetar no CLAUDE.md
 
-Injete após o primeiro bloco de conteúdo (não no topo, não no fim):
+Adicione após o primeiro bloco de conteúdo (não no topo, não no fim):
 
-```markdown
+```
 ## Gestão de Contexto — Regra dos 12%
-- **Ao iniciar:** leia `<path-do-context-snapshot>` primeiro
-- **Se `/context` > 120K tokens usados:** execute `/clear` e retome via context-snapshot
-- Nunca deixe compaction automático decidir — prefira `/clear` + resumo manual
+- Ao iniciar: leia <path-do-context-snapshot> primeiro
+- Se /context > 120K tokens usados: execute /clear e retome via context-snapshot
+- Nunca deixe compaction automático decidir — prefira /clear + resumo manual
 ```
 
-Adapte o path para onde o context-snapshot.md foi criado.
+Substitua `<path-do-context-snapshot>` pelo path real onde foi criado no Passo 3.
 
 ---
 
 ## PASSO 5 — SESSIONS.JSONL
 
-Verifique se existe `sessions.jsonl` no memory dir.
+Verifique se existe `sessions.jsonl` no memory dir definido no Passo 3.
 
 - **Não existe:** crie com a entrada da sessão atual
 - **Existe mas vazio:** popule com histórico inferido do `git log`
 - **Existe com entradas:** deixe como está
 
 Formato de entrada:
-```json
+```
 {"date":"YYYY-MM-DD","mode":"quick|standard|deep","agent":"<agente>","check_attempts":N,"status":"shipped","note":"<descrição>"}
 ```
 
@@ -183,7 +185,7 @@ Formato de entrada:
 Ao concluir, apresente:
 
 ```
-MASSA-TOKEN-SAVE — COMPLETO
+MASSA-TOKEN-SAVE — COMPLETO ⚡
 
 Camada A: config comprimida
   ├── CLAUDE.md: XXX → YYY linhas (−ZZ%)
@@ -207,10 +209,10 @@ PROTOCOLO ATIVO:
 
 ## QUANDO PARAR E PERGUNTAR
 
-- O projeto não tem CLAUDE.md → pergunte onde colocar as regras
-- Arquivos de config com regras ambíguas → liste o que vai cortar antes de cortar
-- Estrutura de diretórios muito diferente do padrão → confirme paths com o usuário
+- Projeto sem CLAUDE.md → pergunte onde colocar as regras
+- Config com regras ambíguas → liste o que vai cortar antes de cortar
+- Estrutura de diretórios não convencional → confirme paths com o usuário
 
 ---
 
-*Massa — /massa-token-save | "Sessões inteligentes, tokens economizados"*
+*Criado por Gabriel Quental — Massa | /massa-token-save*
