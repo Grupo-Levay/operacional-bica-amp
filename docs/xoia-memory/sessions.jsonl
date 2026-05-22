@@ -1,0 +1,5 @@
+{"date":"2026-05-20","mode":"deep","story":"fases-1-5","agent":"dev","check_attempts":2,"status":"shipped","note":"Sistema completo Bica/AMP — Dashboard, Compras, Estoque, Fichas, PWA"}
+{"date":"2026-05-22","mode":"quick","story":null,"agent":"dev","check_attempts":1,"status":"shipped","note":"fix: dashboard checklists pendentes + estoque crítico"}
+{"date":"2026-05-22","mode":"quick","story":null,"agent":"dev","check_attempts":1,"status":"shipped","note":"feat: PWA manifest + ícones gerados"}
+{"date":"2026-05-22","mode":"standard","story":null,"agent":"dev","check_attempts":1,"status":"shipped","note":"feat: compras — adicionar/remover itens da rodada aberta"}
+{"date":"2026-05-22","mode":"deep","story":null,"agent":"xoia","check_attempts":0,"status":"shipped","note":"chore: token economy — context-snapshot, regra 12%, compressão de rules"}

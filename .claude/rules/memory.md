@@ -1,65 +1,23 @@
-# XOIA Memory — Aprendizado Persistente Entre Sessões
+# XOIA Memory
 
-## O que é
+`docs/xoia-memory/` — persistência entre sessões, zero dependências externas.
 
-Sistema de memória leve baseado em arquivos. Persiste aprendizados, padrões e
-preferências entre sessões sem banco de dados ou dependências externas.
+## Arquivos
+- `context-snapshot.md` — estado atual do projeto (leia SEMPRE ao iniciar)
+- `learnings.md` — aprendizados técnicos, append-only
+- `sessions.jsonl` — log de ciclos (1 linha JSON por SHIP)
+- `clients/<cliente>.md` — padrões e histórico por cliente
 
-## Estrutura
+## LER
+- `context-snapshot.md`: sempre ao iniciar qualquer ciclo
+- `learnings.md`: antes de decisão técnica, debug recorrente, retomar sessão
+- `clients/<cliente>.md`: antes de landing page ou copy
 
-```
-docs/xoia-memory/
-  learnings.md       # Aprendizados gerais do projeto e do framework
-  sessions.jsonl     # Log de ciclos executados (1 linha JSON por ciclo)
-  clients/
-    <cliente>.md     # Padrões, preferências e histórico por cliente
-```
-
-## Quando LER memória
-
-**Sempre ao iniciar um ciclo** — verifique se há contexto relevante em:
-- `docs/xoia-memory/learnings.md`
-- `docs/xoia-memory/clients/<cliente-atual>.md` (se aplicável)
-
-Leia especialmente antes de:
-- Propor arquitetura ou decisão técnica
-- Criar landing page ou copy (leia o arquivo do cliente)
-- Debugar um problema recorrente
-- Retomar trabalho de sessão anterior
-
-## Quando ESCREVER memória
-
-**Escreva em `learnings.md` quando:**
-- Um bug foi resolvido via `/investigate` e a causa raiz tem valor futuro
-- Uma decisão técnica foi tomada com tradeoffs que podem se repetir
-- Um padrão de código foi estabelecido para o projeto
-- Uma integração foi configurada com detalhes não documentados
-
-**Escreva em `clients/<cliente>.md` quando:**
-- O cliente aprovou/rejeitou um design e expressou preferência clara
-- Uma campanha teve resultado mensurável (conversão, leads, etc.)
-- Um padrão de copy funcionou bem para esse público específico
-- `/design-shotgun` foi executado e a escolha foi registrada
-
-**Escreva em `sessions.jsonl` ao final de cada SHIP:**
-```json
-{"date":"YYYY-MM-DD","mode":"quick|standard|deep","story":"S1.3","agent":"dev","check_attempts":1,"duration_min":14,"status":"shipped"}
-```
-
-## Formato de entrada em learnings.md
-
-```markdown
-## [YYYY-MM-DD] — <título do aprendizado em uma linha>
-**Contexto:** o que estava sendo feito quando o aprendizado surgiu
-**Aprendizado:** o que foi descoberto — específico e acionável
-**Aplicar quando:** em quais situações futuras isso é relevante
----
-```
+## ESCREVER
+- `learnings.md`: após investigação com causa raiz de valor futuro (max 5 linhas/entrada)
+- `sessions.jsonl`: ao final de todo SHIP — `{"date":"YYYY-MM-DD","mode":"...","agent":"...","check_attempts":N,"status":"shipped"}`
+- `context-snapshot.md`: ao final de todo SHIP — atualize últimos ships, gaps, decisões
 
 ## Regras
-
-- Entradas são APPEND-ONLY — nunca delete um aprendizado existente
-- Máximo 5 linhas por entrada — seja cirúrgico
-- Só escreva se o aprendizado tiver valor real em sessões futuras
-- Verifique duplicata antes de adicionar: `grep "<palavra-chave>" docs/xoia-memory/learnings.md`
-- Arquivos de cliente são confidenciais — não incluir dados sensíveis de negócio
+APPEND-ONLY em learnings.md. Sem dados sensíveis de negócio.
+Verifique duplicata antes de adicionar: `grep "<keyword>" docs/xoia-memory/learnings.md`
