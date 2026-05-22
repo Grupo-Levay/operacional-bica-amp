@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__45d670d4-7788-486e-a043-5cc1064651cc__list_tables",
+      "mcp__45d670d4-7788-486e-a043-5cc1064651cc__apply_migration"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
