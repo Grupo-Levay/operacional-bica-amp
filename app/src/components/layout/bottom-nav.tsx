@@ -3,8 +3,9 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Home, CheckSquare, ShoppingCart, Package, Calendar, ChefHat } from "lucide-react"
+import { rotasPermitidas, type Role } from "@/lib/roles"
 
-const tabs = [
+const ALL_TABS = [
   { href: "/dashboard",   label: "Início",      icon: Home },
   { href: "/checklists",  label: "Checklists",  icon: CheckSquare },
   { href: "/compras",     label: "Compras",     icon: ShoppingCart },
@@ -13,8 +14,14 @@ const tabs = [
   { href: "/fichas",      label: "Fichas",      icon: ChefHat },
 ]
 
-export function BottomNav() {
+interface BottomNavProps {
+  role: Role
+}
+
+export function BottomNav({ role }: BottomNavProps) {
   const pathname = usePathname()
+  const allowed = rotasPermitidas(role)
+  const tabs = ALL_TABS.filter(t => allowed.includes(t.href))
 
   return (
     <nav

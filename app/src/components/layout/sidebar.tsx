@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTransition } from "react"
 import {
   Home,
   CheckSquare,
@@ -9,9 +10,12 @@ import {
   Package,
   Calendar,
   ChefHat,
+  LogOut,
 } from "lucide-react"
+import { signOut } from "@/app/actions/auth"
+import { rotasPermitidas, type Role } from "@/lib/roles"
 
-const tabs = [
+const ALL_TABS = [
   { href: "/dashboard",  label: "Início",     icon: Home },
   { href: "/checklists", label: "Checklists", icon: CheckSquare },
   { href: "/compras",    label: "Compras",    icon: ShoppingCart },
@@ -20,8 +24,15 @@ const tabs = [
   { href: "/fichas",     label: "Fichas",     icon: ChefHat },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  role: Role
+}
+
+export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
+  const [isPending, startTransition] = useTransition()
+  const allowed = rotasPermitidas(role)
+  const tabs = ALL_TABS.filter(t => allowed.includes(t.href))
 
   return (
     <aside
@@ -99,15 +110,25 @@ export function Sidebar() {
 
       {/* Rodapé */}
       <div
-        className="shrink-0 px-6 py-4"
+        className="shrink-0 px-4 py-4 flex flex-col gap-3"
         style={{ borderTop: "1px solid var(--border)" }}
       >
         <p
-          className="text-[8px] uppercase"
+          className="text-[8px] uppercase px-2"
           style={{ color: "var(--color-b4)", letterSpacing: "0.38em", opacity: 0.5 }}
         >
           Bica &amp; AMP 213
         </p>
+        <button
+          type="button"
+          onClick={() => startTransition(() => signOut())}
+          disabled={isPending}
+          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted disabled:opacity-50"
+          style={{ color: "var(--color-b4)" }}
+        >
+          <LogOut size={15} strokeWidth={1.8} aria-hidden="true" />
+          Sair
+        </button>
       </div>
     </aside>
   )
