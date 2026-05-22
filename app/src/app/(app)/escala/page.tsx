@@ -75,7 +75,7 @@ export default async function EscalaPage() {
       {/* Header */}
       <div>
         <h1
-          className="text-xl font-bold"
+          className="font-display text-2xl"
           style={{ color: "var(--color-bica)" }}
         >
           Escala

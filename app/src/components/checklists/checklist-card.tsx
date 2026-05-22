@@ -51,7 +51,7 @@ export function ChecklistCard({
             <span>{itensConcluidos} de {totalItens} itens</span>
             <span>{percent}%</span>
           </div>
-          <div className="h-2 rounded-full bg-neutral-200 overflow-hidden">
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{

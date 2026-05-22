@@ -80,7 +80,7 @@ export default async function DashboardPage() {
     <main className="p-4 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-bica)" }}>
+        <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
           Bica &amp; AMP 213
         </h1>
         <p className="text-sm text-muted-foreground capitalize">{dataHoje}</p>

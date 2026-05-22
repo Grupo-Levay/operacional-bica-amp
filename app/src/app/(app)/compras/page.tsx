@@ -46,7 +46,7 @@ export default async function ComprasPage() {
     <main className="p-4 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-bica)" }}>
+        <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
           Compras
         </h1>
         <NovaRodadaButton />
