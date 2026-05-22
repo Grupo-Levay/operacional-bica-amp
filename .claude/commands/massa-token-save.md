@@ -182,27 +182,90 @@ Formato de entrada:
 
 ## RELATÓRIO FINAL
 
-Ao concluir, apresente:
+Ao concluir, execute o seguinte cálculo antes de apresentar o relatório:
+
+### Cálculo de impacto em tokens
+
+Estime usando a regra: **1 token ≈ 4 caracteres** (aproximação conservadora).
+
+**Sem a skill — custo típico por sessão:**
+```bash
+# Linhas dos config files ANTES da compressão (coletado na auditoria)
+# Estima: linhas_antes × 15 tokens/linha (média para markdown técnico)
+
+# Re-descoberta de contexto sem snapshot:
+# Claude lê ~20-40 arquivos para entender o projeto do zero
+# Estima: 20 arquivos × média de 80 linhas × 12 tokens/linha ≈ 19.200 tokens
+```
+
+**Com a skill — custo típico por sessão:**
+```bash
+# Linhas dos config files DEPOIS da compressão
+# Estima: linhas_depois × 15 tokens/linha
+
+# Context-snapshot substitui toda re-descoberta:
+# Estima: linhas_do_snapshot × 15 tokens/linha
+```
+
+**Projeção:**
+- Economia por sessão = (custo_sem − custo_com)
+- Projeção 10 sessões = economia_por_sessão × 10
+- Projeção 30 sessões = economia_por_sessão × 30
+
+### Mensagem final
+
+Apresente nesta ordem, sem alterar o tom — direto, claro, sem exageros:
 
 ```
-MASSA-TOKEN-SAVE — COMPLETO ⚡
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  MASSA-TOKEN-SAVE — INSTALADO ⚡
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Camada A: config comprimida
-  ├── CLAUDE.md: XXX → YYY linhas (−ZZ%)
-  └── rules/: XXX → YYY linhas (−ZZ%)
+O QUE MUDOU
+  Camada A  Config comprimida
+            CLAUDE.md:  XXX → YYY linhas (−ZZ%)
+            rules/:     XXX → YYY linhas (−ZZ%)
 
-Camada B: context-snapshot.md
-  └── criado/atualizado em <path>
+  Camada B  context-snapshot.md criado em <path>
+            Próxima sessão começa com contexto completo,
+            sem re-explorar o codebase do zero.
 
-Camada C: regra dos 12%
-  └── injetada em CLAUDE.md
+  Camada C  Regra dos 12% ativa
+            Você controla a janela — não o auto-compactor.
 
-Sessions: <N entradas em sessions.jsonl>
+  Sessions  <N> entradas registradas em sessions.jsonl
 
-PROTOCOLO ATIVO:
-→ Próxima sessão: leia context-snapshot.md primeiro
-→ A cada SHIP: atualize context-snapshot.md + append sessions.jsonl
-→ Se /context > 120K: /clear + retome via snapshot
+─────────────────────────────────────────
+  IMPACTO EM TOKENS — ESTIMATIVA REAL
+─────────────────────────────────────────
+
+                        SEM SKILL    COM SKILL
+  Carga de config:      ~X.XXX tok   ~Y.YYY tok
+  Re-descoberta:        ~19.200 tok  ~ZZZ tok
+  ─────────────────────────────────────────────
+  Total por sessão:     ~XX.XXX tok  ~YY.YYY tok  (−ZZ%)
+
+  Economia em 10 sessões:   ~XX.XXX tokens
+  Economia em 30 sessões:   ~XX.XXX tokens
+
+─────────────────────────────────────────
+  VOCÊ NÃO PRECISA MUDAR NADA
+─────────────────────────────────────────
+
+  Continue trabalhando exatamente como antes.
+  Fale com os agentes normalmente.
+  Descreva o que precisa em linguagem natural.
+
+  A skill opera em silêncio. O único momento
+  que você verá diferença: se o contexto passar
+  de 120K tokens, o agente vai sugerir /clear
+  antes de continuar. Leva 10 segundos.
+
+  Tudo mais: igual. Só mais rápido e mais barato.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Criado por Gabriel Quental — Massa
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
