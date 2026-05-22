@@ -28,6 +28,31 @@ export async function marcarItemComprado(itemId: string, comprado: boolean) {
   revalidatePath('/compras')
 }
 
+export async function adicionarItemRodada(
+  rodadaId: string,
+  itemId: string,
+  nome: string,
+  unidade: string | null,
+  quantidade: number,
+) {
+  const supabase = await createClient()
+  await supabase.from('rodada_itens').insert({
+    rodada_id: rodadaId,
+    item_id: itemId,
+    nome,
+    unidade,
+    quantidade,
+    comprado: false,
+  })
+  revalidatePath('/compras')
+}
+
+export async function removerItemRodada(rodadaItemId: string) {
+  const supabase = await createClient()
+  await supabase.from('rodada_itens').delete().eq('id', rodadaItemId)
+  revalidatePath('/compras')
+}
+
 export async function fecharRodada(rodadaId: string) {
   const supabase = await createClient()
 

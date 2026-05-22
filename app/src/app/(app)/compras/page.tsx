@@ -63,7 +63,7 @@ export default async function ComprasPage() {
         ) : (
           <div className="space-y-4">
             {/* Rodada aberta em destaque */}
-            {rodadaAberta && <RodadaCard rodada={rodadaAberta} />}
+            {rodadaAberta && <RodadaCard rodada={rodadaAberta} categorias={categorias} />}
 
             {/* Rodadas fechadas */}
             {rodadasFechadas.length > 0 && (
