@@ -1,0 +1,18 @@
+devLoadAlwaysFiles:
+  - docs/xoia-memory/learnings.md
+  - docs/xoia-memory/clients/bica-amp.md
+
+storyTemplate: .xoia-core/development/templates/story.md
+
+quality:
+  commands:
+    lint: npm run lint
+    test: npm test
+    typecheck: npm run typecheck
+  maxRetries: 3
+
+memory:
+  dir: docs/xoia-memory
+  sessionsLog: docs/xoia-memory/sessions.jsonl
+  learnings: docs/xoia-memory/learnings.md
+  storiesDir: docs/stories

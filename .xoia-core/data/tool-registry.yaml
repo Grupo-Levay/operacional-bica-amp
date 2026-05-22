@@ -1,0 +1,52 @@
+tools:
+  git:
+    type: native-bash
+    commands:
+      - git status
+      - git diff --stat
+      - git log --oneline -10
+      - git add
+      - git commit
+      - git push
+
+  supabase:
+    type: mcp
+    server: supabase
+    filters:
+      schema:
+        - select relevant fields only
+        - exclude internal metadata columns
+
+  github:
+    type: mcp
+    server: github
+    filters:
+      content:
+        - extract pr title, body, status
+        - exclude review threads unless requested
+
+  vercel:
+    type: mcp
+    server: vercel
+    filters:
+      content:
+        - extract deployment url, status, error
+        - exclude build logs unless debugging
+
+  context7:
+    type: mcp
+    server: context7
+    description: Library documentation lookup
+    usage: resolve-library-id first, then get-library-docs with topic
+
+  exa:
+    type: mcp
+    server: exa
+    description: Web search and research
+    usage: for competitor analysis, external research, web content
+
+  apify:
+    type: mcp
+    server: apify
+    description: Web scraping and social media data
+    usage: for extracting structured data from websites
