@@ -67,7 +67,7 @@ export default async function FichasPage() {
     <main className="p-4 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-bica)" }}>
+        <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
           Ficha Técnica / CMV
         </h1>
       </div>

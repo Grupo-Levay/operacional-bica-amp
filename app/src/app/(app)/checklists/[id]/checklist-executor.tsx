@@ -73,7 +73,7 @@ export function ChecklistExecutor({
         >
           {turno}
         </span>
-        <h1 className="text-xl font-semibold leading-tight">{nome}</h1>
+        <h1 className="font-display text-2xl leading-tight">{nome}</h1>
       </div>
 
       {/* Progresso */}
@@ -82,7 +82,7 @@ export function ChecklistExecutor({
           <span>{concluidos.size} de {itens.length} itens</span>
           <span>{percent}%</span>
         </div>
-        <div className="h-2.5 rounded-full bg-neutral-200 overflow-hidden">
+        <div className="h-2.5 rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-300"
             style={{ width: `${percent}%`, backgroundColor: cor }}

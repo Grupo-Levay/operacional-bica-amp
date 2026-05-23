@@ -28,11 +28,23 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
   const percent = minimo > 0 ? Math.min(100, Math.round((quantidade / minimo) * 100)) : 100
 
   const barColor =
-    status.color === 'success' ? '#22c55e' : status.color === 'warning' ? '#eab308' : '#ef4444'
+    status.color === 'success'
+      ? 'var(--color-success)'
+      : status.color === 'warning'
+      ? 'var(--color-warning)'
+      : 'var(--color-danger)'
   const badgeBg =
-    status.color === 'success' ? '#dcfce7' : status.color === 'warning' ? '#fef9c3' : '#fee2e2'
+    status.color === 'success'
+      ? 'var(--color-success-bg)'
+      : status.color === 'warning'
+      ? 'var(--color-warning-bg)'
+      : 'var(--color-danger-bg)'
   const badgeText =
-    status.color === 'success' ? '#15803d' : status.color === 'warning' ? '#854d0e' : '#b91c1c'
+    status.color === 'success'
+      ? 'var(--color-success)'
+      : status.color === 'warning'
+      ? 'var(--color-warning)'
+      : 'var(--color-danger)'
 
   const unidadeLabel = unidade ?? ''
 
@@ -77,7 +89,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
       </div>
 
       {/* Row 2: barra de nível */}
-      <div className="h-2 rounded-full bg-neutral-200 overflow-hidden">
+      <div className="h-2 rounded-full bg-muted overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${percent}%`, backgroundColor: barColor }}

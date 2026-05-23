@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 
 interface StatCardProps {
   label: string
@@ -12,9 +11,9 @@ interface StatCardProps {
 
 const accentStyles: Record<NonNullable<StatCardProps["accent"]>, React.CSSProperties> = {
   primary: { color: "var(--color-bica)" },
-  danger: { color: "var(--color-amp)" },
-  warning: { color: "#d97706" },
-  success: { color: "#16a34a" },
+  danger:  { color: "var(--color-danger)" },
+  warning: { color: "var(--color-warning)" },
+  success: { color: "var(--color-success)" },
 }
 
 export function StatCard({ label, value, sub, accent, icon }: StatCardProps) {
@@ -30,7 +29,7 @@ export function StatCard({ label, value, sub, accent, icon }: StatCardProps) {
       </CardHeader>
       <CardContent className="pt-1">
         <p
-          className="text-3xl font-bold leading-none tabular-nums"
+          className="text-3xl font-mono font-medium leading-none tabular-nums"
           style={valueStyle}
         >
           {value}
