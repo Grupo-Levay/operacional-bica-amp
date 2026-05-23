@@ -10,6 +10,7 @@ import {
   Calendar,
   ChefHat,
   CalendarCheck,
+  ShieldCheck,
 } from "lucide-react"
 import { rotasPermitidas, type Role } from "@/lib/roles"
 import { type Casa } from "@/lib/tenant"
@@ -24,6 +25,7 @@ const ALL_TABS = [
   { href: "/escala",     label: "Escala",     icon: Calendar },
   { href: "/reservas",   label: "Reservas",   icon: CalendarCheck },
   { href: "/fichas",     label: "Fichas",     icon: ChefHat },
+  { href: "/admin",      label: "Admin",      icon: ShieldCheck },
 ]
 
 interface SidebarProps {

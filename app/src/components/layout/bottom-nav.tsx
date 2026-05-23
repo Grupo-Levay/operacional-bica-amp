@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, CheckSquare, ShoppingCart, Package, Calendar, ChefHat, CalendarCheck } from "lucide-react"
+import { Home, CheckSquare, ShoppingCart, Package, Calendar, ChefHat, CalendarCheck, ShieldCheck } from "lucide-react"
 import { rotasPermitidas, type Role } from "@/lib/roles"
 
 const ALL_TABS = [
@@ -13,6 +13,7 @@ const ALL_TABS = [
   { href: "/escala",      label: "Escala",      icon: Calendar },
   { href: "/reservas",    label: "Reservas",    icon: CalendarCheck },
   { href: "/fichas",      label: "Fichas",      icon: ChefHat },
+  { href: "/admin",       label: "Admin",       icon: ShieldCheck },
 ]
 
 interface BottomNavProps {

@@ -1,6 +1,8 @@
 "use client"
 
+import { useState, useTransition } from "react"
 import { Badge } from "@/components/ui/badge"
+import { salvarEscala, removerEscala } from "@/app/actions/escala"
 
 type Membro = {
   id: string
@@ -25,6 +27,7 @@ type Props = {
   membros: Membro[]
   escala: EscalaItem[]
   dias: Date[]
+  canEdit?: boolean
 }
 
 const TURNO_LABEL: Record<string, string> = {
@@ -39,7 +42,10 @@ function formatDia(date: Date) {
   }).format(date)
 }
 
-export function EscalaGrid({ membros, escala, dias }: Props) {
+export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
+  const [openCell, setOpenCell] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
   if (membros.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center gap-2">
@@ -48,7 +54,6 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
     )
   }
 
-  // Index escala por membro_id + data
   const escalaIndex = new Map<string, EscalaItem>()
   for (const item of escala) {
     if (item.membro_id) {
@@ -56,11 +61,35 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
     }
   }
 
+  function handleCellClick(key: string) {
+    if (!canEdit || isPending) return
+    setOpenCell(openCell === key ? null : key)
+  }
+
+  function handleSave(membroId: string, dataStr: string, turno: string) {
+    startTransition(async () => {
+      await salvarEscala(membroId, dataStr, turno)
+      setOpenCell(null)
+    })
+  }
+
+  function handleRemove(id: string) {
+    startTransition(async () => {
+      await removerEscala(id)
+      setOpenCell(null)
+    })
+  }
+
   const hasEscala = escala.length > 0
 
   return (
     <div>
-      {!hasEscala && (
+      {canEdit && (
+        <p className="text-xs text-muted-foreground mb-3">
+          Toque em uma célula para editar a escala.
+        </p>
+      )}
+      {!hasEscala && !canEdit && (
         <p className="text-sm text-muted-foreground mb-4">
           Nenhuma escala para esta semana
         </p>
@@ -68,7 +97,6 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
 
       <div className="overflow-x-auto -mx-4 px-4">
         <div className="min-w-[480px]">
-          {/* Header row */}
           <div
             className="grid gap-1 mb-1"
             style={{ gridTemplateColumns: `180px repeat(${dias.length}, 1fr)` }}
@@ -86,7 +114,6 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
             ))}
           </div>
 
-          {/* Member rows */}
           <div className="flex flex-col gap-1">
             {membros.map((membro) => (
               <div
@@ -96,7 +123,6 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
                   gridTemplateColumns: `180px repeat(${dias.length}, 1fr)`,
                 }}
               >
-                {/* Member info */}
                 <div className="flex flex-col py-2 pr-2">
                   <span className="font-semibold text-sm leading-tight truncate">
                     {membro.nome}
@@ -106,10 +132,65 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
                   </span>
                 </div>
 
-                {/* Day cells */}
                 {dias.map((dia) => {
                   const dataStr = dia.toISOString().split("T")[0]
-                  const item = escalaIndex.get(`${membro.id}__${dataStr}`)
+                  const key = `${membro.id}__${dataStr}`
+                  const item = escalaIndex.get(key)
+                  const isOpen = openCell === key
+
+                  if (canEdit && isOpen) {
+                    return (
+                      <div
+                        key={dataStr}
+                        className="flex flex-col items-center gap-0.5 h-auto py-1"
+                      >
+                        <div className="flex gap-0.5">
+                          {["AB", "FE"].map((t) => (
+                            <button
+                              key={t}
+                              type="button"
+                              disabled={isPending}
+                              onClick={() => handleSave(membro.id, dataStr, t)}
+                              className="text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50"
+                              style={{
+                                backgroundColor:
+                                  item?.turno === t
+                                    ? "var(--color-bica)"
+                                    : "var(--color-ink4)",
+                                color:
+                                  item?.turno === t
+                                    ? "#14100D"
+                                    : "var(--color-b3)",
+                              }}
+                            >
+                              {t}
+                            </button>
+                          ))}
+                          {item && (
+                            <button
+                              type="button"
+                              disabled={isPending}
+                              onClick={() => handleRemove(item.id)}
+                              className="text-[10px] font-bold px-1 py-1 rounded transition-opacity disabled:opacity-50"
+                              style={{
+                                backgroundColor: "var(--color-danger-bg)",
+                                color: "var(--color-danger)",
+                              }}
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOpenCell(null)}
+                          className="text-[9px] text-muted-foreground/60 leading-none"
+                        >
+                          fechar
+                        </button>
+                      </div>
+                    )
+                  }
 
                   return (
                     <div
@@ -117,21 +198,41 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
                       className="flex items-center justify-center h-10"
                     >
                       {item ? (
-                        <Badge
+                        <button
+                          type="button"
+                          onClick={() => handleCellClick(key)}
+                          disabled={isPending}
                           className={
-                            item.confirmado
-                              ? "text-[10px] font-bold px-1.5 h-7 text-white border-0"
-                              : "text-[10px] font-bold px-1.5 h-7 border-0"
+                            canEdit
+                              ? "cursor-pointer hover:opacity-80 transition-opacity"
+                              : "cursor-default"
                           }
-                          style={
-                            item.confirmado
-                              ? { backgroundColor: "var(--color-bica)" }
-                              : undefined
-                          }
-                          variant={item.confirmado ? "default" : "secondary"}
                         >
-                          {TURNO_LABEL[item.turno] ?? item.turno}
-                        </Badge>
+                          <Badge
+                            className={
+                              item.confirmado
+                                ? "text-[10px] font-bold px-1.5 h-7 text-white border-0"
+                                : "text-[10px] font-bold px-1.5 h-7 border-0"
+                            }
+                            style={
+                              item.confirmado
+                                ? { backgroundColor: "var(--color-bica)" }
+                                : undefined
+                            }
+                            variant={item.confirmado ? "default" : "secondary"}
+                          >
+                            {TURNO_LABEL[item.turno] ?? item.turno}
+                          </Badge>
+                        </button>
+                      ) : canEdit ? (
+                        <button
+                          type="button"
+                          onClick={() => handleCellClick(key)}
+                          disabled={isPending}
+                          className="w-8 h-8 rounded flex items-center justify-center text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/50 transition-colors text-base"
+                        >
+                          +
+                        </button>
                       ) : (
                         <span className="text-xs text-muted-foreground/50">
                           –
@@ -146,7 +247,6 @@ export function EscalaGrid({ membros, escala, dias }: Props) {
         </div>
       </div>
 
-      {/* Legenda */}
       <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
         <span>
           <span className="font-semibold">AB</span> = Abertura
