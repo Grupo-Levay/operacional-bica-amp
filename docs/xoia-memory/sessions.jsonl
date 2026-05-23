@@ -1,3 +1,4 @@
 {"date":"2026-05-22","session_id":"3b9a64d5-0f8e-4862-ba0f-70da1233166c","trigger":"auto","compacted_at":"2026-05-22T23:50:16.587Z","line_count":359}
 {"date":"2026-05-23","session_id":"3b9a64d5-0f8e-4862-ba0f-70da1233166c","trigger":"auto","compacted_at":"2026-05-23T00:16:56.587Z","line_count":857}
 {"date":"2026-05-23","mode":"standard","story":"auth+onboarding","agent":"dev","check_attempts":1,"duration_min":45,"status":"shipped","note":"auth completo: login, proteção de rotas, roles, onboarding modal, recuperação de senha"}
+{"date":"2026-05-23","mode":"standard","story":"multitenant-foundation","agent":"nova","check_attempts":1,"duration_min":90,"status":"shipped","note":"recovery PR#6 fase 1/5: tenant.ts + ADR-001 + RLS migration SQL versionada"}
