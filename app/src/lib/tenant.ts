@@ -1,13 +1,7 @@
 import { cookies, headers } from "next/headers"
-
-export type Casa = "bica" | "amp"
-
-export const CASAS: readonly Casa[] = ["bica", "amp"] as const
-
-export const CASA_LABELS: Record<Casa, string> = {
-  bica: "Bica Bar",
-  amp: "AMP 213",
-}
+import type { Casa } from "@/lib/tenant-types"
+export type { Casa } from "@/lib/tenant-types"
+export { CASAS, CASA_LABELS } from "@/lib/tenant-types"
 
 const COOKIE_NAME = "casa_atual"
 

@@ -3,7 +3,7 @@
 import { useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { setCasaAction } from "@/app/actions/auth"
-import { CASA_LABELS, type Casa } from "@/lib/tenant"
+import { CASA_LABELS, type Casa } from "@/lib/tenant-types"
 
 interface CasaSwitcherProps {
   currentCasa: Casa
