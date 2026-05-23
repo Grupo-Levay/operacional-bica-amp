@@ -11,6 +11,7 @@ import {
   Calendar,
   ChefHat,
   LogOut,
+  ShieldCheck,
 } from "lucide-react"
 import { signOut } from "@/app/actions/auth"
 import { rotasPermitidas, type Role } from "@/lib/roles"
@@ -22,6 +23,7 @@ const ALL_TABS = [
   { href: "/estoque",    label: "Estoque",    icon: Package },
   { href: "/escala",     label: "Escala",     icon: Calendar },
   { href: "/fichas",     label: "Fichas",     icon: ChefHat },
+  { href: "/admin",      label: "Admin",      icon: ShieldCheck },
 ]
 
 interface SidebarProps {

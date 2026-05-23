@@ -7,6 +7,7 @@ const ROUTE_PERMISSIONS: Record<string, Role[]> = {
   '/estoque':    ['super_admin', 'admin', 'estoque', 'operacional', 'cmv'],
   '/escala':     ['super_admin', 'admin', 'operacional'],
   '/fichas':     ['super_admin', 'admin', 'cmv', 'operacional'],
+  '/admin':      ['super_admin', 'admin'],
 }
 
 export function rotasPermitidas(role: Role): string[] {
