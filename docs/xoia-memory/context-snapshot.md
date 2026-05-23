@@ -32,9 +32,13 @@ Ambiente: Container remoto Claude Code; deploy automático na Vercel (projeto `b
 ✅ Navegação filtrada por role (super_admin/admin/operacional/estoque/cmv/bar)
 ✅ Onboarding modal guiado por role no primeiro acesso
 ✅ Recuperação de senha por e-mail (resetPasswordForEmail + PKCE callback)
-🔄 Admin panel para gestão de roles (próximo ciclo)
+✅ CasaSwitcher multi-tenant (bica/amp) via cookie
+✅ Admin panel /admin — listagem de perfis + troca de role
+✅ Escala editável — mini-picker AB/FE/✕ para admin/super_admin
+✅ Alertas de estoque — banner crítico/baixo no topo da lista
+✅ Módulo /reservas — placeholder funcional
 ⬜ Página pública `/cardapio`
-⬜ Módulos: checklists, estoque, escala, compras, fichas técnicas
+⬜ Módulos com lógica de negócio: checklists, compras, fichas técnicas
 
 ## Decisões técnicas ativas
 - `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação de rotas
@@ -44,11 +48,11 @@ Ambiente: Container remoto Claude Code; deploy automático na Vercel (projeto `b
 - Supabase MCP (`ducbzdfxzaifzqefolhy`): usa ferramenta `execute_sql` para migrações remotas
 
 ## Últimos ships
-1. feat: recuperação de senha por e-mail (2026-05-22)
-2. feat: onboarding guiado por role no primeiro acesso (2026-05-22)
-3. feat: autenticação completa com Supabase Auth + proteção de rotas por role (2026-05-22)
-4. feat: sidebar desktop — wordmark BiCA + nav responsivo (2026-05-21)
-5. feat: design system — dark theme + brand guide BICA v2 (2026-05-21)
+1. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-23)
+2. feat: Tier 1 UX — limelight nav, filtro estoque, search fichas (2026-05-23)
+3. feat: recuperação de senha por e-mail (2026-05-22)
+4. feat: onboarding guiado por role no primeiro acesso (2026-05-22)
+5. feat: autenticação completa com Supabase Auth + proteção de rotas por role (2026-05-22)
 
 ## Gaps conhecidos
 - Usuário `quentalgabriel@gmail.com` pode não ter senha definida — foi criado antes do trigger; precisa de reset via Supabase Dashboard se ainda não conseguiu logar
