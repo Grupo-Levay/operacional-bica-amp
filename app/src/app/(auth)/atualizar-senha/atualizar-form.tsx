@@ -2,31 +2,31 @@
 
 import { useActionState } from 'react'
 import { Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { signIn } from '@/app/actions/auth'
+import { updatePassword } from '@/app/actions/auth'
 
 const initialState = null
 
-export function LoginForm() {
-  const [state, action, isPending] = useActionState(signIn, initialState)
+export function AtualizarForm() {
+  const [state, action, isPending] = useActionState(updatePassword, initialState)
 
   return (
     <form action={action} className="space-y-4">
       <div className="space-y-1.5">
         <label
-          htmlFor="email"
+          htmlFor="password"
           className="text-xs font-medium uppercase tracking-wide"
           style={{ color: 'var(--color-b4)' }}
         >
-          E-mail
+          Nova senha
         </label>
         <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
           required
-          placeholder="seu@email.com"
+          minLength={8}
+          placeholder="Mínimo 8 caracteres"
           className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
           style={{
             backgroundColor: 'var(--color-ink2)',
@@ -40,19 +40,19 @@ export function LoginForm() {
 
       <div className="space-y-1.5">
         <label
-          htmlFor="password"
+          htmlFor="confirm"
           className="text-xs font-medium uppercase tracking-wide"
           style={{ color: 'var(--color-b4)' }}
         >
-          Senha
+          Confirmar senha
         </label>
         <input
-          id="password"
-          name="password"
+          id="confirm"
+          name="confirm"
           type="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
-          placeholder="••••••••"
+          placeholder="Repita a senha"
           className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
           style={{
             backgroundColor: 'var(--color-ink2)',
@@ -67,10 +67,7 @@ export function LoginForm() {
       {state?.error && (
         <p
           className="rounded-lg px-3 py-2 text-sm"
-          style={{
-            backgroundColor: 'var(--color-danger-bg)',
-            color: 'var(--color-danger)',
-          }}
+          style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}
         >
           {state.error}
         </p>
@@ -80,28 +77,17 @@ export function LoginForm() {
         type="submit"
         disabled={isPending}
         className="mt-2 w-full rounded-lg py-2.5 text-sm font-medium transition-opacity disabled:opacity-60"
-        style={{
-          backgroundColor: 'var(--color-bica)',
-          color: 'var(--color-ink2)',
-        }}
+        style={{ backgroundColor: 'var(--color-bica)', color: 'var(--color-ink2)' }}
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">
             <Loader2 className="size-4 animate-spin" />
-            Entrando…
+            Salvando…
           </span>
         ) : (
-          'Entrar'
+          'Salvar nova senha'
         )}
       </button>
-
-      <Link
-        href="/recuperar-senha"
-        className="mt-3 flex justify-center text-xs transition-opacity hover:opacity-80"
-        style={{ color: 'var(--color-b4)' }}
-      >
-        Esqueceu a senha?
-      </Link>
     </form>
   )
 }
