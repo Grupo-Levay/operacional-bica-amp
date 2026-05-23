@@ -1,5 +1,6 @@
 import { RodadaCard } from "@/components/compras/rodada-card"
 import { NovaRodadaButton } from "@/components/compras/nova-rodada-button"
+import { getCurrentCasa } from "@/lib/tenant"
 import { Tables } from "@/types/database.types"
 
 type ComprasCategoria = Tables<"compras_categorias"> & {
@@ -8,7 +9,7 @@ type ComprasCategoria = Tables<"compras_categorias"> & {
 type RodadaItem = Tables<"rodada_itens">
 type Rodada = Tables<"rodadas"> & { rodada_itens: RodadaItem[] }
 
-async function getComprasData(): Promise<{
+async function getComprasData(casa: string): Promise<{
   rodadas: Rodada[]
   categorias: ComprasCategoria[]
 }> {
@@ -19,11 +20,13 @@ async function getComprasData(): Promise<{
       supabase
         .from("rodadas")
         .select("*, rodada_itens(*)")
+        .eq("casa", casa)
         .order("created_at", { ascending: false })
         .limit(10),
       supabase
         .from("compras_categorias")
         .select("*, compras_itens(*)")
+        .eq("casa", casa)
         .order("ordem"),
     ])
     return {
@@ -37,8 +40,10 @@ async function getComprasData(): Promise<{
 }
 
 export default async function ComprasPage() {
-  const { rodadas, categorias } = await getComprasData()
+  const casa = await getCurrentCasa()
+  const { rodadas, categorias } = await getComprasData(casa)
 
+  const casaColor = casa === 'bica' ? 'var(--color-bica)' : 'var(--color-amp)'
   const rodadaAberta = rodadas.find((r) => r.status === "aberta")
   const rodadasFechadas = rodadas.filter((r) => r.status !== "aberta")
 
@@ -46,7 +51,7 @@ export default async function ComprasPage() {
     <main className="p-4 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-2">
-        <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
+        <h1 className="font-display text-2xl" style={{ color: casaColor }}>
           Compras
         </h1>
         <NovaRodadaButton />

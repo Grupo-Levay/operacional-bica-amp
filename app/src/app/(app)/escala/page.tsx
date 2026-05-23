@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EscalaGrid } from "@/components/escala/escala-grid"
+import { getCurrentCasa } from "@/lib/tenant"
 
-async function getEscalaData() {
+async function getEscalaData(casa: string) {
   try {
     const { createClient } = await import("@/lib/supabase/server")
     const supabase = await createClient()
@@ -14,10 +15,11 @@ async function getEscalaData() {
     const fimStr = fim.toISOString().split("T")[0]
 
     const [{ data: membros }, { data: escala }] = await Promise.all([
-      supabase.from("equipe").select("*").eq("ativo", true).order("nome"),
+      supabase.from("equipe").select("*").eq("casa", casa).eq("ativo", true).order("nome"),
       supabase
         .from("escala")
         .select("*, equipe(nome, funcao)")
+        .eq("casa", casa)
         .gte("data", inicioStr)
         .lte("data", fimStr),
     ])
@@ -66,7 +68,9 @@ function buildDias(inicioStr: string): Date[] {
 }
 
 export default async function EscalaPage() {
-  const { membros, escala, inicioStr, fimStr } = await getEscalaData()
+  const casa = await getCurrentCasa()
+  const { membros, escala, inicioStr, fimStr } = await getEscalaData(casa)
+  const casaColor = casa === 'bica' ? 'var(--color-bica)' : 'var(--color-amp)'
   const rangeLabel = formatRangeLabel(inicioStr, fimStr)
   const dias = buildDias(inicioStr)
 
@@ -76,7 +80,7 @@ export default async function EscalaPage() {
       <div>
         <h1
           className="font-display text-2xl"
-          style={{ color: "var(--color-bica)" }}
+          style={{ color: casaColor }}
         >
           Escala
         </h1>

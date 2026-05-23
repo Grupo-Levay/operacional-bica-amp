@@ -1,15 +1,17 @@
 import type { Tables } from "@/types/database.types"
 import { FichasList } from "@/components/fichas/fichas-list"
+import { getCurrentCasa } from "@/lib/tenant"
 
 type FichaTecnica = Tables<"fichas_tecnicas">
 
-async function getFichasData() {
+async function getFichasData(casa: string) {
   try {
     const { createClient } = await import("@/lib/supabase/server")
     const supabase = await createClient()
     const { data: fichas } = await supabase
       .from("fichas_tecnicas")
       .select("*")
+      .eq("casa", casa)
       .eq("ativo", true)
       .order("nome")
     return { fichas: fichas ?? [] }
@@ -35,7 +37,9 @@ function calcularStats(fichas: FichaTecnica[]) {
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" })
 
 export default async function FichasPage() {
-  const { fichas } = await getFichasData()
+  const casa = await getCurrentCasa()
+  const { fichas } = await getFichasData(casa)
+  const casaColor = casa === 'bica' ? 'var(--color-bica)' : 'var(--color-amp)'
   const { cmvMedio, custoMedio, total } = calcularStats(fichas)
   const categorias = [...new Set(fichas.map(f => f.categoria ?? "Sem categoria"))].sort()
 
@@ -44,7 +48,7 @@ export default async function FichasPage() {
 
   return (
     <main className="p-4 space-y-6">
-      <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
+      <h1 className="font-display text-2xl" style={{ color: casaColor }}>
         Ficha Técnica / CMV
       </h1>
 

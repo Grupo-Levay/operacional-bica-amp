@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Jost, DM_Serif_Display, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
+import { ToastProvider } from "@/components/ui/toast"
 
 const jost = Jost({
   subsets: ["latin"],
@@ -32,7 +33,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${jost.variable} ${dmSerifDisplay.variable} ${jetbrainsMono.variable}`}>
-      <body>{children}</body>
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#C9A368" />
+      </head>
+      <body>
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   )
 }
