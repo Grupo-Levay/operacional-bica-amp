@@ -12,7 +12,7 @@ import {
   CalendarCheck,
 } from "lucide-react"
 import { rotasPermitidas, type Role } from "@/lib/roles"
-import { type Casa } from "@/lib/tenant"
+import { type Casa } from "@/lib/tenant-types"
 import { CasaSwitcher } from "@/components/layout/casa-switcher"
 import { LogoutBtn } from "@/components/layout/logout-btn"
 
