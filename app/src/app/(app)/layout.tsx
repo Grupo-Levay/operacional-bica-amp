@@ -2,7 +2,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Sidebar } from '@/components/layout/sidebar'
-import type { Role } from '@/lib/roles'
+import { OnboardingModal } from '@/components/onboarding/onboarding-modal'
+import { rotasPermitidas, type Role } from '@/lib/roles'
+import { getOnboardingConfig } from '@/lib/onboarding'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -12,11 +14,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const { data: perfil } = await supabase
     .from('perfis')
-    .select('role, nome')
+    .select('role, nome, onboarding_completo')
     .eq('id', user.id)
     .single()
 
   const role = (perfil?.role ?? 'operacional') as Role
+  const rotas = rotasPermitidas(role)
+  const onboardingPendente = perfil?.onboarding_completo === false
 
   return (
     <div className="flex min-h-screen">
@@ -29,6 +33,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {/* Bottom nav — mobile only */}
         <BottomNav role={role} />
       </div>
+
+      {/* Onboarding — exibido apenas no primeiro acesso */}
+      {onboardingPendente && (
+        <OnboardingModal
+          config={getOnboardingConfig(role, rotas)}
+          nomeUsuario={perfil?.nome}
+        />
+      )}
     </div>
   )
 }
