@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/proxy'
 
-const PUBLIC_PATHS = ['/login', '/cardapio']
+const PUBLIC_PATHS = ['/login', '/cardapio', '/recuperar-senha', '/atualizar-senha', '/auth/callback']
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
