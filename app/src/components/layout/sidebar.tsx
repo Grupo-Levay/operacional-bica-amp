@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useTransition } from "react"
 import {
   Home,
   CheckSquare,
@@ -10,10 +9,13 @@ import {
   Package,
   Calendar,
   ChefHat,
-  LogOut,
+  CalendarCheck,
+  ShieldCheck,
 } from "lucide-react"
-import { signOut } from "@/app/actions/auth"
 import { rotasPermitidas, type Role } from "@/lib/roles"
+import { type Casa } from "@/lib/tenant-types"
+import { CasaSwitcher } from "@/components/layout/casa-switcher"
+import { LogoutBtn } from "@/components/layout/logout-btn"
 
 const ALL_TABS = [
   { href: "/dashboard",  label: "Início",     icon: Home },
@@ -21,16 +23,19 @@ const ALL_TABS = [
   { href: "/compras",    label: "Compras",    icon: ShoppingCart },
   { href: "/estoque",    label: "Estoque",    icon: Package },
   { href: "/escala",     label: "Escala",     icon: Calendar },
+  { href: "/reservas",   label: "Reservas",   icon: CalendarCheck },
   { href: "/fichas",     label: "Fichas",     icon: ChefHat },
+  { href: "/admin",      label: "Admin",      icon: ShieldCheck },
 ]
 
 interface SidebarProps {
   role: Role
+  currentCasa: Casa
+  availableCasas: Casa[]
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, currentCasa, availableCasas }: SidebarProps) {
   const pathname = usePathname()
-  const [isPending, startTransition] = useTransition()
   const allowed = rotasPermitidas(role)
   const tabs = ALL_TABS.filter(t => allowed.includes(t.href))
 
@@ -42,28 +47,31 @@ export function Sidebar({ role }: SidebarProps) {
         borderRight: "1px solid var(--border)",
       }}
     >
-      {/* Wordmark */}
+      {/* Wordmark + Casa Switcher */}
       <div
-        className="flex h-16 shrink-0 items-center gap-3 px-6"
+        className="flex h-16 shrink-0 items-center justify-between gap-3 px-4"
         style={{ borderBottom: "1px solid var(--border)" }}
       >
-        <span
-          className="font-display text-[26px] leading-none select-none"
-          style={{ color: "var(--color-b1)" }}
-        >
-          B<em style={{ color: "var(--color-bica)", fontStyle: "italic" }}>i</em>CA
-        </span>
-        <span
-          className="text-[8px] uppercase leading-tight"
-          style={{
-            color: "var(--color-b4)",
-            letterSpacing: "0.36em",
-            fontWeight: 300,
-            paddingTop: "2px",
-          }}
-        >
-          Oper&shy;acional
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className="font-display text-[26px] leading-none select-none"
+            style={{ color: "var(--color-b1)" }}
+          >
+            B<em style={{ color: "var(--color-bica)", fontStyle: "italic" }}>i</em>CA
+          </span>
+          <span
+            className="text-[8px] uppercase leading-tight"
+            style={{
+              color: "var(--color-b4)",
+              letterSpacing: "0.36em",
+              fontWeight: 300,
+              paddingTop: "2px",
+            }}
+          >
+            Oper&shy;acional
+          </span>
+        </div>
+        <CasaSwitcher currentCasa={currentCasa} availableCasas={availableCasas} />
       </div>
 
       {/* Navegação */}
@@ -110,25 +118,16 @@ export function Sidebar({ role }: SidebarProps) {
 
       {/* Rodapé */}
       <div
-        className="shrink-0 px-4 py-4 flex flex-col gap-3"
+        className="shrink-0 px-4 py-4 flex items-center justify-between"
         style={{ borderTop: "1px solid var(--border)" }}
       >
         <p
-          className="text-[8px] uppercase px-2"
+          className="text-[8px] uppercase"
           style={{ color: "var(--color-b4)", letterSpacing: "0.38em", opacity: 0.5 }}
         >
           Bica &amp; AMP 213
         </p>
-        <button
-          type="button"
-          onClick={() => startTransition(() => signOut())}
-          disabled={isPending}
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted disabled:opacity-50"
-          style={{ color: "var(--color-b4)" }}
-        >
-          <LogOut size={15} strokeWidth={1.8} aria-hidden="true" />
-          Sair
-        </button>
+        <LogoutBtn />
       </div>
     </aside>
   )

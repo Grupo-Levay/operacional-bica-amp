@@ -1,7 +1,9 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { setCurrentCasa, type Casa } from '@/lib/tenant'
 
 export async function signIn(
   _prevState: { error: string } | null,
@@ -24,6 +26,15 @@ export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect('/login')
+}
+
+export async function setCasaAction(casa: Casa) {
+  try {
+    await setCurrentCasa(casa)
+    revalidatePath('/', 'layout')
+  } catch {
+    // ignore tenant switch errors
+  }
 }
 
 export async function resetPassword(

@@ -7,15 +7,47 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      bar_tables: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          is_active: boolean
+          location: string | null
+          number: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          number: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          number?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       checklist_registros: {
         Row: {
+          casa: string
           checklist_id: string | null
           concluido: boolean | null
           created_at: string | null
@@ -26,6 +58,7 @@ export type Database = {
           turno: string
         }
         Insert: {
+          casa?: string
           checklist_id?: string | null
           concluido?: boolean | null
           created_at?: string | null
@@ -36,6 +69,7 @@ export type Database = {
           turno: string
         }
         Update: {
+          casa?: string
           checklist_id?: string | null
           concluido?: boolean | null
           created_at?: string | null
@@ -57,6 +91,7 @@ export type Database = {
       }
       checklists: {
         Row: {
+          casa: string
           created_at: string | null
           id: string
           itens: Json
@@ -64,6 +99,7 @@ export type Database = {
           turno: string
         }
         Insert: {
+          casa?: string
           created_at?: string | null
           id?: string
           itens?: Json
@@ -71,6 +107,7 @@ export type Database = {
           turno: string
         }
         Update: {
+          casa?: string
           created_at?: string | null
           id?: string
           itens?: Json
@@ -81,18 +118,21 @@ export type Database = {
       }
       compras_categorias: {
         Row: {
+          casa: string
           emoji: string | null
           id: string
           nome: string
           ordem: number | null
         }
         Insert: {
+          casa?: string
           emoji?: string | null
           id?: string
           nome: string
           ordem?: number | null
         }
         Update: {
+          casa?: string
           emoji?: string | null
           id?: string
           nome?: string
@@ -103,6 +143,7 @@ export type Database = {
       compras_itens: {
         Row: {
           ativo: boolean | null
+          casa: string
           categoria_id: string | null
           id: string
           nome: string
@@ -110,6 +151,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          casa?: string
           categoria_id?: string | null
           id?: string
           nome: string
@@ -117,6 +159,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          casa?: string
           categoria_id?: string | null
           id?: string
           nome?: string
@@ -135,6 +178,7 @@ export type Database = {
       equipe: {
         Row: {
           ativo: boolean | null
+          casa: string
           created_at: string | null
           funcao: string
           id: string
@@ -143,6 +187,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          casa?: string
           created_at?: string | null
           funcao: string
           id?: string
@@ -151,6 +196,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          casa?: string
           created_at?: string | null
           funcao?: string
           id?: string
@@ -161,6 +207,7 @@ export type Database = {
       }
       escala: {
         Row: {
+          casa: string
           confirmado: boolean | null
           data: string
           id: string
@@ -169,6 +216,7 @@ export type Database = {
           turno: string
         }
         Insert: {
+          casa?: string
           confirmado?: boolean | null
           data: string
           id?: string
@@ -177,6 +225,7 @@ export type Database = {
           turno: string
         }
         Update: {
+          casa?: string
           confirmado?: boolean | null
           data?: string
           id?: string
@@ -196,18 +245,21 @@ export type Database = {
       }
       estoque_categorias: {
         Row: {
+          casa: string
           emoji: string | null
           id: string
           nome: string
           ordem: number | null
         }
         Insert: {
+          casa?: string
           emoji?: string | null
           id?: string
           nome: string
           ordem?: number | null
         }
         Update: {
+          casa?: string
           emoji?: string | null
           id?: string
           nome?: string
@@ -217,6 +269,7 @@ export type Database = {
       }
       estoque_contagens: {
         Row: {
+          casa: string
           created_at: string | null
           id: string
           item_id: string | null
@@ -224,6 +277,7 @@ export type Database = {
           responsavel: string | null
         }
         Insert: {
+          casa?: string
           created_at?: string | null
           id?: string
           item_id?: string | null
@@ -231,6 +285,7 @@ export type Database = {
           responsavel?: string | null
         }
         Update: {
+          casa?: string
           created_at?: string | null
           id?: string
           item_id?: string | null
@@ -251,6 +306,7 @@ export type Database = {
         Row: {
           ativo: boolean | null
           atual: number | null
+          casa: string
           categoria_id: string | null
           id: string
           minimo: number | null
@@ -261,6 +317,7 @@ export type Database = {
         Insert: {
           ativo?: boolean | null
           atual?: number | null
+          casa?: string
           categoria_id?: string | null
           id?: string
           minimo?: number | null
@@ -271,6 +328,7 @@ export type Database = {
         Update: {
           ativo?: boolean | null
           atual?: number | null
+          casa?: string
           categoria_id?: string | null
           id?: string
           minimo?: number | null
@@ -291,6 +349,7 @@ export type Database = {
       fichas_tecnicas: {
         Row: {
           ativo: boolean | null
+          casa: string
           categoria: string | null
           cmv_pct: number | null
           created_at: string | null
@@ -304,6 +363,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean | null
+          casa?: string
           categoria?: string | null
           cmv_pct?: number | null
           created_at?: string | null
@@ -317,6 +377,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean | null
+          casa?: string
           categoria?: string | null
           cmv_pct?: number | null
           created_at?: string | null
@@ -330,8 +391,75 @@ export type Database = {
         }
         Relationships: []
       }
+      reservations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_name: string | null
+          customer_name: string
+          customer_phone: string | null
+          end_time: string
+          guest_count: number
+          id: string
+          notes: string | null
+          reservation_date: string
+          start_time: string
+          status: Database["public"]["Enums"]["reservation_status"]
+          table_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          end_time: string
+          guest_count: number
+          id?: string
+          notes?: string | null
+          reservation_date: string
+          start_time: string
+          status?: Database["public"]["Enums"]["reservation_status"]
+          table_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          end_time?: string
+          guest_count?: number
+          id?: string
+          notes?: string | null
+          reservation_date?: string
+          start_time?: string
+          status?: Database["public"]["Enums"]["reservation_status"]
+          table_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "bar_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rodada_itens: {
         Row: {
+          casa: string
           comprado: boolean | null
           id: string
           item_id: string | null
@@ -343,6 +471,7 @@ export type Database = {
           unidade: string | null
         }
         Insert: {
+          casa?: string
           comprado?: boolean | null
           id?: string
           item_id?: string | null
@@ -354,6 +483,7 @@ export type Database = {
           unidade?: string | null
         }
         Update: {
+          casa?: string
           comprado?: boolean | null
           id?: string
           item_id?: string | null
@@ -383,6 +513,7 @@ export type Database = {
       }
       rodadas: {
         Row: {
+          casa: string
           created_at: string | null
           data: string
           id: string
@@ -391,6 +522,7 @@ export type Database = {
           total: number | null
         }
         Insert: {
+          casa?: string
           created_at?: string | null
           data?: string
           id?: string
@@ -399,6 +531,7 @@ export type Database = {
           total?: number | null
         }
         Update: {
+          casa?: string
           created_at?: string | null
           data?: string
           id?: string
@@ -408,15 +541,50 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          last_login_at: string | null
+          role: Database["public"]["Enums"]["team_role"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_name: string
+          email: string
+          id: string
+          last_login_at?: string | null
+          role?: Database["public"]["Enums"]["team_role"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_name?: string
+          email?: string
+          id?: string
+          last_login_at?: string | null
+          role?: Database["public"]["Enums"]["team_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_active_team_member: { Args: never; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      reservation_status: "pendente" | "confirmada" | "cancelada" | "concluida"
+      team_role: "admin" | "atendente"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -438,3 +606,5 @@ export type TablesInsert<
 export type TablesUpdate<
   T extends keyof DefaultSchema["Tables"],
 > = DefaultSchema["Tables"][T]["Update"]
+
+export type Enums<T extends keyof DefaultSchema["Enums"]> = DefaultSchema["Enums"][T]

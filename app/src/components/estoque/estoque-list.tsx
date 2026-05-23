@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Package } from "lucide-react"
+import { Package, AlertTriangle } from "lucide-react"
 import { ItemEstoque } from "@/components/estoque/item-estoque"
 import type { Database } from "@/types/database.types"
 
@@ -13,6 +13,62 @@ interface EstoqueListProps {
   itens: Item[]
 }
 
+function AlertasEstoque({ itens }: { itens: Item[] }) {
+  const criticos = itens.filter(
+    (i) => (i.minimo ?? 0) > 0 && (i.atual ?? 0) < (i.minimo ?? 0) * 0.5
+  )
+  const baixos = itens.filter(
+    (i) =>
+      (i.minimo ?? 0) > 0 &&
+      (i.atual ?? 0) >= (i.minimo ?? 0) * 0.5 &&
+      (i.atual ?? 0) < (i.minimo ?? 0)
+  )
+
+  if (criticos.length === 0 && baixos.length === 0) return null
+
+  return (
+    <section
+      className="rounded-lg p-3 space-y-2"
+      style={{ backgroundColor: "var(--color-danger-bg)" }}
+    >
+      <div className="flex items-center gap-2">
+        <AlertTriangle size={14} style={{ color: "var(--color-danger)" }} />
+        <span
+          className="text-xs font-semibold uppercase tracking-wide"
+          style={{ color: "var(--color-danger)", letterSpacing: "0.06em" }}
+        >
+          Alertas de Estoque
+        </span>
+      </div>
+      {criticos.map((item) => (
+        <div key={item.id} className="flex items-center justify-between text-xs">
+          <span className="font-medium" style={{ color: "var(--color-danger)" }}>
+            {item.nome}
+            {item.unidade && (
+              <span className="font-normal text-muted-foreground ml-1">({item.unidade})</span>
+            )}
+          </span>
+          <span style={{ color: "var(--color-danger)" }}>
+            {item.atual ?? 0} / mín {item.minimo ?? 0}
+          </span>
+        </div>
+      ))}
+      {baixos.map((item) => (
+        <div key={item.id} className="flex items-center justify-between text-xs">
+          <span style={{ color: "var(--color-warning)" }}>
+            {item.nome}
+            {item.unidade && (
+              <span className="font-normal text-muted-foreground ml-1">({item.unidade})</span>
+            )}
+          </span>
+          <span style={{ color: "var(--color-warning)" }}>
+            {item.atual ?? 0} / mín {item.minimo ?? 0}
+          </span>
+        </div>
+      ))}
+    </section>
+  )
+}
 
 export function EstoqueList({ categorias, itens }: EstoqueListProps) {
   const [filtro, setFiltro] = useState<string | null>(null)
@@ -35,6 +91,9 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
 
   return (
     <>
+      {/* Alertas */}
+      <AlertasEstoque itens={itens} />
+
       {/* Filtro por categoria */}
       {categorias.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
