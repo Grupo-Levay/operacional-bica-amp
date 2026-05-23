@@ -6,6 +6,7 @@ const ROUTE_PERMISSIONS: Record<string, Role[]> = {
   '/compras':    ['super_admin', 'admin', 'estoque'],
   '/estoque':    ['super_admin', 'admin', 'estoque', 'operacional', 'cmv'],
   '/escala':     ['super_admin', 'admin', 'operacional'],
+  '/reservas':   ['super_admin', 'admin', 'operacional', 'bar'],
   '/fichas':     ['super_admin', 'admin', 'cmv', 'operacional'],
 }
 

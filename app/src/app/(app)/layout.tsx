@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/layout/sidebar'
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal'
 import { rotasPermitidas, type Role } from '@/lib/roles'
 import { getOnboardingConfig } from '@/lib/onboarding'
+import { getCurrentCasa, CASAS, type Casa } from '@/lib/tenant'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -12,20 +13,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect('/login')
 
-  const { data: perfil } = await supabase
-    .from('perfis')
-    .select('role, nome, onboarding_completo')
-    .eq('id', user.id)
-    .single()
+  const [{ data: perfil }, currentCasa] = await Promise.all([
+    supabase
+      .from('perfis')
+      .select('role, nome, onboarding_completo, casas')
+      .eq('id', user.id)
+      .single(),
+    getCurrentCasa(),
+  ])
 
   const role = (perfil?.role ?? 'operacional') as Role
   const rotas = rotasPermitidas(role)
   const onboardingPendente = perfil?.onboarding_completo === false
 
+  // casas disponíveis para o usuário (null/vazio → ambas as casas para admin, só a atual para demais)
+  const rawCasas = perfil?.casas as Casa[] | null
+  const availableCasas: Casa[] =
+    rawCasas && rawCasas.length > 0 ? rawCasas : Array.from(CASAS)
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar — desktop only */}
-      <Sidebar role={role} />
+      <Sidebar role={role} currentCasa={currentCasa} availableCasas={availableCasas} />
 
       {/* Conteúdo principal */}
       <div className="flex flex-col flex-1 md:pl-56">
