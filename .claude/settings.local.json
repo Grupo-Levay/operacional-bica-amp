@@ -8,7 +8,8 @@
       "mcp__3aa4f70e-5a0b-464f-a535-a704c8b395ba__list_deployments",
       "mcp__3aa4f70e-5a0b-464f-a535-a704c8b395ba__list_projects",
       "mcp__3aa4f70e-5a0b-464f-a535-a704c8b395ba__get_deployment",
-      "mcp__3aa4f70e-5a0b-464f-a535-a704c8b395ba__get_deployment_build_logs"
+      "mcp__3aa4f70e-5a0b-464f-a535-a704c8b395ba__get_deployment_build_logs",
+      "mcp__45d670d4-7788-486e-a043-5cc1064651cc__generate_typescript_types"
     ]
   },
   "hooks": {
