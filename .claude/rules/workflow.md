@@ -10,13 +10,22 @@
 
 ## Passos
 
-**PRE-CYCLE:** leia `docs/xoia-memory/learnings.md` e `context-snapshot.md` se relevante
+**PRE-CYCLE:** leia `docs/xoia-memory/context-snapshot.md` (não explore o codebase — o snapshot tem o estado atual).
 
 **PLAN:** Quick=pula. Standard=story em `docs/stories/`. Deep=design doc+story.
+→ Se Standard/Deep com 2+ tarefas independentes: use `/XOIA:orchestrate` antes de BUILD.
 
-**BUILD:** segue tasks da story. Commits atomicos. Ciclos >30min: `/XOIA:checkpoint save`
+**ORCHESTRATE** (Standard/Deep com múltiplas tarefas):
+- Decompor tarefas por domínio e arquivo
+- Identificar paralelas vs sequenciais
+- Criar briefs token-eficientes (escopo fechado, sem re-exploração)
+- Lançar agentes em paralelo com `Agent` tool
+- Agentes NÃO fazem commit nem lint — só o orquestrador
+- Apresentar plano + budget estimado ao usuário antes de executar
 
-**CHECK:** `npm run lint && npm test && npm run typecheck`. Falhou: corrige e re-executa (max 3x). Falhou 3x sem causa obvia: `/XOIA:investigate`.
+**BUILD:** segue tasks da story (ou resultados do orchestrate). Commits atômicos.
+
+**CHECK:** `npm run lint && npm test && npm run typecheck` — UMA vez, no final. Falhou: corrige e re-executa (max 3x). Falhou 3x: `/XOIA:investigate`.
 
 **SHIP:** push → PR → marca story `done` → append `docs/xoia-memory/sessions.jsonl`:
 `{"date":"YYYY-MM-DD","mode":"...","story":"S?.?","agent":"dev","check_attempts":N,"status":"shipped"}`
