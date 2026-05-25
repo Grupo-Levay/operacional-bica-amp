@@ -12,14 +12,13 @@ export function RecuperarForm() {
   if (state?.success) {
     return (
       <div
-        className="flex flex-col items-center gap-3 rounded-lg px-4 py-5 text-center"
-        style={{ backgroundColor: 'var(--color-success-bg)' }}
+        className="flex flex-col items-center gap-3 rounded-lg px-4 py-5 text-center bg-success-bg"
       >
-        <CheckCircle className="size-6" style={{ color: 'var(--color-success)' }} />
-        <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>
+        <CheckCircle className="size-6 text-success" />
+        <p className="text-sm font-medium text-success">
           E-mail enviado!
         </p>
-        <p className="text-xs" style={{ color: 'var(--color-b4)' }}>
+        <p className="text-xs text-b4">
           Verifique sua caixa de entrada e clique no link para redefinir sua senha.
         </p>
       </div>
@@ -31,8 +30,7 @@ export function RecuperarForm() {
       <div className="space-y-1.5">
         <label
           htmlFor="email"
-          className="text-xs font-medium uppercase tracking-wide"
-          style={{ color: 'var(--color-b4)' }}
+          className="text-xs font-medium uppercase tracking-wide text-b4"
         >
           E-mail
         </label>
@@ -43,21 +41,13 @@ export function RecuperarForm() {
           autoComplete="email"
           required
           placeholder="seu@email.com"
-          className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
-          style={{
-            backgroundColor: 'var(--color-ink2)',
-            border: '1px solid var(--border)',
-            color: 'var(--color-b1)',
-          }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-bica)')}
-          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+          className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors bg-ink2 border border-border text-b1 focus:border-bica"
         />
       </div>
 
       {state?.error && (
         <p
-          className="rounded-lg px-3 py-2 text-sm"
-          style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}
+          className="rounded-lg px-3 py-2 text-sm bg-danger-bg text-danger"
         >
           {state.error}
         </p>
@@ -66,8 +56,7 @@ export function RecuperarForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="mt-2 w-full rounded-lg py-2.5 text-sm font-medium transition-opacity disabled:opacity-60"
-        style={{ backgroundColor: 'var(--color-bica)', color: 'var(--color-ink2)' }}
+        className="mt-2 w-full rounded-lg py-2.5 text-sm font-medium transition-opacity disabled:opacity-60 bg-bica text-ink2"
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">

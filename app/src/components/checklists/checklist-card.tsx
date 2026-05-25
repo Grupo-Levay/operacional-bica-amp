@@ -53,7 +53,7 @@ export function ChecklistCard({
               )}
               style={{ width: `${percent}%` }}
             />
-          </div>
+</div>
         </div>
         <Button
           variant="outline"

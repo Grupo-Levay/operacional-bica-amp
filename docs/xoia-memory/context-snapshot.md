@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-25 | Branch: main (PR#25 mergeado)_
+_Atualizado: 2026-05-25 | Branch: claude/eloquent-fermat-HMqSr (sessão nova — main em PR#25)_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas

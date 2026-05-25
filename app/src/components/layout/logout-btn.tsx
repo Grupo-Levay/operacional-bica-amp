@@ -19,17 +19,7 @@ export function LogoutBtn() {
       onClick={handleLogout}
       disabled={isPending}
       title="Sair"
-      className="flex items-center justify-center size-8 rounded-full transition-colors disabled:opacity-50"
-      style={{
-        border: "1px solid var(--border)",
-        color: "var(--color-b4)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "var(--muted)"
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = "transparent"
-      }}
+      className="flex items-center justify-center size-8 rounded-full transition-colors disabled:opacity-50 border border-border text-b4 hover:bg-muted"
     >
       <LogOut size={15} strokeWidth={1.8} aria-hidden="true" />
     </button>
