@@ -37,8 +37,7 @@ export default async function AdminPage() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1
-            className="font-display text-2xl"
-            style={{ color: "var(--color-bica)" }}
+            className="font-display text-2xl text-bica"
           >
             Admin
           </h1>

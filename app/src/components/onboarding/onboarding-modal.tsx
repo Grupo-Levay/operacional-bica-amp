@@ -136,11 +136,7 @@ function FeaturesStep({
         type="button"
         onClick={onConcluir}
         disabled={isPending}
-        className="flex w-full items-center justify-between rounded-xl px-5 py-3.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
-        style={{
-          backgroundColor: 'var(--color-bica)',
-          color: 'var(--color-ink2)',
-        }}
+        className="flex w-full items-center justify-between rounded-xl px-5 py-3.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50 bg-bica text-ink2"
       >
         Entendido, vamos começar
         <Check className="size-4" />

@@ -43,19 +43,14 @@ export function UsuariosTable({ perfis, currentUserId }: Props) {
         return (
           <div
             key={perfil.id}
-            className="flex items-center justify-between gap-3 px-4 py-3"
-            style={{ backgroundColor: "var(--color-ink2)" }}
+            className="flex items-center justify-between gap-3 px-4 py-3 bg-ink2"
           >
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium leading-tight truncate">
                 {perfil.nome ?? "Sem nome"}
                 {isSelf && (
                   <span
-                    className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                    style={{
-                      backgroundColor: "var(--color-bica-light)",
-                      color: "var(--color-bica)",
-                    }}
+                    className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-bica-light text-bica"
                   >
                     você
                   </span>
@@ -70,8 +65,7 @@ export function UsuariosTable({ perfis, currentUserId }: Props) {
               disabled={isPending || isSelf}
               value={perfil.role}
               onChange={(e) => handleRoleChange(perfil.id, e.target.value as Role)}
-              className="text-xs rounded border border-border bg-background px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--color-bica)] disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ color: "var(--color-b2)" }}
+              className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-bica disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
