@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-25 | Branch: claude/eloquent-fermat-HMqSr (sessão nova — main em PR#25)_
+_Atualizado: 2026-05-25 | Branch: claude/nifty-mccarthy-q92sY (PR em aberto — 6 commits à frente de main)_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -24,6 +24,10 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/components/shared/`                    → PageHeader, EmptyState, SectionLabel — usar em pages
 `src/components/ui/brand-link.tsx`          → Link CTA full-width estilo primary 52px
 `src/components/ui/button.tsx`              → variantes: default, brand (bg-bica), cta (52px w-full)
+`app/src/app/actions/__tests__/`            → testes vitest para auth, checklist e reservas
+`app/vitest.config.ts`                      → configuração vitest
+`app/public/icon-192.png`                   → ícone PWA 192px
+`app/public/icon-512.png`                   → ícone PWA 512px
 
 ## Estado atual
 ✅ Auth — login, proteção de rotas por role, onboarding, recuperação de senha
@@ -32,13 +36,15 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Reservas — CRUD completo, DateNav, status badges, confirmar/cancelar/concluir
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
-✅ Dashboard — checklists pendentes + estoque crítico por casa
+✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop
 ✅ RLS relaxada (isolamento na aplicação) — migration 0002 aplicada
 ✅ Design System v2 — tokens sincronizados, PageHeader/EmptyState/SectionLabel, BrandLink, Button brand
-⬜ Layout/Auth inline styles (~50 restantes) — sidebar, bottom-nav, login, onboarding (próxima sessão)
-⬜ Mesas no Supabase (bar_tables) — criar via dashboard para habilitar seletor no form reservas
-⬜ Ícones PWA (public/icon-192.png, public/icon-512.png)
-⬜ Testes de integração para Server Actions
+✅ Inline styles — sidebar, bottom-nav, login, onboarding migrados para tokens
+✅ bar_tables — tabela criada no Supabase; seletor de mesas habilitado no form reservas
+✅ Ícones PWA — icon-192.png e icon-512.png em public/
+✅ Testes vitest — auth, checklist e reservas cobertos
+⬜ Testes de integração para Server Actions (coverage parcial — expandir)
+⬜ PRs obsoletos #2 e #3 (Vercel bots) — podem ser fechados
 
 ## Decisões técnicas ativas
 - `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação
@@ -53,13 +59,13 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
-2. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
-3. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-25)
-4. feat: Tier 1 UX — limelight nav, filtro estoque, search fichas (2026-05-25)
+1. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
+2. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
+3. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
+4. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-25)
 5. feat: recuperação de senha + PKCE flow (2026-05-22)
 
 ## Gaps conhecidos
-- `bar_tables` pode estar vazia — criar mesas via Supabase dashboard para form de reservas funcionar
+- Testes vitest criados para auth/checklist/reservas — expandir para compras/estoque/escala/fichas
 - Migration 0001 multi_tenant.sql versionada; já aplicada via PR#6 histórico (idempotente)
-- Sem testes unitários — `npm test` passa por não ter specs
+- PRs #2 e #3 (Vercel bots) ainda abertos como draft — podem ser fechados sem impacto
