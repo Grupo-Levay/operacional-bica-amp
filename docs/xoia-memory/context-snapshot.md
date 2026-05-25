@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-25 | Branch: claude/eloquent-fermat-HMqSr (sessão nova — main em PR#25)_
+_Atualizado: 2026-05-25 | Branch: main (PR#26 mergeado)_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -35,10 +35,10 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Dashboard — checklists pendentes + estoque crítico por casa
 ✅ RLS relaxada (isolamento na aplicação) — migration 0002 aplicada
 ✅ Design System v2 — tokens sincronizados, PageHeader/EmptyState/SectionLabel, BrandLink, Button brand
-⬜ Layout/Auth inline styles (~50 restantes) — sidebar, bottom-nav, login, onboarding (próxima sessão)
-⬜ Mesas no Supabase (bar_tables) — criar via dashboard para habilitar seletor no form reservas
-⬜ Ícones PWA (public/icon-192.png, public/icon-512.png)
-⬜ Testes de integração para Server Actions
+✅ Inline styles removidos — apenas 6 dinâmicos restantes (barras de progresso + gridTemplateColumns)
+✅ bar_tables — 9 mesas (5 bica + 4 amp) com location; constraint UNIQUE(casa,number) corrigida
+✅ PWA — manifest.json + icon-192/512.png + metadata em layout.tsx
+✅ Testes — vitest 4.1.7 + 16 specs (auth, checklist, reservas)
 
 ## Decisões técnicas ativas
 - `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação
@@ -53,7 +53,8 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
+1. feat: bar_tables + PWA + vitest + inline styles — PR#26 (2026-05-25)
+2. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
 2. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
 3. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-25)
 4. feat: Tier 1 UX — limelight nav, filtro estoque, search fichas (2026-05-25)
