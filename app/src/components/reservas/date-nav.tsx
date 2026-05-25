@@ -51,24 +51,21 @@ export function DateNav({ currentDate }: DateNavProps) {
         type="button"
         aria-label="Dia anterior"
         onClick={() => navegar(shiftDate(currentDate, -1))}
-        className="flex items-center justify-center rounded-lg border border-border bg-background transition-colors hover:bg-muted"
-        style={{ minWidth: '44px', minHeight: '44px' }}
+        className="flex items-center justify-center rounded-lg border border-border bg-background transition-colors hover:bg-muted min-w-[52px] min-h-[52px]"
       >
         <ChevronLeft size={20} aria-hidden="true" />
       </button>
 
       <div className="flex flex-1 flex-col items-center">
         <span
-          className="text-sm font-medium capitalize"
-          style={{ color: 'var(--color-b2)' }}
+          className="text-sm font-medium capitalize text-b2"
         >
           {formatarLabel(currentDate)}
         </span>
         <button
           type="button"
           onClick={() => navegar(hojeStr())}
-          className="text-xs underline underline-offset-2"
-          style={{ color: 'var(--color-bica)' }}
+          className="text-xs underline underline-offset-2 text-primary"
         >
           Hoje
         </button>
@@ -78,8 +75,7 @@ export function DateNav({ currentDate }: DateNavProps) {
         type="button"
         aria-label="Próximo dia"
         onClick={() => navegar(shiftDate(currentDate, 1))}
-        className="flex items-center justify-center rounded-lg border border-border bg-background transition-colors hover:bg-muted"
-        style={{ minWidth: '44px', minHeight: '44px' }}
+        className="flex items-center justify-center rounded-lg border border-border bg-background transition-colors hover:bg-muted min-w-[52px] min-h-[52px]"
       >
         <ChevronRight size={20} aria-hidden="true" />
       </button>

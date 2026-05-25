@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { Badge } from "@/components/ui/badge"
 import { salvarEscala, removerEscala } from "@/app/actions/escala"
+import { cn } from "@/lib/utils"
 
 type Membro = {
   id: string
@@ -95,7 +96,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
         </p>
       )}
 
-      <div className="overflow-x-auto -mx-4 px-4">
+      <div className="overflow-x-auto scroll-smooth snap-x snap-mandatory -mx-4 px-4">
         <div className="min-w-[480px]">
           <div
             className="grid gap-1 mb-1"
@@ -107,7 +108,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
             {dias.map((dia) => (
               <div
                 key={dia.toISOString()}
-                className="text-xs text-muted-foreground font-medium text-center py-1 capitalize"
+                className="text-xs text-muted-foreground font-medium text-center py-1 capitalize snap-start"
               >
                 {formatDia(dia)}
               </div>
@@ -151,17 +152,12 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                               type="button"
                               disabled={isPending}
                               onClick={() => handleSave(membro.id, dataStr, t)}
-                              className="text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50"
-                              style={{
-                                backgroundColor:
-                                  item?.turno === t
-                                    ? "var(--color-bica)"
-                                    : "var(--color-ink4)",
-                                color:
-                                  item?.turno === t
-                                    ? "#14100D"
-                                    : "var(--color-b3)",
-                              }}
+                              className={cn(
+                                "text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50",
+                                item?.turno === t
+                                  ? "bg-primary text-[#14100D]"
+                                  : "bg-ink4 text-b3"
+                              )}
                             >
                               {t}
                             </button>
@@ -171,11 +167,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                               type="button"
                               disabled={isPending}
                               onClick={() => handleRemove(item.id)}
-                              className="text-[10px] font-bold px-1 py-1 rounded transition-opacity disabled:opacity-50"
-                              style={{
-                                backgroundColor: "var(--color-danger-bg)",
-                                color: "var(--color-danger)",
-                              }}
+                              className="text-[10px] font-bold px-1 py-1 rounded transition-opacity disabled:opacity-50 bg-danger-bg text-danger"
                             >
                               ✕
                             </button>
@@ -209,16 +201,10 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                           }
                         >
                           <Badge
-                            className={
-                              item.confirmado
-                                ? "text-[10px] font-bold px-1.5 h-7 text-white border-0"
-                                : "text-[10px] font-bold px-1.5 h-7 border-0"
-                            }
-                            style={
-                              item.confirmado
-                                ? { backgroundColor: "var(--color-bica)" }
-                                : undefined
-                            }
+                            className={cn(
+                              "text-[10px] font-bold px-1.5 h-7 border-0",
+                              item.confirmado && "bg-primary text-white"
+                            )}
                             variant={item.confirmado ? "default" : "secondary"}
                           >
                             {TURNO_LABEL[item.turno] ?? item.turno}
@@ -255,10 +241,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
           <span className="font-semibold">FE</span> = Fechamento
         </span>
         <span className="flex items-center gap-1">
-          <span
-            className="inline-block w-3 h-3 rounded-sm"
-            style={{ backgroundColor: "var(--color-bica)" }}
-          />
+          <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
           Confirmado
         </span>
         <span className="flex items-center gap-1">

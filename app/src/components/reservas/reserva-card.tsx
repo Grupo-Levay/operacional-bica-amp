@@ -30,14 +30,14 @@ function formatarHora(time: string): string {
 function StatusBadge({ status }: { status: Status }) {
   if (status === 'confirmada') {
     return (
-      <Badge style={{ backgroundColor: 'var(--color-bica)', color: '#fff' }}>
+      <Badge className="bg-primary text-bica-fg border-0">
         {STATUS_LABEL[status]}
       </Badge>
     )
   }
   if (status === 'concluida') {
     return (
-      <Badge style={{ backgroundColor: 'var(--color-success)', color: '#fff' }}>
+      <Badge className="bg-success text-white border-0">
         {STATUS_LABEL[status]}
       </Badge>
     )
@@ -72,19 +72,18 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p
-              className={`text-sm font-semibold ${cancelada ? 'line-through' : ''}`}
-              style={{ color: 'var(--color-b2)' }}
+              className={`text-sm font-semibold text-b2 ${cancelada ? 'line-through' : ''}`}
             >
               {reserva.customer_name}
             </p>
-            <p className="text-xs" style={{ color: 'var(--color-b3)' }}>
+            <p className="text-xs text-b3">
               {formatarHora(reserva.start_time)} - {formatarHora(reserva.end_time)}
             </p>
           </div>
           <StatusBadge status={status} />
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style={{ color: 'var(--color-b3)' }}>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-b3">
           <span className="flex items-center gap-1">
             <Users size={14} aria-hidden="true" />
             {reserva.guest_count} {reserva.guest_count === 1 ? 'pessoa' : 'pessoas'}
@@ -105,14 +104,14 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
         </div>
 
         {reserva.notes && (
-          <p className="flex items-start gap-1 text-xs" style={{ color: 'var(--color-b4)' }}>
+          <p className="flex items-start gap-1 text-xs text-b4">
             <StickyNote size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
             <span>{reserva.notes}</span>
           </p>
         )}
 
         {erro && (
-          <p className="text-xs" style={{ color: 'var(--color-danger)' }}>
+          <p className="text-xs text-danger">
             {erro}
           </p>
         )}
@@ -120,10 +119,11 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
         {status === 'pendente' && (
           <div className="flex items-center gap-2 pt-1">
             <Button
+              variant="brand"
               size="sm"
               disabled={isPending}
               onClick={() => mudarStatus('confirmada')}
-              style={{ backgroundColor: 'var(--color-bica)', color: '#fff', minHeight: '44px' }}
+              className="min-h-[52px] flex-1"
             >
               Confirmar
             </Button>
@@ -132,7 +132,7 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
               variant="destructive"
               disabled={isPending}
               onClick={() => mudarStatus('cancelada')}
-              style={{ minHeight: '44px' }}
+              className="min-h-[52px]"
             >
               Cancelar
             </Button>
@@ -145,7 +145,7 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
               size="sm"
               disabled={isPending}
               onClick={() => mudarStatus('concluida')}
-              style={{ backgroundColor: 'var(--color-success)', color: '#fff', minHeight: '44px' }}
+              className="bg-success text-white min-h-[52px] flex-1"
             >
               Concluir
             </Button>
@@ -154,7 +154,7 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
               variant="destructive"
               disabled={isPending}
               onClick={() => mudarStatus('cancelada')}
-              style={{ minHeight: '44px' }}
+              className="min-h-[52px]"
             >
               Cancelar
             </Button>

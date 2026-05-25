@@ -38,6 +38,15 @@
   --color-warning-bg:  rgba(251, 191, 36, 0.12);
   --color-danger:      #f87171;
   --color-danger-bg:   rgba(248, 113, 113, 0.12);
+
+  /* Aliases semânticos de marca (usar em componentes — não as cores diretas) */
+  --color-brand-primary:       var(--color-bica);
+  --color-brand-primary-dark:  var(--color-bica-dark);
+  --color-brand-primary-light: var(--color-bica-light);
+  --color-brand-primary-fg:    var(--color-bica-fg);
+  --color-brand-secondary:     var(--color-amp);
+  --color-brand-secondary-dark:var(--color-amp-dark);
+  --color-brand-secondary-fg:  var(--color-amp-fg);
 }
 
 @theme inline {
@@ -51,9 +60,37 @@
   --color-bica:        var(--color-bica);
   --color-bica-dark:   var(--color-bica-dark);
   --color-bica-light:  var(--color-bica-light);
+  --color-bica-fg:     var(--color-bica-fg);
   --color-amp:         var(--color-amp);
   --color-amp-dark:    var(--color-amp-dark);
   --color-amp-light:   var(--color-amp-light);
+  --color-amp-fg:      var(--color-amp-fg);
+  /* Aliases semânticos de marca */
+  --color-brand-primary:        var(--color-brand-primary);
+  --color-brand-primary-dark:   var(--color-brand-primary-dark);
+  --color-brand-primary-light:  var(--color-brand-primary-light);
+  --color-brand-primary-fg:     var(--color-brand-primary-fg);
+  --color-brand-secondary:      var(--color-brand-secondary);
+  --color-brand-secondary-dark: var(--color-brand-secondary-dark);
+  --color-brand-secondary-fg:   var(--color-brand-secondary-fg);
+  /* Paleta Parchment */
+  --color-b0: var(--color-b0);
+  --color-b1: var(--color-b1);
+  --color-b2: var(--color-b2);
+  --color-b3: var(--color-b3);
+  --color-b4: var(--color-b4);
+  /* Paleta Ink */
+  --color-ink:  var(--color-ink);
+  --color-ink2: var(--color-ink2);
+  --color-ink3: var(--color-ink3);
+  --color-ink4: var(--color-ink4);
+  /* Status semânticos */
+  --color-success:    var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-warning:    var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-danger:     var(--color-danger);
+  --color-danger-bg:  var(--color-danger-bg);
   /* shadcn aliases */
   --color-sidebar-ring:                 var(--sidebar-ring);
   --color-sidebar-border:               var(--sidebar-border);

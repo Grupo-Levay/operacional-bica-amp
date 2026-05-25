@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EscalaGrid } from "@/components/escala/escala-grid"
+import { PageHeader } from "@/components/shared/page-header"
 
 async function getEscalaData() {
   try {
@@ -82,24 +83,10 @@ export default async function EscalaPage() {
 
   return (
     <main className="p-4 space-y-4">
-      <div>
-        <h1
-          className="font-display text-2xl"
-          style={{ color: "var(--color-bica)" }}
-        >
-          Escala
-        </h1>
-        {rangeLabel && (
-          <p className="text-sm text-muted-foreground capitalize">
-            {rangeLabel}
-            {canEdit && (
-              <span className="ml-2 text-xs" style={{ color: "var(--color-bica)" }}>
-                · modo edição
-              </span>
-            )}
-          </p>
-        )}
-      </div>
+      <PageHeader
+        title="Escala"
+        subtitle={`${rangeLabel}${canEdit ? ' · modo edição' : ''}`}
+      />
 
       <Card>
         <CardHeader>

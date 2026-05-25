@@ -1,23 +1,24 @@
-import * as React from "react"
+import type { ReactNode } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 interface StatCardProps {
   label: string
   value: string | number
   sub?: string
   accent?: "primary" | "danger" | "warning" | "success"
-  icon?: React.ReactNode
+  icon?: ReactNode
 }
 
-const accentStyles: Record<NonNullable<StatCardProps["accent"]>, React.CSSProperties> = {
-  primary: { color: "var(--color-bica)" },
-  danger:  { color: "var(--color-danger)" },
-  warning: { color: "var(--color-warning)" },
-  success: { color: "var(--color-success)" },
+const accentClasses: Record<NonNullable<StatCardProps["accent"]>, string> = {
+  primary: "text-primary",
+  danger:  "text-danger",
+  warning: "text-warning",
+  success: "text-success",
 }
 
 export function StatCard({ label, value, sub, accent, icon }: StatCardProps) {
-  const valueStyle = accent ? accentStyles[accent] : undefined
+  const accentClass = accent ? accentClasses[accent] : ""
 
   return (
     <Card size="sm" className="min-h-[96px]">
@@ -28,10 +29,7 @@ export function StatCard({ label, value, sub, accent, icon }: StatCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-1">
-        <p
-          className="text-3xl font-mono font-medium leading-none tabular-nums"
-          style={valueStyle}
-        >
+        <p className={cn("text-3xl font-mono font-medium leading-none tabular-nums", accentClass)}>
           {value}
         </p>
         {sub && (

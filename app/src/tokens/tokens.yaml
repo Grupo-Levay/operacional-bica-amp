@@ -1,40 +1,51 @@
 # tokens.yaml — Fonte de verdade do design system Bica & AMP 213
-# Exportado para CSS custom properties e TypeScript via tokens/index.ts
+# Sincronizado com DESIGN.md e globals.css
+# Exportado para TypeScript via tokens/index.ts
 
 color:
-  # Brand — Bica Bar
-  bica:         "#c4973a"
-  bica-dark:    "#a07a28"
-  bica-light:   "#f5e8c8"
-  bica-fg:      "#ffffff"
+  # ── Brand ─────────────────────────────────────────────────────
+  bica:           "#C9A368"   # Âmbar Bica — primary
+  bica-dark:      "#B98D4E"   # Hover, active
+  bica-light:     "rgba(201, 163, 104, 0.14)"
+  bica-fg:        "#14100D"   # Texto sobre fundo bica
 
-  # Brand — AMP 213
-  amp:          "#c13b2a"
-  amp-dark:     "#9a2e1f"
-  amp-light:    "#f7dbd7"
-  amp-fg:       "#ffffff"
+  amp:            "#B91C1C"   # Tijolo AMP — secondary
+  amp-dark:       "#991818"   # Hover, active
+  amp-light:      "rgba(185, 28, 28, 0.14)"
+  amp-fg:         "#EFE3CC"   # Texto sobre fundo amp
 
-  # Semânticos
-  success:      "#16a34a"
-  success-light: "#dcfce7"
-  warning:      "#f59e0b"
-  warning-light: "#fef9c3"
-  danger:       "#dc2626"
-  danger-light: "#fee2e2"
-  info:         "#2563eb"
-  info-light:   "#dbeafe"
+  # ── Aliases semânticos ────────────────────────────────────────
+  # Usar estes em componentes — não os brand diretamente
+  primary:        "var(--color-bica)"
+  primary-dark:   "var(--color-bica-dark)"
+  primary-light:  "var(--color-bica-light)"
+  primary-fg:     "var(--color-bica-fg)"
 
-  # Neutros
-  neutral-50:   "#fafafa"
-  neutral-100:  "#f4f4f5"
-  neutral-200:  "#e4e4e7"
-  neutral-300:  "#d4d4d8"
-  neutral-400:  "#a1a1aa"
-  neutral-500:  "#71717a"
-  neutral-600:  "#52525b"
-  neutral-700:  "#3f3f46"
-  neutral-800:  "#27272a"
-  neutral-900:  "#18181b"
+  secondary-brand:      "var(--color-amp)"
+  secondary-brand-dark: "var(--color-amp-dark)"
+  secondary-brand-light:"var(--color-amp-light)"
+  secondary-fg:   "var(--color-amp-fg)"
+
+  # ── Status semânticos ─────────────────────────────────────────
+  success:        "#4ade80"
+  success-bg:     "rgba(74, 222, 128, 0.12)"
+  warning:        "#fbbf24"
+  warning-bg:     "rgba(251, 191, 36, 0.12)"
+  danger:         "#f87171"
+  danger-bg:      "rgba(248, 113, 113, 0.12)"
+
+  # ── Parchment (texto e superfícies sobre dark) ────────────────
+  b0:  "#F4ECDC"   # oklch(0.940 0.024 72) — quase branco creme
+  b1:  "#EFE3CC"   # oklch(0.913 0.025 72) — foreground principal
+  b2:  "#D8C9A8"   # oklch(0.825 0.033 72) — texto secundário
+  b3:  "#B5A481"   # oklch(0.683 0.038 72) — labels, placeholders
+  b4:  "#8D7F66"   # oklch(0.552 0.024 72) — muted foreground
+
+  # ── Ink (backgrounds) ─────────────────────────────────────────
+  ink:   "#0B0807"   # oklch(0.065 0.008 52) — preto quase absoluto
+  ink2:  "#14100D"   # oklch(0.098 0.010 52) — background card
+  ink3:  "#1C1612"   # oklch(0.138 0.012 52) — background principal
+  ink4:  "#2A211A"   # oklch(0.190 0.014 52) — superfície elevada
 
 spacing:
   1:   "0.25rem"   # 4px
@@ -49,26 +60,27 @@ spacing:
   16:  "4rem"      # 64px
 
 typography:
-  font-sans:    "'Inter', system-ui, sans-serif"
-  font-mono:    "'Geist Mono', monospace"
-  text-xs:      "0.75rem"
-  text-sm:      "0.875rem"
-  text-base:    "1rem"
-  text-lg:      "1.125rem"
-  text-xl:      "1.25rem"
-  text-2xl:     "1.5rem"
-  text-3xl:     "1.875rem"
-  font-normal:  "400"
-  font-medium:  "500"
+  font-sans:     "'Jost', system-ui, sans-serif"
+  font-display:  "'DM Serif Display', serif"
+  font-mono:     "'JetBrains Mono', monospace"
+  text-xs:       "0.75rem"
+  text-sm:       "0.875rem"
+  text-base:     "1rem"
+  text-lg:       "1.125rem"
+  text-xl:       "1.25rem"
+  text-2xl:      "1.5rem"
+  text-3xl:      "1.875rem"
+  font-normal:   "400"
+  font-medium:   "500"
   font-semibold: "600"
-  font-bold:    "700"
+  font-bold:     "700"
 
 radius:
-  sm:   "0.25rem"   # 4px
-  md:   "0.5rem"    # 8px
-  lg:   "0.75rem"   # 12px
-  xl:   "1rem"      # 16px
-  full: "9999px"
+  sm:   "0.25rem"   # 4px — badges, chips
+  md:   "0.5rem"    # 8px — inputs, cards small
+  lg:   "0.75rem"   # 12px — cards, modais
+  xl:   "1rem"      # 16px — sheets, drawers
+  full: "9999px"    # pills, avatares
 
 shadow:
   sm:  "0 1px 2px rgb(0 0 0 / 0.05)"
@@ -80,6 +92,9 @@ transition:
   fast:   "150ms ease"
   normal: "200ms ease"
   slow:   "300ms ease"
+
+touch:
+  target: "52px"   # WCAG 2.5.5 AAA
 
 z-index:
   base:    "0"

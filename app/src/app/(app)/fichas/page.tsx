@@ -1,5 +1,7 @@
 import type { Tables } from "@/types/database.types"
 import { FichasList } from "@/components/fichas/fichas-list"
+import { PageHeader } from "@/components/shared/page-header"
+import { cn } from "@/lib/utils"
 
 type FichaTecnica = Tables<"fichas_tecnicas">
 
@@ -43,19 +45,17 @@ export default async function FichasPage() {
   const categorias = [...new Set(fichas.map(f => f.categoria ?? "Sem categoria"))].sort()
 
   const cmvDanger = cmvMedio != null && cmvMedio > 30
-  const cmvColor = cmvDanger ? "var(--color-amp)" : cmvMedio != null ? "#16a34a" : undefined
+  const cmvClass = cmvMedio == null ? undefined : cmvDanger ? 'text-amp' : 'text-success'
 
   return (
     <main className="p-4 space-y-6">
-      <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
-        Ficha Técnica / CMV
-      </h1>
+      <PageHeader title="Ficha Técnica / CMV" />
 
       {fichas.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           <div className="rounded-lg border shadow-sm bg-card p-3 flex flex-col gap-1">
             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide leading-none">CMV Médio</span>
-            <span className="text-2xl font-bold tabular-nums leading-none" style={{ color: cmvColor }}>
+            <span className={cn("text-2xl font-bold tabular-nums leading-none", cmvClass)}>
               {cmvMedio != null ? `${cmvMedio.toFixed(1)}%` : "—"}
             </span>
             <span className="text-[10px] text-muted-foreground">{cmvDanger ? "acima da meta" : "dentro da meta"}</span>

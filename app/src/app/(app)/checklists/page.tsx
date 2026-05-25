@@ -1,6 +1,8 @@
 import { CheckSquare } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ChecklistCard } from '@/components/checklists/checklist-card'
+import { PageHeader } from '@/components/shared/page-header'
+import { SectionLabel } from '@/components/shared/section-label'
 import type { Database } from '@/types/database.types'
 
 type Checklist = Database['public']['Tables']['checklists']['Row']
@@ -72,19 +74,15 @@ export default async function ChecklistsPage() {
   return (
     <main className="p-4 space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Checklists</h1>
-          <p className="text-xs text-muted-foreground capitalize">
-            {formatarData(new Date())}
-          </p>
-        </div>
-        {pendentes.length > 0 && (
-          <Badge variant="destructive" className="shrink-0 mt-1">
+      <PageHeader
+        title="Checklists"
+        subtitle={formatarData(new Date())}
+        badge={pendentes.length > 0 ? (
+          <Badge variant="destructive" className="shrink-0">
             {pendentes.length} pendente{pendentes.length !== 1 ? 's' : ''}
           </Badge>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       {/* Empty state */}
       {checklists.length === 0 && (
@@ -97,9 +95,7 @@ export default async function ChecklistsPage() {
       {/* Grupos por turno */}
       {grupos.map((grupo) => (
         <section key={grupo.label} className="space-y-3">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            {grupo.label}
-          </h2>
+          <SectionLabel>{grupo.label}</SectionLabel>
           <div className="space-y-3">
             {grupo.items.map((checklist) => {
               const itens = Array.isArray(checklist.itens) ? checklist.itens : []

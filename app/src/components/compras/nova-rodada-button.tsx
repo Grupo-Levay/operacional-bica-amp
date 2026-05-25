@@ -23,8 +23,8 @@ export function NovaRodadaButton() {
     return (
       <Button
         size="sm"
+        variant="brand"
         onClick={() => setAberto(true)}
-        style={{ backgroundColor: "var(--color-bica)", color: "#fff" }}
       >
         Nova Rodada
       </Button>
@@ -39,12 +39,12 @@ export function NovaRodadaButton() {
         onChange={(e) => setNome(e.target.value)}
         placeholder={`Rodada ${new Date().toLocaleDateString("pt-BR")}`}
         autoFocus
-        className="flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-bica)]"
+        className="flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
       />
       <Button
         type="submit"
         size="sm"
-        style={{ backgroundColor: "var(--color-bica)", color: "#fff" }}
+        variant="brand"
       >
         Criar
       </Button>

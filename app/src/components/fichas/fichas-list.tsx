@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChefHat, Search } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { FichaCard } from "@/components/fichas/ficha-card"
 import type { Tables } from "@/types/database.types"
 
@@ -45,8 +46,7 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Buscar ficha..."
-          className="w-full rounded-lg border bg-muted/50 pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1"
-          style={{ "--tw-ring-color": "var(--color-bica)" } as React.CSSProperties}
+          className="w-full rounded-lg border bg-muted/50 pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -56,12 +56,12 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
           <button
             type="button"
             onClick={() => setFiltroCategoria(null)}
-            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent transition-colors"
-            style={
+            className={cn(
+              "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent transition-colors",
               filtroCategoria === null
-                ? { backgroundColor: "var(--color-bica)", color: "#14100D" }
-                : { backgroundColor: "transparent", color: "var(--color-b3)", borderColor: "var(--color-ink4)" }
-            }
+                ? "bg-primary text-bica-fg"
+                : "bg-transparent text-b3 border-ink4"
+            )}
           >
             Todas
           </button>
@@ -70,12 +70,12 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
               key={cat}
               type="button"
               onClick={() => setFiltroCategoria(filtroCategoria === cat ? null : cat)}
-              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
-              style={
+              className={cn(
+                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
                 filtroCategoria === cat
-                  ? { backgroundColor: "var(--color-bica)", color: "#14100D", borderColor: "transparent" }
-                  : { backgroundColor: "transparent", color: "var(--color-b3)", borderColor: "var(--color-ink4)" }
-              }
+                  ? "bg-primary text-bica-fg border-transparent"
+                  : "bg-transparent text-b3 border-ink4"
+              )}
             >
               {cat}
             </button>
