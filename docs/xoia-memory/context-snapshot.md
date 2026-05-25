@@ -1,56 +1,53 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-23 | Branch: claude/blissful-turing-lVZPh_
+_Atualizado: 2026-05-25 | Branch: main (PR#23 mergeado)_
 
 ## Projeto
-App: Painel operacional do bar BiCA — gestão de checklists, estoque, escala, compras e fichas técnicas
-Stack: Next.js 16.2.6 (App Router) + TypeScript + Supabase (Auth + DB) + Tailwind CSS + Vercel
-Ambiente: Container remoto Claude Code; deploy automático na Vercel (projeto `bica-bar-system`)
+App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
+Stack: Next.js 16 (App Router) + TypeScript + Supabase (Auth + DB) + Tailwind + Vercel
+Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica-bar-system`)
 
 ## Arquivos críticos
-`app/src/proxy.ts`                                    → proteção de rotas (Next.js 16 — NÃO middleware.ts)
-`app/src/lib/supabase/proxy.ts`                       → updateSession() com cookie forwarding SSR
-`app/src/lib/supabase/server.ts`                      → createClient() para Server Components e Actions
-`app/src/lib/supabase/client.ts`                      → createClient() para Client Components
-`app/src/lib/roles.ts`                                → type Role + rotasPermitidas(role)
-`app/src/lib/onboarding.ts`                           → getOnboardingConfig() por role
-`app/src/app/actions/auth.ts`                         → signIn, signOut, resetPassword, updatePassword
-`app/src/app/(auth)/login/login-form.tsx`             → form login com useActionState
-`app/src/app/(auth)/recuperar-senha/`                 → flow reset password
-`app/src/app/(auth)/atualizar-senha/`                 → flow set new password
-`app/src/app/auth/callback/route.ts`                  → PKCE exchange code → session
-`app/src/app/(app)/layout.tsx`                        → layout protegido: busca perfil + onboarding
-`app/src/components/layout/sidebar.tsx`               → nav desktop filtrado por role
-`app/src/components/layout/bottom-nav.tsx`            → nav mobile filtrado por role
-`app/src/components/onboarding/onboarding-modal.tsx`  → modal 2-step onboarding por role
+`src/proxy.ts`                              → proteção de rotas (Next.js 16 — não middleware.ts)
+`src/lib/tenant.ts`                         → getCurrentCasa() — resolve bica/amp via subdomínio + cookie
+`src/lib/auth-guard.ts`                     → requireUser() — auth + casa para Server Actions
+`src/lib/supabase/server.ts`                → createClient() para Server Components e Actions
+`src/lib/roles.ts`                          → type Role + rotasPermitidas(role)
+`src/app/actions/auth.ts`                   → signIn, signOut, resetPassword, setCasaAction
+`src/app/(app)/reservas/page.tsx`           → módulo reservas completo com DateNav + form
+`src/components/reservas/`                  → date-nav, nova-reserva-form, reserva-card
+`src/types/database.types.ts`              → tipos Supabase com coluna `casa` em todas as tabelas
+`supabase/migrations/`                      → 0001 multi_tenant SQL | 0002 relaxa RLS
 
 ## Estado atual
-✅ Design system — dark theme + brand guide BiCA
-✅ Sidebar desktop + BottomNav mobile responsivos
-✅ Supabase Auth — login email+senha com proteção de rotas via proxy.ts
-✅ Tabela `perfis` com roles + RLS + trigger auto-create
-✅ Navegação filtrada por role (super_admin/admin/operacional/estoque/cmv/bar)
-✅ Onboarding modal guiado por role no primeiro acesso
-✅ Recuperação de senha por e-mail (resetPasswordForEmail + PKCE callback)
-🔄 Admin panel para gestão de roles (próximo ciclo)
-⬜ Página pública `/cardapio`
-⬜ Módulos: checklists, estoque, escala, compras, fichas técnicas
+✅ Auth — login, proteção de rotas por role, onboarding, recuperação de senha
+✅ Multi-tenant — isolamento por `casa` (bica/amp) via getCurrentCasa() + requireUser()
+✅ Layout — CasaSwitcher, LogoutBtn, AbastecimentoSubnav, sidebar + bottom-nav
+✅ Reservas — CRUD completo, DateNav, status badges, confirmar/cancelar/concluir
+✅ Escala — grid 7 dias, edição inline por admin
+✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
+✅ Dashboard — checklists pendentes + estoque crítico por casa
+✅ RLS relaxada (isolamento na aplicação) — migration 0002 aplicada
+⬜ Mesas no Supabase (bar_tables) — criar via dashboard para habilitar seletor no form reservas
+⬜ Ícones PWA (public/icon-192.png, public/icon-512.png)
+⬜ Testes de integração para Server Actions
 
 ## Decisões técnicas ativas
-- `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação de rotas
+- `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação
+- `requireUser()` em actions: ponto único de auth+casa, lança Error se não autenticado
+- Isolamento multi-tenant na aplicação: filter `.eq('casa', casa)` em toda query — não no RLS
 - `getUser()` (não `getSession()`): única chamada segura para auth decisions no server
 - PKCE flow via `/auth/callback`: `exchangeCodeForSession(code)` antes de redirecionar
-- `useActionState` + Server Actions: pattern para forms com pending state (não `useState`)
-- Supabase MCP (`ducbzdfxzaifzqefolhy`): usa ferramenta `execute_sql` para migrações remotas
+- Supabase MCP (`ducbzdfxzaifzqefolhy`): usa `execute_sql` para migrações remotas
 
 ## Últimos ships
-1. feat: recuperação de senha por e-mail (2026-05-22)
-2. feat: onboarding guiado por role no primeiro acesso (2026-05-22)
-3. feat: autenticação completa com Supabase Auth + proteção de rotas por role (2026-05-22)
-4. feat: sidebar desktop — wordmark BiCA + nav responsivo (2026-05-21)
-5. feat: design system — dark theme + brand guide BICA v2 (2026-05-21)
+1. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
+2. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-25)
+3. feat: Tier 1 UX — limelight nav, filtro estoque, search fichas (2026-05-25)
+4. feat: recuperação de senha + PKCE flow (2026-05-22)
+5. feat: design system BiCA v2 + autenticação + onboarding guiado (2026-05-22)
 
 ## Gaps conhecidos
-- Usuário `quentalgabriel@gmail.com` pode não ter senha definida — foi criado antes do trigger; precisa de reset via Supabase Dashboard se ainda não conseguiu logar
-- Módulos do dashboard (checklists, estoque etc.) existem como páginas vazias — sem lógica de negócio
-- Sem testes unitários ainda — `npm test` passa por não ter specs
+- `bar_tables` pode estar vazia — criar mesas via Supabase dashboard para form de reservas funcionar
+- Migration 0001 multi_tenant.sql versionada; já aplicada via PR#6 histórico (idempotente)
+- Sem testes unitários — `npm test` passa por não ter specs
