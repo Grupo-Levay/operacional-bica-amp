@@ -1,17 +1,25 @@
 import { notFound } from 'next/navigation'
 import { ChecklistExecutor } from './checklist-executor'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentCasa } from '@/lib/tenant'
 
 async function getData(id: string) {
   const supabase = await createClient()
+  const casa = await getCurrentCasa()
   const hoje = new Date().toISOString().split('T')[0]
 
   const [{ data: checklist }, { data: registro }] = await Promise.all([
-    supabase.from('checklists').select('*').eq('id', id).single(),
+    supabase
+      .from('checklists')
+      .select('*')
+      .eq('id', id)
+      .eq('casa', casa)
+      .maybeSingle(),
     supabase
       .from('checklist_registros')
       .select('*')
       .eq('checklist_id', id)
+      .eq('casa', casa)
       .eq('data', hoje)
       .maybeSingle(),
   ])

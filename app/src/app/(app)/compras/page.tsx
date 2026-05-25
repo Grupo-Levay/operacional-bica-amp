@@ -14,16 +14,20 @@ async function getComprasData(): Promise<{
 }> {
   try {
     const { createClient } = await import("@/lib/supabase/server")
+    const { getCurrentCasa } = await import("@/lib/tenant")
     const supabase = await createClient()
+    const casa = await getCurrentCasa()
     const [{ data: rodadas }, { data: categorias }] = await Promise.all([
       supabase
         .from("rodadas")
         .select("*, rodada_itens(*)")
+        .eq("casa", casa)
         .order("created_at", { ascending: false })
         .limit(10),
       supabase
         .from("compras_categorias")
         .select("*, compras_itens(*)")
+        .eq("casa", casa)
         .order("ordem"),
     ])
     return {

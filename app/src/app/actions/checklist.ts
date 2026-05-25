@@ -1,21 +1,25 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth-guard'
 
 export async function marcarItemChecklist(
   checklistId: string,
   itemNome: string,
   marcar: boolean,
 ) {
-  const supabase = await createClient()
+  if (!checklistId?.trim()) throw new Error('Checklist inválido')
+  if (!itemNome?.trim()) throw new Error('Item inválido')
+
+  const { supabase, casa } = await requireUser()
   const hoje = new Date().toISOString().split('T')[0]
 
   const { data: checklist } = await supabase
     .from('checklists')
     .select('itens, turno')
     .eq('id', checklistId)
-    .single()
+    .eq('casa', casa)
+    .maybeSingle()
 
   const totalItens = Array.isArray(checklist?.itens) ? checklist.itens.length : 0
 
@@ -23,6 +27,7 @@ export async function marcarItemChecklist(
     .from('checklist_registros')
     .select('*')
     .eq('checklist_id', checklistId)
+    .eq('casa', casa)
     .eq('data', hoje)
     .maybeSingle()
 
@@ -41,6 +46,7 @@ export async function marcarItemChecklist(
       .from('checklist_registros')
       .update({ itens_concluidos: novosItens, concluido })
       .eq('id', existente.id)
+      .eq('casa', casa)
   } else {
     const novosItens = marcar ? [itemNome] : []
     const concluido = totalItens > 0 && novosItens.length >= totalItens
@@ -51,6 +57,7 @@ export async function marcarItemChecklist(
       turno: checklist?.turno ?? 'abertura',
       itens_concluidos: novosItens,
       concluido,
+      casa,
     })
   }
 
@@ -59,13 +66,16 @@ export async function marcarItemChecklist(
 }
 
 export async function reabrirChecklist(checklistId: string) {
-  const supabase = await createClient()
+  if (!checklistId?.trim()) throw new Error('Checklist inválido')
+
+  const { supabase, casa } = await requireUser()
   const hoje = new Date().toISOString().split('T')[0]
 
   await supabase
     .from('checklist_registros')
     .update({ itens_concluidos: [], concluido: false })
     .eq('checklist_id', checklistId)
+    .eq('casa', casa)
     .eq('data', hoje)
 
   revalidatePath('/checklists')

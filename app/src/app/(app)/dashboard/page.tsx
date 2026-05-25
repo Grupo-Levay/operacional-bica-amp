@@ -11,7 +11,9 @@ import { StatCard } from "@/components/dashboard/stat-card"
 async function getDashboardData() {
   try {
     const { createClient } = await import("@/lib/supabase/server")
+    const { getCurrentCasa } = await import("@/lib/tenant")
     const supabase = await createClient()
+    const casa = await getCurrentCasa()
     const hoje = new Date().toISOString().split("T")[0]
 
     const [
@@ -23,24 +25,29 @@ async function getDashboardData() {
     ] = await Promise.all([
       supabase
         .from("checklists")
-        .select("id", { count: "exact", head: true }),
+        .select("id", { count: "exact", head: true })
+        .eq("casa", casa),
       supabase
         .from("checklist_registros")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .eq("data", hoje)
         .eq("concluido", true),
       // PostgREST não suporta comparação coluna-vs-coluna — filtra client-side
       supabase
         .from("estoque_itens")
         .select("atual, minimo")
+        .eq("casa", casa)
         .eq("ativo", true),
       supabase
         .from("rodadas")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .eq("status", "aberta"),
       supabase
         .from("equipe")
         .select("id", { count: "exact", head: true })
+        .eq("casa", casa)
         .eq("ativo", true),
     ])
 

@@ -9,17 +9,21 @@ type Registro = Database['public']['Tables']['checklist_registros']['Row']
 async function getChecklists(): Promise<{ checklists: Checklist[]; registros: Registro[] }> {
   try {
     const { createClient } = await import('@/lib/supabase/server')
+    const { getCurrentCasa } = await import('@/lib/tenant')
     const supabase = await createClient()
+    const casa = await getCurrentCasa()
     const hoje = new Date().toISOString().split('T')[0]
 
     const { data: checklists } = await supabase
       .from('checklists')
       .select('*')
+      .eq('casa', casa)
       .order('turno')
 
     const { data: registros } = await supabase
       .from('checklist_registros')
       .select('*')
+      .eq('casa', casa)
       .eq('data', hoje)
 
     return { checklists: checklists ?? [], registros: registros ?? [] }
