@@ -22,15 +22,10 @@ export function OnboardingModal({ config, nomeUsuario }: OnboardingModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300"
-      style={{ backgroundColor: 'rgba(12, 9, 7, 0.85)', backdropFilter: 'blur(4px)' }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300 bg-[rgba(12,9,7,0.85)] backdrop-blur-sm"
     >
       <div
-        className="w-full max-w-md rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-400"
-        style={{
-          backgroundColor: 'var(--color-ink3)',
-          border: '1px solid var(--border)',
-        }}
+        className="w-full max-w-md rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-400 bg-ink3 border border-border"
       >
         {step === 'welcome' && (
           <WelcomeStep
@@ -66,20 +61,18 @@ function WelcomeStep({
     <div className="p-8 space-y-6">
       {/* Wordmark */}
       <span
-        className="font-display text-3xl leading-none select-none block"
-        style={{ color: 'var(--color-b1)' }}
+        className="font-display text-3xl leading-none select-none block text-b1"
       >
-        B<em style={{ color: 'var(--color-bica)', fontStyle: 'italic' }}>i</em>CA
+        B<em className="text-bica italic">i</em>CA
       </span>
 
       <div className="space-y-2">
         <h2
-          className="font-display text-2xl leading-tight"
-          style={{ color: 'var(--color-b1)' }}
+          className="font-display text-2xl leading-tight text-b1"
         >
           {primeiroNome ? `Olá, ${primeiroNome}.` : 'Bem-vindo.'}
         </h2>
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--color-b4)' }}>
+        <p className="text-sm leading-relaxed text-b4">
           {config.subtitulo} Vamos te mostrar o que está disponível para você nesta plataforma.
         </p>
       </div>
@@ -87,11 +80,7 @@ function WelcomeStep({
       <button
         type="button"
         onClick={onNext}
-        className="flex w-full items-center justify-between rounded-xl px-5 py-3.5 text-sm font-medium transition-opacity hover:opacity-90"
-        style={{
-          backgroundColor: 'var(--color-bica)',
-          color: 'var(--color-ink2)',
-        }}
+        className="flex w-full items-center justify-between rounded-xl px-5 py-3.5 text-sm font-medium transition-opacity hover:opacity-90 bg-bica text-ink2"
       >
         Ver o que está disponível
         <ArrowRight className="size-4" />
@@ -113,12 +102,11 @@ function FeaturesStep({
     <div className="p-8 space-y-6">
       <div className="space-y-1">
         <h2
-          className="font-display text-xl leading-tight"
-          style={{ color: 'var(--color-b1)' }}
+          className="font-display text-xl leading-tight text-b1"
         >
           {config.titulo}
         </h2>
-        <p className="text-sm" style={{ color: 'var(--color-b4)' }}>
+        <p className="text-sm text-b4">
           Estas são as seções que você tem acesso:
         </p>
       </div>
@@ -127,18 +115,16 @@ function FeaturesStep({
         {config.features.map((f) => (
           <li
             key={f.label}
-            className="flex items-start gap-3 rounded-lg px-3 py-2.5"
-            style={{ backgroundColor: 'var(--color-ink2)' }}
+            className="flex items-start gap-3 rounded-lg px-3 py-2.5 bg-ink2"
           >
             <span className="text-xl leading-none mt-0.5" aria-hidden="true">{f.icon}</span>
             <div className="min-w-0">
               <p
-                className="text-sm font-medium leading-none mb-1"
-                style={{ color: 'var(--color-b1)' }}
+                className="text-sm font-medium leading-none mb-1 text-b1"
               >
                 {f.label}
               </p>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--color-b4)' }}>
+              <p className="text-xs leading-relaxed text-b4">
                 {f.descricao}
               </p>
             </div>

@@ -41,32 +41,20 @@ export function Sidebar({ role, currentCasa, availableCasas }: SidebarProps) {
 
   return (
     <aside
-      className="hidden md:flex fixed inset-y-0 left-0 z-30 w-56 flex-col"
-      style={{
-        backgroundColor: "var(--color-ink2)",
-        borderRight: "1px solid var(--border)",
-      }}
+      className="hidden md:flex fixed inset-y-0 left-0 z-30 w-56 flex-col bg-ink2 border-r border-border"
     >
       {/* Wordmark + Casa Switcher */}
       <div
-        className="flex h-16 shrink-0 items-center justify-between gap-3 px-4"
-        style={{ borderBottom: "1px solid var(--border)" }}
+        className="flex h-16 shrink-0 items-center justify-between gap-3 px-4 border-b border-border"
       >
         <div className="flex items-center gap-2">
           <span
-            className="font-display text-[26px] leading-none select-none"
-            style={{ color: "var(--color-b1)" }}
+            className="font-display text-[26px] leading-none select-none text-b1"
           >
-            B<em style={{ color: "var(--color-bica)", fontStyle: "italic" }}>i</em>CA
+            B<em className="text-bica italic">i</em>CA
           </span>
           <span
-            className="text-[8px] uppercase leading-tight"
-            style={{
-              color: "var(--color-b4)",
-              letterSpacing: "0.36em",
-              fontWeight: 300,
-              paddingTop: "2px",
-            }}
+            className="text-[8px] uppercase leading-tight text-b4 tracking-[0.36em] font-light pt-[2px]"
           >
             Oper&shy;acional
           </span>
@@ -84,19 +72,11 @@ export function Sidebar({ role, currentCasa, availableCasas }: SidebarProps) {
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className="flex items-center gap-3 rounded-md px-3 transition-colors"
-                  style={{
-                    minHeight: "44px",
-                    paddingTop: "10px",
-                    paddingBottom: "10px",
-                    backgroundColor: active
-                      ? "var(--color-bica-light)"
-                      : "transparent",
-                    color: active ? "var(--color-bica)" : "var(--color-b4)",
-                    borderLeft: active
-                      ? "2px solid var(--color-bica)"
-                      : "2px solid transparent",
-                  }}
+                  className={`flex items-center gap-3 rounded-md px-3 min-h-[52px] py-[10px] transition-colors border-l-2 ${
+                    active
+                      ? "bg-bica-light text-bica border-bica"
+                      : "bg-transparent text-b4 border-transparent"
+                  }`}
                 >
                   <Icon
                     size={17}
@@ -104,8 +84,7 @@ export function Sidebar({ role, currentCasa, availableCasas }: SidebarProps) {
                     aria-hidden="true"
                   />
                   <span
-                    className="text-sm tracking-wide"
-                    style={{ fontWeight: active ? 500 : 400 }}
+                    className={`text-sm tracking-wide ${active ? "font-medium" : "font-normal"}`}
                   >
                     {label}
                   </span>
@@ -118,12 +97,10 @@ export function Sidebar({ role, currentCasa, availableCasas }: SidebarProps) {
 
       {/* Rodapé */}
       <div
-        className="shrink-0 px-4 py-4 flex items-center justify-between"
-        style={{ borderTop: "1px solid var(--border)" }}
+        className="shrink-0 px-4 py-4 flex items-center justify-between border-t border-border"
       >
         <p
-          className="text-[8px] uppercase"
-          style={{ color: "var(--color-b4)", letterSpacing: "0.38em", opacity: 0.5 }}
+          className="text-[8px] uppercase text-b4 tracking-[0.38em] opacity-50"
         >
           Bica &amp; AMP 213
         </p>
