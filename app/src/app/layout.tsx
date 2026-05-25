@@ -27,6 +27,13 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Bica & AMP 213 — Operacional",
   description: "Sistema operacional Bica Bar e AMP 213",
+  manifest: "/manifest.json",
+  themeColor: "#c9a368",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "BiCA",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
