@@ -14,8 +14,7 @@ export function AtualizarForm() {
       <div className="space-y-1.5">
         <label
           htmlFor="password"
-          className="text-xs font-medium uppercase tracking-wide"
-          style={{ color: 'var(--color-b4)' }}
+          className="text-xs font-medium uppercase tracking-wide text-b4"
         >
           Nova senha
         </label>
@@ -27,22 +26,14 @@ export function AtualizarForm() {
           required
           minLength={8}
           placeholder="Mínimo 8 caracteres"
-          className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
-          style={{
-            backgroundColor: 'var(--color-ink2)',
-            border: '1px solid var(--border)',
-            color: 'var(--color-b1)',
-          }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-bica)')}
-          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+          className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors bg-ink2 border border-border text-b1 focus:border-bica"
         />
       </div>
 
       <div className="space-y-1.5">
         <label
           htmlFor="confirm"
-          className="text-xs font-medium uppercase tracking-wide"
-          style={{ color: 'var(--color-b4)' }}
+          className="text-xs font-medium uppercase tracking-wide text-b4"
         >
           Confirmar senha
         </label>
@@ -53,21 +44,13 @@ export function AtualizarForm() {
           autoComplete="new-password"
           required
           placeholder="Repita a senha"
-          className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
-          style={{
-            backgroundColor: 'var(--color-ink2)',
-            border: '1px solid var(--border)',
-            color: 'var(--color-b1)',
-          }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-bica)')}
-          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+          className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors bg-ink2 border border-border text-b1 focus:border-bica"
         />
       </div>
 
       {state?.error && (
         <p
-          className="rounded-lg px-3 py-2 text-sm"
-          style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}
+          className="rounded-lg px-3 py-2 text-sm bg-danger-bg text-danger"
         >
           {state.error}
         </p>
@@ -76,8 +59,7 @@ export function AtualizarForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="mt-2 w-full rounded-lg py-2.5 text-sm font-medium transition-opacity disabled:opacity-60"
-        style={{ backgroundColor: 'var(--color-bica)', color: 'var(--color-ink2)' }}
+        className="mt-2 w-full rounded-lg py-2.5 text-sm font-medium transition-opacity disabled:opacity-60 bg-bica text-ink2"
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">
