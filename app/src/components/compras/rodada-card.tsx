@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tables } from "@/types/database.types"
 import { marcarItemComprado, fecharRodada } from "@/app/actions/compras"
+import { cn } from "@/lib/utils"
 
 type RodadaItem = Tables<"rodada_itens">
 type Rodada = Tables<"rodadas"> & { rodada_itens: RodadaItem[] }
@@ -52,15 +53,13 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
 
   return (
     <Card
-      className="rounded-lg border shadow-sm"
-      style={{ borderColor: "var(--color-bica)" }}
+      className={cn("rounded-lg border shadow-sm", "border-primary")}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base">{rodada.nome}</CardTitle>
           <Badge
-            className="text-xs font-semibold shrink-0"
-            style={{ backgroundColor: "#16a34a", color: "#fff" }}
+            className="text-xs font-semibold shrink-0 bg-success text-white border-0"
           >
             ABERTA
           </Badge>
@@ -78,14 +77,13 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
                 <button
                   type="button"
                   onClick={() => handleToggle(item)}
-                  className="w-full flex items-center gap-3 py-2.5 text-sm text-left"
-                  style={{ minHeight: "44px" }}
+                  className={cn("w-full flex items-center gap-3 py-2.5 text-sm text-left", "min-h-[52px]")}
                 >
                   <input
                     type="checkbox"
                     checked={item.comprado ?? false}
                     readOnly
-                    className="accent-[var(--color-bica)] h-4 w-4 shrink-0 pointer-events-none"
+                    className="accent-bica h-4 w-4 shrink-0 pointer-events-none"
                   />
                   <span
                     className={`flex-1 ${item.comprado ? "line-through text-muted-foreground" : ""}`}
@@ -116,7 +114,7 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
           </button>
           <p className="text-sm font-bold">
             Total:{" "}
-            <span style={{ color: "var(--color-bica)" }}>{formatarMoeda(total)}</span>
+            <span className="text-primary">{formatarMoeda(total)}</span>
           </p>
         </div>
       </CardContent>

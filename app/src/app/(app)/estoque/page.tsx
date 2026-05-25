@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { EstoqueList } from '@/components/estoque/estoque-list'
+import { PageHeader } from '@/components/shared/page-header'
 import type { Database } from '@/types/database.types'
 
 type Categoria = Database['public']['Tables']['estoque_categorias']['Row']
@@ -28,19 +29,15 @@ export default async function EstoquePage() {
 
   return (
     <main className="p-4 space-y-6 pb-24">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>Estoque</h1>
-          <p className="text-xs text-muted-foreground">
-            {itens.length} {itens.length === 1 ? 'item cadastrado' : 'itens cadastrados'}
-          </p>
-        </div>
-        {criticos.length > 0 && (
-          <Badge variant="destructive" className="shrink-0 mt-1">
+      <PageHeader
+        title="Estoque"
+        subtitle={`${itens.length} ${itens.length === 1 ? 'item cadastrado' : 'itens cadastrados'}`}
+        badge={criticos.length > 0 ? (
+          <Badge variant="destructive" className="shrink-0">
             {criticos.length} crítico{criticos.length !== 1 ? 's' : ''}
           </Badge>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       <EstoqueList categorias={categorias} itens={itens} />
     </main>

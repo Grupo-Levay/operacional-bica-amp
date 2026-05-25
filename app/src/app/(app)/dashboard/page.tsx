@@ -1,4 +1,3 @@
-import Link from "next/link"
 import {
   AlertTriangle,
   CheckSquare,
@@ -7,6 +6,8 @@ import {
   Users,
 } from "lucide-react"
 import { StatCard } from "@/components/dashboard/stat-card"
+import { PageHeader } from "@/components/shared/page-header"
+import { BrandLink } from "@/components/ui/brand-link"
 
 async function getDashboardData() {
   try {
@@ -86,12 +87,7 @@ export default async function DashboardPage() {
   return (
     <main className="p-4 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
-          Bica &amp; AMP 213
-        </h1>
-        <p className="text-sm text-muted-foreground capitalize">{dataHoje}</p>
-      </div>
+      <PageHeader title="Bica &amp; AMP 213" subtitle={dataHoje} />
 
       {/* Stat Cards Grid */}
       <section>
@@ -133,38 +129,14 @@ export default async function DashboardPage() {
           Ações Rápidas
         </h2>
         <div className="flex flex-col gap-3">
-          <Link
-            href="/checklists"
-            className="flex items-center justify-center gap-2 rounded-lg px-4 font-semibold text-white transition-opacity hover:opacity-90 active:opacity-80"
-            style={{
-              height: 56,
-              backgroundColor: "var(--color-bica)",
-            }}
-          >
+          <BrandLink href="/checklists" badge={pendentes > 0 ? pendentes : undefined}>
             <CheckSquare className="size-5" />
             Ver Checklists
-            {pendentes > 0 && (
-              <span className="ml-1 rounded-full bg-white/25 px-2 py-0.5 text-xs font-bold">
-                {pendentes}
-              </span>
-            )}
-          </Link>
-          <Link
-            href="/compras"
-            className="flex items-center justify-center gap-2 rounded-lg px-4 font-semibold text-white transition-opacity hover:opacity-90 active:opacity-80"
-            style={{
-              height: 56,
-              backgroundColor: "var(--color-bica)",
-            }}
-          >
+          </BrandLink>
+          <BrandLink href="/compras" badge={criticos > 0 ? criticos : undefined}>
             <AlertTriangle className="size-5" />
             Lista de Compras
-            {criticos > 0 && (
-              <span className="ml-1 rounded-full bg-white/25 px-2 py-0.5 text-xs font-bold">
-                {criticos}
-              </span>
-            )}
-          </Link>
+          </BrandLink>
         </div>
       </section>
     </main>

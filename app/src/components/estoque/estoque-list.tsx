@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Package, AlertTriangle } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { ItemEstoque } from "@/components/estoque/item-estoque"
 import type { Database } from "@/types/database.types"
 
@@ -27,41 +28,35 @@ function AlertasEstoque({ itens }: { itens: Item[] }) {
   if (criticos.length === 0 && baixos.length === 0) return null
 
   return (
-    <section
-      className="rounded-lg p-3 space-y-2"
-      style={{ backgroundColor: "var(--color-danger-bg)" }}
-    >
+    <section className="rounded-lg p-3 space-y-2 bg-danger-bg">
       <div className="flex items-center gap-2">
-        <AlertTriangle size={14} style={{ color: "var(--color-danger)" }} />
-        <span
-          className="text-xs font-semibold uppercase tracking-wide"
-          style={{ color: "var(--color-danger)", letterSpacing: "0.06em" }}
-        >
+        <AlertTriangle size={14} className="text-danger" />
+        <span className="text-xs font-semibold uppercase tracking-wide text-danger">
           Alertas de Estoque
         </span>
       </div>
       {criticos.map((item) => (
         <div key={item.id} className="flex items-center justify-between text-xs">
-          <span className="font-medium" style={{ color: "var(--color-danger)" }}>
+          <span className="font-medium text-danger">
             {item.nome}
             {item.unidade && (
               <span className="font-normal text-muted-foreground ml-1">({item.unidade})</span>
             )}
           </span>
-          <span style={{ color: "var(--color-danger)" }}>
+          <span className="text-danger">
             {item.atual ?? 0} / mín {item.minimo ?? 0}
           </span>
         </div>
       ))}
       {baixos.map((item) => (
         <div key={item.id} className="flex items-center justify-between text-xs">
-          <span style={{ color: "var(--color-warning)" }}>
+          <span className="text-warning">
             {item.nome}
             {item.unidade && (
               <span className="font-normal text-muted-foreground ml-1">({item.unidade})</span>
             )}
           </span>
-          <span style={{ color: "var(--color-warning)" }}>
+          <span className="text-warning">
             {item.atual ?? 0} / mín {item.minimo ?? 0}
           </span>
         </div>
@@ -100,12 +95,12 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
           <button
             type="button"
             onClick={() => setFiltro(null)}
-            className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent transition-colors"
-            style={
+            className={cn(
+              "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent transition-colors",
               filtro === null
-                ? { backgroundColor: "var(--color-bica)", color: "#14100D" }
-                : { backgroundColor: "var(--color-ink4)", color: "var(--color-b3)", borderColor: "var(--color-ink4)" }
-            }
+                ? "bg-primary text-bica-fg"
+                : "bg-ink4 text-b3 border-ink4"
+            )}
           >
             Todos
           </button>
@@ -114,12 +109,12 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
               key={cat.id}
               type="button"
               onClick={() => setFiltro(filtro === cat.id ? null : cat.id)}
-              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
-              style={
+              className={cn(
+                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
                 filtro === cat.id
-                  ? { backgroundColor: "var(--color-bica)", color: "#14100D", borderColor: "transparent" }
-                  : { backgroundColor: "transparent", color: "var(--color-b3)", borderColor: "var(--color-ink4)" }
-              }
+                  ? "bg-primary text-bica-fg border-transparent"
+                  : "bg-transparent text-b3 border-ink4"
+              )}
             >
               {cat.emoji ? `${cat.emoji} ` : ""}{cat.nome}
             </button>

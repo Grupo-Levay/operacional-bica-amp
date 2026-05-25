@@ -11,7 +11,7 @@ interface NovaReservaFormProps {
 }
 
 const inputClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-bica)]'
+  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary'
 
 export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
   const [aberto, setAberto] = useState(false)
@@ -83,9 +83,9 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
   if (!aberto) {
     return (
       <Button
-        size="sm"
+        variant="brand"
+        size="cta"
         onClick={() => setAberto(true)}
-        style={{ backgroundColor: 'var(--color-bica)', color: '#fff', minHeight: '44px' }}
       >
         Nova reserva
       </Button>
@@ -98,7 +98,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
       className="space-y-3 rounded-lg border border-border bg-card p-4"
     >
       <div className="space-y-1">
-        <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+        <label className="text-b3 text-xs font-medium">
           Nome do cliente
         </label>
         <input
@@ -112,7 +112,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+        <label className="text-b3 text-xs font-medium">
           Telefone
         </label>
         <input
@@ -125,7 +125,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+        <label className="text-b3 text-xs font-medium">
           Data
         </label>
         <input
@@ -138,7 +138,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
 
       <div className="flex gap-3">
         <div className="flex-1 space-y-1">
-          <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+          <label className="text-b3 text-xs font-medium">
             Início
           </label>
           <input
@@ -149,7 +149,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
           />
         </div>
         <div className="flex-1 space-y-1">
-          <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+          <label className="text-b3 text-xs font-medium">
             Fim
           </label>
           <input
@@ -163,7 +163,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
 
       <div className="flex gap-3">
         <div className="w-24 space-y-1">
-          <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+          <label className="text-b3 text-xs font-medium">
             Pessoas
           </label>
           <input
@@ -175,7 +175,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
           />
         </div>
         <div className="flex-1 space-y-1">
-          <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+          <label className="text-b3 text-xs font-medium">
             Mesa
           </label>
           <select
@@ -195,7 +195,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-xs font-medium" style={{ color: 'var(--color-b3)' }}>
+        <label className="text-b3 text-xs font-medium">
           Observações
         </label>
         <textarea
@@ -208,7 +208,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
       </div>
 
       {erro && (
-        <p className="text-xs" style={{ color: 'var(--color-danger)' }}>
+        <p className="text-xs text-danger">
           {erro}
         </p>
       )}
@@ -216,11 +216,11 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
       <div className="flex items-center gap-2 pt-1">
         <Button
           type="submit"
-          size="sm"
+          variant="brand"
+          size="cta"
           disabled={isPending}
-          style={{ backgroundColor: 'var(--color-bica)', color: '#fff', minHeight: '44px' }}
         >
-          {isPending ? 'Salvando...' : 'Salvar'}
+          {isPending ? 'Salvando...' : 'Salvar Reserva'}
         </Button>
         <Button
           type="button"
@@ -228,7 +228,7 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
           variant="ghost"
           onClick={fechar}
           disabled={isPending}
-          style={{ minHeight: '44px' }}
+          className="min-h-[52px]"
         >
           Cancelar
         </Button>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,24 +23,17 @@ export function ChecklistCard({
 }: ChecklistCardProps) {
   const percent = totalItens > 0 ? Math.round((itensConcluidos / totalItens) * 100) : 0
   const isAbertura = turno.toLowerCase() === 'abertura'
-  const borderColor = isAbertura ? 'var(--color-bica)' : 'var(--color-amp)'
-  const progressColor = isAbertura ? 'var(--color-bica)' : 'var(--color-amp)'
+  const borderClass = isAbertura ? 'border-l-4 border-l-bica' : 'border-l-4 border-l-amp'
+  const badgeClass = isAbertura ? 'border-bica text-bica' : 'border-amp text-amp'
 
   return (
-    <Card
-      className="rounded-lg border shadow-sm"
-      style={{ borderLeftWidth: '4px', borderLeftColor: borderColor }}
-    >
+    <Card className={cn('rounded-lg border shadow-sm', borderClass)}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-sm font-semibold leading-tight">{nome}</CardTitle>
           <Badge
             variant="outline"
-            className="shrink-0 text-xs capitalize"
-            style={{
-              borderColor,
-              color: borderColor,
-            }}
+            className={cn('shrink-0 text-xs capitalize', badgeClass)}
           >
             {turno}
           </Badge>
@@ -53,11 +47,11 @@ export function ChecklistCard({
           </div>
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <div
-              className="h-full rounded-full transition-all"
-              style={{
-                width: `${percent}%`,
-                backgroundColor: progressColor,
-              }}
+              className={cn(
+                'h-full rounded-full transition-all',
+                isAbertura ? 'bg-bica' : 'bg-amp',
+              )}
+              style={{ width: `${percent}%` }}
             />
           </div>
         </div>

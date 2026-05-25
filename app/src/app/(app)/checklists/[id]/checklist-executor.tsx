@@ -3,6 +3,7 @@
 import { useOptimistic, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, ChevronLeft, RotateCcw } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { marcarItemChecklist, reabrirChecklist } from '@/app/actions/checklist'
 
 type Props = {
@@ -24,7 +25,7 @@ export function ChecklistExecutor({
   const router = useRouter()
   const [, startTransition] = useTransition()
   const isAbertura = turno.toLowerCase() === 'abertura'
-  const cor = isAbertura ? 'var(--color-bica)' : 'var(--color-amp)'
+  const corClass = isAbertura ? 'text-bica' : 'text-amp'
 
   const [concluidos, setConcluidos] = useOptimistic(
     new Set(itensConcluidos),
@@ -68,8 +69,7 @@ export function ChecklistExecutor({
       {/* Header */}
       <div>
         <span
-          className="text-xs font-semibold uppercase tracking-wide"
-          style={{ color: cor }}
+          className={cn('text-xs font-semibold uppercase tracking-wide', corClass)}
         >
           {turno}
         </span>
@@ -84,8 +84,11 @@ export function ChecklistExecutor({
         </div>
         <div className="h-2.5 rounded-full bg-muted overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-300"
-            style={{ width: `${percent}%`, backgroundColor: cor }}
+            className={cn(
+              'h-full rounded-full transition-all duration-300',
+              isAbertura ? 'bg-bica' : 'bg-amp',
+            )}
+            style={{ width: `${percent}%` }}
           />
         </div>
       </div>
@@ -93,8 +96,10 @@ export function ChecklistExecutor({
       {/* Concluído banner */}
       {todosFeitos && (
         <div
-          className="flex items-center justify-between rounded-lg px-4 py-3 text-white text-sm font-medium"
-          style={{ backgroundColor: cor }}
+          className={cn(
+            'flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium',
+            isAbertura ? 'bg-bica text-bica-fg' : 'bg-amp text-amp-fg',
+          )}
         >
           <div className="flex items-center gap-2">
             <Check className="size-4" />
@@ -120,15 +125,13 @@ export function ChecklistExecutor({
               <button
                 type="button"
                 onClick={() => handleToggle(item)}
-                className="w-full flex items-center gap-3 px-4 py-4 text-left bg-card active:bg-muted transition-colors"
-                style={{ minHeight: '52px' }}
+                className="w-full flex items-center gap-3 px-4 py-4 text-left bg-card active:bg-muted transition-colors min-h-[52px]"
               >
                 <span
-                  className="shrink-0 size-5 rounded-full border-2 flex items-center justify-center transition-all"
-                  style={{
-                    borderColor: feito ? cor : undefined,
-                    backgroundColor: feito ? cor : undefined,
-                  }}
+                  className={cn(
+                    'shrink-0 size-5 rounded-full border-2 flex items-center justify-center transition-all',
+                    feito && (isAbertura ? 'border-bica bg-bica' : 'border-amp bg-amp'),
+                  )}
                 >
                   {feito && <Check className="size-3 text-white" strokeWidth={3} />}
                 </span>

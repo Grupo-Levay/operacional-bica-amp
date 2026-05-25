@@ -9,8 +9,8 @@
 
 | Marca | Cor primária | Hex | OKLCH |
 |-------|-------------|-----|-------|
-| **Bica Bar** | Âmbar dourado | `#c4973a` | `oklch(0.68 0.12 72)` |
-| **AMP 213** | Tijolo quente | `#c13b2a` | `oklch(0.49 0.17 28)` |
+| **Bica Bar** | Âmbar dourado | `#C9A368` | `oklch(0.707 0.092 72)` |
+| **AMP 213** | Tijolo quente | `#B91C1C` | `oklch(0.428 0.170 28)` |
 
 O sistema operacional serve ambas as marcas. **Bica é primary, AMP é secondary.**
 
@@ -21,49 +21,68 @@ O sistema operacional serve ambas as marcas. **Bica é primary, AMP é secondary
 ### Brand Tokens
 
 ```css
---color-bica:          #c4973a   /* Âmbar Bica — primary */
---color-bica-dark:     #a07a28   /* Hover, active states */
---color-bica-light:    #f5e8c8   /* Backgrounds, badges */
---color-bica-fg:       #ffffff   /* Texto sobre bica */
+--color-bica:          #C9A368   /* Âmbar Bica — primary */
+--color-bica-dark:     #B98D4E   /* Hover, active states */
+--color-bica-light:    rgba(201, 163, 104, 0.14)  /* Backgrounds sutis */
+--color-bica-fg:       #14100D   /* Texto sobre fundo bica */
 
---color-amp:           #c13b2a   /* Tijolo AMP — secondary */
---color-amp-dark:      #9a2e1f   /* Hover, active states */
---color-amp-light:     #f7dbd7   /* Backgrounds, badges */
---color-amp-fg:        #ffffff   /* Texto sobre amp */
+--color-amp:           #B91C1C   /* Tijolo AMP — secondary */
+--color-amp-dark:      #991818   /* Hover, active states */
+--color-amp-light:     rgba(185, 28, 28, 0.14)    /* Backgrounds sutis */
+--color-amp-fg:        #EFE3CC   /* Texto sobre fundo amp */
 ```
 
-### Tokens Semânticos
+### Aliases Semânticos
+
+Dentro de componentes, use SEMPRE os aliases semânticos — não as cores de marca diretamente.
+Isso permite trocar o tema da casa sem alterar código de componente.
 
 ```css
---color-primary:        var(--color-bica)
---color-primary-dark:   var(--color-bica-dark)
---color-primary-light:  var(--color-bica-light)
---color-primary-fg:     var(--color-bica-fg)
+--color-primary:       var(--color-bica)
+--color-primary-dark:  var(--color-bica-dark)
+--color-primary-light: var(--color-bica-light)
+--color-primary-fg:    var(--color-bica-fg)
 
---color-secondary:      var(--color-amp)
---color-secondary-dark: var(--color-amp-dark)
---color-secondary-light:var(--color-amp-light)
---color-secondary-fg:   var(--color-amp-fg)
-
---color-success:        oklch(0.55 0.16 145)  /* #16a34a verde */
---color-warning:        oklch(0.75 0.15 78)   /* #f59e0b amarelo */
---color-danger:         oklch(0.58 0.24 27)   /* #dc2626 vermelho */
---color-info:           oklch(0.54 0.18 250)  /* #2563eb azul */
+--color-secondary-brand:      var(--color-amp)
+--color-secondary-brand-dark: var(--color-amp-dark)
+--color-secondary-brand-light:var(--color-amp-light)
+--color-secondary-fg:  var(--color-amp-fg)
 ```
 
-### Neutros
+**Exceção legítima:** componentes que exibem AMBAS as marcas simultaneamente
+(ex: checklist-card mostra bica para Abertura e amp para Fechamento) podem usar
+`var(--color-bica)` e `var(--color-amp)` diretamente.
+
+### Status Semânticos
 
 ```css
---color-neutral-50:    oklch(0.985 0 0)   /* #fafafa */
---color-neutral-100:   oklch(0.97 0 0)    /* #f4f4f5 */
---color-neutral-200:   oklch(0.922 0 0)   /* #e4e4e7 */
---color-neutral-300:   oklch(0.87 0 0)    /* #d4d4d8 */
---color-neutral-400:   oklch(0.71 0 0)    /* #a1a1aa */
---color-neutral-500:   oklch(0.556 0 0)   /* #71717a */
---color-neutral-600:   oklch(0.439 0 0)   /* #52525b */
---color-neutral-700:   oklch(0.371 0 0)   /* #3f3f46 */
---color-neutral-800:   oklch(0.269 0 0)   /* #27272a */
---color-neutral-900:   oklch(0.205 0 0)   /* #18181b */
+--color-success:       #4ade80   /* oklch(0.74 0.18 145) */
+--color-success-bg:    rgba(74, 222, 128, 0.12)
+
+--color-warning:       #fbbf24   /* oklch(0.81 0.16 78) */
+--color-warning-bg:    rgba(251, 191, 36, 0.12)
+
+--color-danger:        #f87171   /* oklch(0.69 0.19 27) */
+--color-danger-bg:     rgba(248, 113, 113, 0.12)
+```
+
+### Paleta Parchment (texto, superfícies claras sobre escuro)
+
+```css
+--color-b0:  #F4ECDC   /* oklch(0.940 0.024 72) — Quase branco creme */
+--color-b1:  #EFE3CC   /* oklch(0.913 0.025 72) — Foreground principal */
+--color-b2:  #D8C9A8   /* oklch(0.825 0.033 72) — Texto secundário */
+--color-b3:  #B5A481   /* oklch(0.683 0.038 72) — Labels, placeholders */
+--color-b4:  #8D7F66   /* oklch(0.552 0.024 72) — Muted foreground */
+```
+
+### Paleta Ink (backgrounds escuros)
+
+```css
+--color-ink:   #0B0807   /* oklch(0.065 0.008 52) — Preto quase absoluto */
+--color-ink2:  #14100D   /* oklch(0.098 0.010 52) — Background card */
+--color-ink3:  #1C1612   /* oklch(0.138 0.012 52) — Background principal */
+--color-ink4:  #2A211A   /* oklch(0.190 0.014 52) — Superfície elevada */
 ```
 
 ---
@@ -71,9 +90,9 @@ O sistema operacional serve ambas as marcas. **Bica é primary, AMP é secondary
 ## Tipografia
 
 ```css
---font-sans:     'Inter', system-ui, sans-serif
---font-heading:  'Inter', system-ui, sans-serif
---font-mono:     'Geist Mono', monospace
+--font-sans:     'Jost', system-ui, sans-serif     /* Corpo — UI geral */
+--font-display:  'DM Serif Display', serif          /* Títulos de página */
+--font-mono:     'JetBrains Mono', monospace        /* Números, código */
 
 --text-xs:       0.75rem / 1rem
 --text-sm:       0.875rem / 1.25rem
@@ -88,6 +107,8 @@ O sistema operacional serve ambas as marcas. **Bica é primary, AMP é secondary
 --font-semibold: 600
 --font-bold:     700
 ```
+
+Padrão de header de página: `font-display text-2xl text-primary`
 
 ---
 
@@ -140,31 +161,63 @@ Base 4px. Tokens em múltiplos.
 - **Safe area**: `env(safe-area-inset-bottom)` no padding do bottom nav
 - **Breakpoints**: `sm: 640px`, `md: 768px`, `lg: 1024px`
 
+Em Tailwind: `min-h-[52px]` para botões de ação primária.
+
 ---
 
 ## Componentes Core
 
+### PageHeader (shared)
+```tsx
+// Padrão de cabeçalho de página — props: title, subtitle?, badge?, action?
+<div className="flex items-start justify-between gap-3">
+  <h1 className="font-display text-2xl text-primary">{title}</h1>
+  <p className="text-xs text-muted-foreground capitalize">{subtitle}</p>
+</div>
+```
+
+### EmptyState (shared)
+```tsx
+// Props: icon?, message, className?
+// Com ícone: fichas, checklists, reservas
+// Sem ícone: empty inline (compras, rodadas)
+```
+
+### BrandLink (ui)
+```tsx
+// Link full-width com estilo primary, 52px height
+// Substitui <Link style={{ height: 56, backgroundColor: "var(--color-bica)" }}>
+```
+
 ### Bottom Nav (mobile)
 - 5–6 tabs máximo
-- Tab ativa: cor `--color-primary`, peso semibold
-- Tab inativa: `--color-neutral-500`
-- Badge de urgência: `--color-danger`, círculo 18px
+- Tab ativa: `text-primary` (âmbar), `font-semibold`
+- Tab inativa: `text-b4`
+- Indicador ativo: linha 2px `bg-primary` no topo da tab
 
 ### Cards de Dashboard
-- `rounded-lg`, `shadow-sm`, `border border-neutral-200`
-- Header: label sm muted + valor xl bold
-- Cor de destaque no valor quando crítico (`--color-danger`)
+- `rounded-xl`, `ring-1 ring-foreground/10`
+- Header: label xs muted uppercase + valor 3xl mono
+- Cor de destaque no valor: `text-danger`, `text-success`, `text-primary`
 
 ### Checklists
-- Checkbox 24px, touch area 48px
+- Checkbox 24px, touch area 48px+
 - Item completado: `line-through text-muted`
-- Grupo com header sticky top-0
+- Grupo com `SectionLabel` como header
+- Borda esquerda colorida: bica para Abertura, amp para Fechamento
 
 ### Status Badges
 ```
-OK      → bg-success-light text-success
-BAIXO   → bg-warning-light text-warning
-CRÍTICO → bg-danger-light text-danger
+OK      → bg-success-bg text-success
+BAIXO   → bg-warning-bg text-warning
+CRÍTICO → bg-danger-bg text-danger
+```
+
+Em Tailwind (após @theme inline):
+```
+bg-success-bg text-success
+bg-warning-bg text-warning
+bg-danger-bg text-danger
 ```
 
 ---
@@ -175,24 +228,28 @@ CRÍTICO → bg-danger-light text-danger
 - Focus visible em todos os elementos interativos
 - `aria-label` obrigatório em ícones sem texto
 - Nunca remover outline de focus — customizar com `ring-*`
+- Touch targets mínimo 52px (WCAG 2.5.5 — AAA)
 
 ---
 
 ## Regras para Agentes AI
 
-1. **Zero hardcoded** — use sempre tokens CSS via `var(--token-name)` ou classes Tailwind mapeadas
-2. **shadcn/ui primeiro** — prefira componentes shadcn antes de criar do zero
-3. **Mobile-first** — escreva styles mobile e use `md:` para desktop
-4. **Semântico** — `--color-primary` não `--color-bica` dentro de componentes
-5. **Dark mode** — qualquer token novo precisa ter variante `.dark`
-6. **Cores da marca** — `--color-primary` = Bica âmbar, `--color-secondary` = AMP tijolo
+1. **Zero hardcoded** — use sempre tokens CSS via classes Tailwind ou `var(--token-name)`
+2. **Semântico primeiro** — `text-primary` não `text-bica`; `bg-danger` não `style={{ backgroundColor: "#dc2626" }}`
+3. **shadcn/ui primeiro** — prefira componentes existentes antes de criar do zero
+4. **Mobile-first** — escreva styles mobile e use `md:` para desktop
+5. **Leia este arquivo** antes de qualquer trabalho em UI
+6. **`style={{}}` inevitáveis**: `gridTemplateColumns` dinâmico, `env(safe-area-inset-bottom)`, radial-gradient — documentar com comentário inline
+7. **Exceção multi-brand**: checklist-card e wordmark BiCA podem usar `var(--color-bica)` e `var(--color-amp)` diretamente
 
 ---
 
 ## Tokens File
 
-`app/src/tokens/tokens.yaml` — fonte de verdade YAML exportada para CSS e TypeScript.
+`app/src/tokens/tokens.yaml` — exporta para TypeScript via `app/src/tokens/index.ts`
+
+`app/src/app/globals.css` — CSS custom properties + `@theme inline` para Tailwind v4
 
 ---
 
-*DESIGN.md v1.0 — Bica & AMP 213 Design System*
+*DESIGN.md v2.0 — Bica & AMP 213 Design System (atualizado 2026-05-25)*

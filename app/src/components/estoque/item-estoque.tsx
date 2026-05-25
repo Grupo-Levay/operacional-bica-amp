@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition, useRef } from 'react'
+import { cn } from '@/lib/utils'
 import { atualizarQuantidade } from '@/app/actions/estoque'
 
 type ItemEstoqueProps = {
@@ -27,24 +28,15 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
   const status = getItemStatus(quantidade, minimo)
   const percent = minimo > 0 ? Math.min(100, Math.round((quantidade / minimo) * 100)) : 100
 
-  const barColor =
-    status.color === 'success'
-      ? 'var(--color-success)'
-      : status.color === 'warning'
-      ? 'var(--color-warning)'
-      : 'var(--color-danger)'
-  const badgeBg =
-    status.color === 'success'
-      ? 'var(--color-success-bg)'
-      : status.color === 'warning'
-      ? 'var(--color-warning-bg)'
-      : 'var(--color-danger-bg)'
-  const badgeText =
-    status.color === 'success'
-      ? 'var(--color-success)'
-      : status.color === 'warning'
-      ? 'var(--color-warning)'
-      : 'var(--color-danger)'
+  const isCritico = status.color === 'danger'
+  const isBaixo = status.color === 'warning'
+
+  const barClass = isCritico ? 'bg-danger' : isBaixo ? 'bg-warning' : 'bg-success'
+  const badgeClass = isCritico
+    ? 'bg-danger-bg text-danger'
+    : isBaixo
+    ? 'bg-warning-bg text-warning'
+    : 'bg-success-bg text-success'
 
   const unidadeLabel = unidade ?? ''
 
@@ -81,8 +73,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
           )}
         </span>
         <span
-          className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full"
-          style={{ backgroundColor: badgeBg, color: badgeText }}
+          className={cn("shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full", badgeClass)}
         >
           {status.label}
         </span>
@@ -91,8 +82,8 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
       {/* Row 2: barra de nível */}
       <div className="h-2 rounded-full bg-muted overflow-hidden">
         <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${percent}%`, backgroundColor: barColor }}
+          className={cn("h-full rounded-full transition-all", barClass)}
+          style={{ width: `${percent}%` }}
         />
       </div>
 
@@ -110,14 +101,13 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
               onKeyDown={handleKeyDown}
               onBlur={handleConfirmar}
               autoFocus
-              className="w-20 rounded border border-border bg-background px-2 py-0.5 text-sm tabular-nums focus:outline-none focus:ring-1 focus:ring-[var(--color-bica)]"
+              className="w-20 rounded border border-border bg-background px-2 py-0.5 text-sm tabular-nums focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <span className="text-xs text-muted-foreground">{unidadeLabel}</span>
             <button
               type="button"
               onClick={handleConfirmar}
-              className="text-xs font-semibold px-2 py-0.5 rounded text-white"
-              style={{ backgroundColor: 'var(--color-bica)' }}
+              className={cn("text-xs font-semibold px-2 py-0.5 rounded text-white", "bg-primary")}
             >
               OK
             </button>

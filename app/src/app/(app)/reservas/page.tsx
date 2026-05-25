@@ -4,6 +4,8 @@ import { getCurrentCasa } from '@/lib/tenant'
 import { DateNav } from '@/components/reservas/date-nav'
 import { NovaReservaForm } from '@/components/reservas/nova-reserva-form'
 import { ReservaCard } from '@/components/reservas/reserva-card'
+import { PageHeader } from '@/components/shared/page-header'
+import { EmptyState } from '@/components/shared/empty-state'
 import type { Tables } from '@/types/database.types'
 
 type Reserva = Tables<'reservations'>
@@ -61,14 +63,12 @@ export default async function ReservasPage({
 
   return (
     <main className="p-4 space-y-4 pb-24">
-      <h1 className="font-display text-2xl" style={{ color: 'var(--color-bica)' }}>
-        Reservas
-      </h1>
+      <PageHeader title="Reservas" />
 
       <DateNav currentDate={dataAlvo} />
 
       {reservas.length > 0 && (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs" style={{ color: 'var(--color-b3)' }}>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-b3">
           <span>{contagens.pendente} pendentes</span>
           <span>{contagens.confirmada} confirmadas</span>
           <span>{contagens.concluida} concluídas</span>
@@ -79,17 +79,10 @@ export default async function ReservasPage({
       <NovaReservaForm tables={mesas} defaultDate={dataAlvo} />
 
       {reservas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-          <CalendarCheck
-            size={48}
-            strokeWidth={1.2}
-            style={{ color: 'var(--color-b4)' }}
-            aria-hidden="true"
-          />
-          <p className="text-sm" style={{ color: 'var(--color-b4)' }}>
-            Nenhuma reserva para este dia.
-          </p>
-        </div>
+        <EmptyState
+          icon={<CalendarCheck strokeWidth={1.2} />}
+          message="Nenhuma reserva para este dia."
+        />
       ) : (
         <div className="space-y-3">
           {reservas.map((reserva) => {

@@ -1,5 +1,7 @@
 import { RodadaCard } from "@/components/compras/rodada-card"
 import { NovaRodadaButton } from "@/components/compras/nova-rodada-button"
+import { PageHeader } from "@/components/shared/page-header"
+import { EmptyState } from "@/components/shared/empty-state"
 import { Tables } from "@/types/database.types"
 
 type ComprasCategoria = Tables<"compras_categorias"> & {
@@ -49,21 +51,14 @@ export default async function ComprasPage() {
   return (
     <main className="p-4 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="font-display text-2xl" style={{ color: "var(--color-bica)" }}>
-          Compras
-        </h1>
-        <NovaRodadaButton />
-      </div>
+      <PageHeader title="Compras" action={<NovaRodadaButton />} />
 
       {/* Seção 1 — Rodadas */}
       <section className="space-y-4">
         <h2 className="text-base font-semibold">Rodadas</h2>
 
         {rodadas.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">
-            Nenhuma rodada criada
-          </p>
+          <EmptyState message="Nenhuma rodada criada" />
         ) : (
           <div className="space-y-4">
             {/* Rodada aberta em destaque */}
@@ -86,9 +81,7 @@ export default async function ComprasPage() {
         <h2 className="text-base font-semibold">Catálogo de itens</h2>
 
         {categorias.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">
-            Nenhuma categoria cadastrada
-          </p>
+          <EmptyState message="Nenhuma categoria cadastrada" />
         ) : (
           <div className="space-y-5">
             {categorias.map((categoria) => (
@@ -101,9 +94,7 @@ export default async function ComprasPage() {
                 </h3>
 
                 {categoria.compras_itens.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic pl-1">
-                    Nenhum item nesta categoria
-                  </p>
+                  <EmptyState message="Nenhum item nesta categoria" />
                 ) : (
                   <ul className="divide-y divide-border rounded-lg border shadow-sm overflow-hidden">
                     {categoria.compras_itens.map((item) => (
