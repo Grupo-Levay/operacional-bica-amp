@@ -92,7 +92,7 @@ export default async function DashboardPage() {
       {/* Stat Cards Grid */}
       <section>
         <h2 className="sr-only">Resumo do dia</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
             label="Checklists Pendentes"
             value={pendentes}
