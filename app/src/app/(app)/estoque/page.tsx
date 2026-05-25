@@ -8,10 +8,12 @@ type Item = Database['public']['Tables']['estoque_itens']['Row']
 async function getEstoqueData(): Promise<{ categorias: Categoria[]; itens: Item[] }> {
   try {
     const { createClient } = await import('@/lib/supabase/server')
+    const { getCurrentCasa } = await import('@/lib/tenant')
     const supabase = await createClient()
+    const casa = await getCurrentCasa()
     const [{ data: categorias }, { data: itens }] = await Promise.all([
-      supabase.from('estoque_categorias').select('*').order('ordem'),
-      supabase.from('estoque_itens').select('*').eq('ativo', true).order('nome'),
+      supabase.from('estoque_categorias').select('*').eq('casa', casa).order('ordem'),
+      supabase.from('estoque_itens').select('*').eq('casa', casa).eq('ativo', true).order('nome'),
     ])
     return { categorias: categorias ?? [], itens: itens ?? [] }
   } catch (e) {

@@ -4,7 +4,9 @@ import { EscalaGrid } from "@/components/escala/escala-grid"
 async function getEscalaData() {
   try {
     const { createClient } = await import("@/lib/supabase/server")
+    const { getCurrentCasa } = await import("@/lib/tenant")
     const supabase = await createClient()
+    const casa = await getCurrentCasa()
 
     const hoje = new Date()
     const fim = new Date(hoje)
@@ -18,10 +20,11 @@ async function getEscalaData() {
       { data: escala },
     ] = await Promise.all([
       supabase.auth.getUser(),
-      supabase.from("equipe").select("*").eq("ativo", true).order("nome"),
+      supabase.from("equipe").select("*").eq("casa", casa).eq("ativo", true).order("nome"),
       supabase
         .from("escala")
         .select("*, equipe(nome, funcao)")
+        .eq("casa", casa)
         .gte("data", inicioStr)
         .lte("data", fimStr),
     ])

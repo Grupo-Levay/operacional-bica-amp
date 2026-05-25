@@ -6,10 +6,13 @@ type FichaTecnica = Tables<"fichas_tecnicas">
 async function getFichasData() {
   try {
     const { createClient } = await import("@/lib/supabase/server")
+    const { getCurrentCasa } = await import("@/lib/tenant")
     const supabase = await createClient()
+    const casa = await getCurrentCasa()
     const { data: fichas } = await supabase
       .from("fichas_tecnicas")
       .select("*")
+      .eq("casa", casa)
       .eq("ativo", true)
       .order("nome")
     return { fichas: fichas ?? [] }
