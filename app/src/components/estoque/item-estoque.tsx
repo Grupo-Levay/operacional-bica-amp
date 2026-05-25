@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useTransition, useRef } from 'react'
+import { Plus, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { atualizarQuantidade } from '@/app/actions/estoque'
 
 type ItemEstoqueProps = {
@@ -40,6 +42,20 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
 
   const unidadeLabel = unidade ?? ''
 
+  function salvar(nova: number) {
+    if (isNaN(nova) || nova < 0) return
+    setQuantidade(nova)
+    setValor(String(nova))
+    startTransition(async () => {
+      await atualizarQuantidade(id, nova)
+    })
+  }
+
+  function ajustar(delta: number) {
+    const nova = Math.max(0, quantidade + delta)
+    salvar(nova)
+  }
+
   function handleConfirmar() {
     const nova = parseFloat(valor)
     if (isNaN(nova) || nova < 0) {
@@ -47,11 +63,8 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
       setEditando(false)
       return
     }
-    setQuantidade(nova)
+    salvar(nova)
     setEditando(false)
-    startTransition(async () => {
-      await atualizarQuantidade(id, nova)
-    })
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -72,9 +85,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
             <span className="text-xs text-muted-foreground font-normal ml-1">({unidadeLabel})</span>
           )}
         </span>
-        <span
-          className={cn("shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full", badgeClass)}
-        >
+        <span className={cn("shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full", badgeClass)}>
           {status.label}
         </span>
       </div>
@@ -87,7 +98,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
         />
       </div>
 
-      {/* Row 3: valores + edição inline */}
+      {/* Row 3: valores + edição + step buttons */}
       <div className="flex items-center justify-between gap-2">
         {editando ? (
           <div className="flex items-center gap-2 flex-1">
@@ -113,19 +124,42 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
             </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => {
-              setEditando(true)
-              setTimeout(() => inputRef.current?.select(), 50)
-            }}
-            className="text-xs text-muted-foreground text-left hover:text-foreground transition-colors"
-          >
-            <span className="font-medium text-foreground">{quantidade}</span>
-            {unidadeLabel && ` ${unidadeLabel}`}
-            &nbsp;/&nbsp;mín: {minimo} {unidadeLabel}
-            <span className="ml-1 opacity-50 text-[10px]">✏️</span>
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setEditando(true)
+                setTimeout(() => inputRef.current?.select(), 50)
+              }}
+              className="text-xs text-muted-foreground text-left hover:text-foreground transition-colors"
+            >
+              <span className="font-medium text-foreground">{quantidade}</span>
+              {unidadeLabel && ` ${unidadeLabel}`}
+              &nbsp;/&nbsp;mín: {minimo} {unidadeLabel}
+            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <Button
+                type="button"
+                size="icon-xs"
+                variant="ghost"
+                onClick={() => ajustar(-1)}
+                className="size-7 text-b3 hover:text-danger hover:bg-danger-bg"
+                aria-label="Diminuir 1"
+              >
+                <Minus className="size-3.5" />
+              </Button>
+              <Button
+                type="button"
+                size="icon-xs"
+                variant="ghost"
+                onClick={() => ajustar(1)}
+                className="size-7 text-b3 hover:text-success hover:bg-success-bg"
+                aria-label="Aumentar 1"
+              >
+                <Plus className="size-3.5" />
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </div>

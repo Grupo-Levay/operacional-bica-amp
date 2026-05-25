@@ -4,6 +4,7 @@ import { getCurrentCasa } from '@/lib/tenant'
 import { DateNav } from '@/components/reservas/date-nav'
 import { NovaReservaForm } from '@/components/reservas/nova-reserva-form'
 import { ReservaCard } from '@/components/reservas/reserva-card'
+import { ReservaCounters } from '@/components/reservas/reserva-counters'
 import { PageHeader } from '@/components/shared/page-header'
 import { EmptyState } from '@/components/shared/empty-state'
 import type { Tables } from '@/types/database.types'
@@ -68,12 +69,12 @@ export default async function ReservasPage({
       <DateNav currentDate={dataAlvo} />
 
       {reservas.length > 0 && (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-b3">
-          <span>{contagens.pendente} pendentes</span>
-          <span>{contagens.confirmada} confirmadas</span>
-          <span>{contagens.concluida} concluídas</span>
-          <span>{contagens.cancelada} canceladas</span>
-        </div>
+        <ReservaCounters
+          pendente={contagens.pendente}
+          confirmada={contagens.confirmada}
+          concluida={contagens.concluida}
+          cancelada={contagens.cancelada}
+        />
       )}
 
       <NovaReservaForm tables={mesas} defaultDate={dataAlvo} />
