@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { atualizarStatusReserva } from '@/app/actions/reservas'
+import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 import type { Tables, Enums } from '@/types/database.types'
 
@@ -35,20 +36,19 @@ function formatarHora(time: string): string {
   return time.slice(0, 5)
 }
 
+const STATUS_DONE_LABEL: Record<Status, string> = {
+  pendente: 'Reserva atualizada',
+  confirmada: 'Reserva confirmada',
+  concluida: 'Reserva concluída',
+  cancelada: 'Reserva cancelada',
+}
+
 function StatusBadge({ status }: { status: Status }) {
   if (status === 'confirmada') {
-    return (
-      <Badge className="bg-primary text-bica-fg border-0 shrink-0">
-        {STATUS_LABEL[status]}
-      </Badge>
-    )
+    return <Badge className="shrink-0">{STATUS_LABEL[status]}</Badge>
   }
   if (status === 'concluida') {
-    return (
-      <Badge className="bg-success text-white border-0 shrink-0">
-        {STATUS_LABEL[status]}
-      </Badge>
-    )
+    return <Badge variant="success" className="shrink-0">{STATUS_LABEL[status]}</Badge>
   }
   if (status === 'cancelada') {
     return <Badge variant="destructive" className="shrink-0">{STATUS_LABEL[status]}</Badge>
@@ -66,8 +66,11 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
     startTransition(async () => {
       try {
         await atualizarStatusReserva(reserva.id, novo)
+        toast.success(STATUS_DONE_LABEL[novo], reserva.customer_name)
       } catch (err) {
-        setErro(err instanceof Error ? err.message : 'Erro ao atualizar')
+        const msg = err instanceof Error ? err.message : 'Erro ao atualizar'
+        setErro(msg)
+        toast.error('Não foi possível atualizar', msg)
       }
     })
   }
@@ -157,9 +160,10 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
           <div className="flex items-center gap-2 pt-1">
             <Button
               size="sm"
+              variant="success"
               disabled={isPending}
               onClick={() => mudarStatus('concluida')}
-              className="bg-success text-white hover:bg-success/90 min-h-[52px] flex-1"
+              className="min-h-[52px] flex-1"
             >
               {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Concluir'}
             </Button>

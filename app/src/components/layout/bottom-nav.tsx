@@ -36,7 +36,7 @@ export function BottomNav({ role }: BottomNavProps) {
       <div className="relative h-16 flex items-stretch">
         {activeIndex >= 0 && (
           <span
-            className="pointer-events-none absolute top-0 bottom-0 transition-all duration-300 ease-out [background:radial-gradient(ellipse_60%_70%_at_50%_0%,rgba(201,163,104,0.18)_0%,transparent_100%)]"
+            className="pointer-events-none absolute top-0 bottom-0 transition-all duration-300 ease-out [background:radial-gradient(ellipse_60%_70%_at_50%_0%,color-mix(in_oklab,var(--color-bica)_18%,transparent)_0%,transparent_100%)]"
             style={{ left: `${activeIndex * pct}%`, width: `${pct}%` }}
           />
         )}

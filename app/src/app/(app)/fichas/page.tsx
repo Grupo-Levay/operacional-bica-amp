@@ -1,8 +1,10 @@
-import { BookOpen, TrendingUp, Banknote } from 'lucide-react'
+import { BookOpen, TrendingUp, Banknote, Plus } from 'lucide-react'
 import type { Tables } from "@/types/database.types"
 import { FichasList } from "@/components/fichas/fichas-list"
+import { FichaFormDialog } from "@/components/fichas/ficha-form-dialog"
 import { PageHeader } from "@/components/shared/page-header"
 import { StatCard } from "@/components/dashboard/stat-card"
+import { Button } from "@/components/ui/button"
 
 type FichaTecnica = Tables<"fichas_tecnicas">
 
@@ -49,7 +51,19 @@ export default async function FichasPage() {
 
   return (
     <main className="p-4 space-y-6">
-      <PageHeader title="Ficha Técnica / CMV" />
+      <PageHeader
+        title="Ficha Técnica / CMV"
+        action={
+          <FichaFormDialog
+            trigger={
+              <Button variant="brand" size="sm">
+                <Plus className="size-4" />
+                Nova
+              </Button>
+            }
+          />
+        }
+      />
 
       {fichas.length > 0 && (
         <div className="grid grid-cols-3 gap-2">

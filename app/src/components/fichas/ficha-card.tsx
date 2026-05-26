@@ -1,7 +1,10 @@
 "use client"
 
+import { Pencil } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { FichaFormDialog } from "@/components/fichas/ficha-form-dialog"
 import { cn } from "@/lib/utils"
 import type { Tables } from "@/types/database.types"
 
@@ -36,11 +39,26 @@ export function FichaCard({ ficha }: FichaCardProps) {
               </p>
             )}
           </div>
-          {ficha.categoria && (
-            <Badge variant="outline" className="shrink-0 text-xs">
-              {ficha.categoria}
-            </Badge>
-          )}
+          <div className="flex shrink-0 items-center gap-1.5">
+            {ficha.categoria && (
+              <Badge variant="outline" className="text-xs">
+                {ficha.categoria}
+              </Badge>
+            )}
+            <FichaFormDialog
+              ficha={ficha}
+              trigger={
+                <Button
+                  size="icon-xs"
+                  variant="ghost"
+                  className="size-7 text-b4 hover:text-foreground"
+                  aria-label={`Editar ${ficha.nome}`}
+                >
+                  <Pencil className="size-3.5" />
+                </Button>
+              }
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-2 pt-1">

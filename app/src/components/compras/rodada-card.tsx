@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tables } from "@/types/database.types"
 import { marcarItemComprado, fecharRodada } from "@/app/actions/compras"
+import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 
 type RodadaItem = Tables<"rodada_itens">
@@ -41,13 +42,22 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
     const novoComprado = !(item.comprado ?? false)
     startTransition(async () => {
       setItens({ id: item.id, comprado: novoComprado })
-      await marcarItemComprado(item.id, novoComprado)
+      try {
+        await marcarItemComprado(item.id, novoComprado)
+      } catch {
+        toast.error("Não foi possível atualizar o item")
+      }
     })
   }
 
   function handleFechar() {
     startTransition(async () => {
-      await fecharRodada(rodada.id)
+      try {
+        await fecharRodada(rodada.id)
+        toast.success("Rodada fechada", rodada.nome)
+      } catch {
+        toast.error("Não foi possível fechar a rodada")
+      }
     })
   }
 
@@ -58,9 +68,7 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base">{rodada.nome}</CardTitle>
-          <Badge
-            className="text-xs font-semibold shrink-0 bg-success text-white border-0"
-          >
+          <Badge variant="success" className="shrink-0 text-xs font-semibold">
             ABERTA
           </Badge>
         </div>
