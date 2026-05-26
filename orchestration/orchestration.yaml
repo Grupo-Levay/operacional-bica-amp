@@ -1,0 +1,34 @@
+stages:
+  - name: design
+    agents:
+      - squad-creator
+      - ux-design-expert
+    tasks:
+      - "*design-squad --docs ./docs/prd/ui.md"
+      - "*validate-squad {{squad_name}}"
+    barrier: design_done
+  - name: develop
+    agents:
+      - dev
+    tasks:
+      - "*develop story-ui-responsive"
+    barrier: dev_done
+    depends_on:
+      - design
+  - name: qa
+    agents:
+      - qa
+    tasks:
+      - "*run-tests"
+      - "*apply-qa-fixes"
+    barrier: qa_passed
+    depends_on:
+      - develop
+  - name: publish
+    agents:
+      - devops
+    tasks:
+      - "*build-autonomous {{story_id}}"
+      - "*publish-squad {{squad_name}}"
+    depends_on:
+      - qa

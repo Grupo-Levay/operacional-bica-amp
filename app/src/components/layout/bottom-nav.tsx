@@ -18,25 +18,27 @@ const ALL_TABS = [
 
 interface BottomNavProps {
   role: Role
+  className?: string
 }
 
-export function BottomNav({ role }: BottomNavProps) {
+export function BottomNav({ role, className }: BottomNavProps) {
   const pathname = usePathname()
   const allowed = rotasPermitidas(role)
-  const tabs = ALL_TABS.filter(t => allowed.includes(t.href))
+  const tabs = ALL_TABS.filter((t) => allowed.includes(t.href))
 
-  const activeIndex = tabs.findIndex(t => pathname.startsWith(t.href))
+  const activeIndex = tabs.findIndex((t) => pathname.startsWith(t.href))
   const pct = 100 / tabs.length
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-[100] border-t border-border bg-card md:hidden pb-[env(safe-area-inset-bottom)]"
+      aria-label="Navegação móvel"
+      className={`${className || ""} fixed bottom-0 left-0 right-0 z-[100] border-t border-border bg-ink2/85 backdrop-blur-md md:hidden pb-[env(safe-area-inset-bottom)]`}
     >
-      {/* Limelight — spotlight que segue a tab ativa */}
       <div className="relative h-16 flex items-stretch">
+        {/* Limelight — spotlight that follows the active tab */}
         {activeIndex >= 0 && (
           <span
-            className="pointer-events-none absolute top-0 bottom-0 transition-all duration-300 ease-out [background:radial-gradient(ellipse_60%_70%_at_50%_0%,color-mix(in_oklab,var(--color-bica)_18%,transparent)_0%,transparent_100%)]"
+            className="pointer-events-none absolute top-0 bottom-0 transition-all duration-300 ease-out [background:radial-gradient(ellipse_60%_70%_at_50%_0%,rgba(var(--color-primary-dynamic-rgb),0.18)_0%,transparent_100%)]"
             style={{ left: `${activeIndex * pct}%`, width: `${pct}%` }}
           />
         )}
@@ -47,21 +49,17 @@ export function BottomNav({ role }: BottomNavProps) {
             <Link
               key={href}
               href={href}
-              aria-label={label}
               aria-current={active ? "page" : undefined}
-              className={`flex flex-1 flex-col items-center justify-center gap-0.5 relative z-10 transition-colors ${
-                active ? "text-bica" : "text-b4"
+              className={`flex flex-1 flex-col items-center justify-center gap-1 relative z-10 transition-all duration-200 active:scale-95 ${
+                active ? "text-primary" : "text-b4"
               }`}
+              style={{ minHeight: "52px" }}
             >
               {active && (
-                <span
-                  className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 rounded-full bg-bica"
-                />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 rounded-full bg-primary" />
               )}
-              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} aria-hidden="true" />
-              <span
-                className={`text-[9px] uppercase leading-none tracking-[0.08em] ${active ? "font-semibold" : "font-normal"}`}
-              >
+              <Icon size={20} strokeWidth={active ? 2.5 : 1.8} aria-hidden="true" />
+              <span className={`text-[10px] font-medium leading-none ${active ? "font-semibold text-primary" : "font-normal"}`}>
                 {label}
               </span>
             </Link>
