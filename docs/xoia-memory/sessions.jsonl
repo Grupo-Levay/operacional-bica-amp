@@ -4,3 +4,4 @@
 {"date":"2026-05-23","mode":"standard","story":"multitenant-foundation","agent":"nova","check_attempts":1,"duration_min":90,"status":"shipped","note":"recovery PR#6 fase 1/5: tenant.ts + ADR-001 + RLS migration SQL versionada"}
 {"date":"2026-05-25","session_id":"a082552c-ed2c-4ce7-baeb-4399b30aeb94","trigger":"auto","compacted_at":"2026-05-25T16:16:30.007Z","line_count":1906}
 {"date":"2026-05-25","mode":"Deep","story":"design-system-lift","agent":"dev","check_attempts":1,"status":"shipped","pr":25,"notes":"token sync DESIGN.md+tokens.yaml+globals.css, shared components PageHeader/EmptyState/SectionLabel/BrandLink, 5 feature modules refactored, style{{}} 147→77"}
+{"date":"2026-05-26","session_id":"0f842a68-46b0-418c-a1e2-ded37d5319c9","trigger":"auto","compacted_at":"2026-05-26T04:54:42.920Z","line_count":534}
