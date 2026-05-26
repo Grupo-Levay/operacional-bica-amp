@@ -4,3 +4,4 @@
 {"date":"2026-05-23","mode":"standard","story":"multitenant-foundation","agent":"nova","check_attempts":1,"duration_min":90,"status":"shipped","note":"recovery PR#6 fase 1/5: tenant.ts + ADR-001 + RLS migration SQL versionada"}
 {"date":"2026-05-25","session_id":"a082552c-ed2c-4ce7-baeb-4399b30aeb94","trigger":"auto","compacted_at":"2026-05-25T16:16:30.007Z","line_count":1906}
 {"date":"2026-05-25","mode":"Deep","story":"design-system-lift","agent":"dev","check_attempts":1,"status":"shipped","pr":25,"notes":"token sync DESIGN.md+tokens.yaml+globals.css, shared components PageHeader/EmptyState/SectionLabel/BrandLink, 5 feature modules refactored, style{{}} 147→77"}
+{"date":"2026-05-26","mode":"checkpoint","story":"none","agent":"xoia","check_attempts":0,"status":"checkpoint","note":"checkpoint manual — árvore limpa, branch claude/eloquent-dirac-HB4GZ, último ship PR#29 dashboard Bento+toasts+fichas/estoque+testes"}
