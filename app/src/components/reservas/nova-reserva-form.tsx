@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/toast'
 import { criarReserva } from '@/app/actions/reservas'
 import type { Tables } from '@/types/database.types'
 
@@ -73,9 +74,12 @@ export function NovaReservaForm({ tables, defaultDate }: NovaReservaFormProps) {
           tableId: mesa || null,
           notes: obs.trim() || undefined,
         })
+        toast.success('Reserva criada', nome.trim())
         fechar()
       } catch (err) {
-        setErro(err instanceof Error ? err.message : 'Erro ao criar reserva')
+        const msg = err instanceof Error ? err.message : 'Erro ao criar reserva'
+        setErro(msg)
+        toast.error('Não foi possível criar a reserva', msg)
       }
     })
   }

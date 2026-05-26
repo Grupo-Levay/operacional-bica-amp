@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Sidebar } from '@/components/layout/sidebar'
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal'
+import { Toaster } from '@/components/ui/toast'
 import { rotasPermitidas, type Role } from '@/lib/roles'
 import { getOnboardingConfig } from '@/lib/onboarding'
 import { getCurrentCasa, CASAS, type Casa } from '@/lib/tenant'
@@ -50,6 +51,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           nomeUsuario={perfil?.nome}
         />
       )}
+
+      <Toaster />
     </div>
   )
 }

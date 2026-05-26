@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useTransition, useRef } from 'react'
-import { Plus, Minus } from 'lucide-react'
+import { Plus, Minus, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { atualizarQuantidade } from '@/app/actions/estoque'
+import { toast } from '@/components/ui/toast'
+import { atualizarQuantidade, atualizarItemEstoque } from '@/app/actions/estoque'
 
 type ItemEstoqueProps = {
   id: string
@@ -22,13 +23,19 @@ function getItemStatus(atual: number, minimo: number) {
 
 export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoqueProps) {
   const [editando, setEditando] = useState(false)
+  const [editConfig, setEditConfig] = useState(false)
   const [valor, setValor] = useState(String(atual))
   const [quantidade, setQuantidade] = useState(atual)
+  const [minimoState, setMinimoState] = useState(minimo)
+  const [unidadeState, setUnidadeState] = useState(unidade ?? '')
+  const [minimoVal, setMinimoVal] = useState(String(minimo))
+  const [unidadeVal, setUnidadeVal] = useState(unidade ?? '')
   const [, startTransition] = useTransition()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const status = getItemStatus(quantidade, minimo)
-  const percent = minimo > 0 ? Math.min(100, Math.round((quantidade / minimo) * 100)) : 100
+  const status = getItemStatus(quantidade, minimoState)
+  const percent =
+    minimoState > 0 ? Math.min(100, Math.round((quantidade / minimoState) * 100)) : 100
 
   const isCritico = status.color === 'danger'
   const isBaixo = status.color === 'warning'
@@ -40,14 +47,18 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
     ? 'bg-warning-bg text-warning'
     : 'bg-success-bg text-success'
 
-  const unidadeLabel = unidade ?? ''
+  const unidadeLabel = unidadeState
 
   function salvar(nova: number) {
     if (isNaN(nova) || nova < 0) return
     setQuantidade(nova)
     setValor(String(nova))
     startTransition(async () => {
-      await atualizarQuantidade(id, nova)
+      try {
+        await atualizarQuantidade(id, nova)
+      } catch {
+        toast.error('Não foi possível salvar', `${nome} — tente novamente`)
+      }
     })
   }
 
@@ -75,25 +86,88 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
     }
   }
 
+  function salvarConfig() {
+    const novoMin = parseFloat(minimoVal)
+    if (isNaN(novoMin) || novoMin < 0) {
+      toast.error('Mínimo inválido')
+      return
+    }
+    const novaUnidade = unidadeVal.trim()
+    setMinimoState(novoMin)
+    setUnidadeState(novaUnidade)
+    setEditConfig(false)
+    startTransition(async () => {
+      try {
+        await atualizarItemEstoque(id, { minimo: novoMin, unidade: novaUnidade })
+        toast.success(`${nome} atualizado`)
+      } catch {
+        toast.error('Não foi possível atualizar', nome)
+      }
+    })
+  }
+
   return (
-    <div className="py-3 space-y-2">
-      {/* Row 1: nome + badge */}
+    <div className="space-y-2 py-3">
+      {/* Row 1: nome + badge + ajustes */}
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium leading-tight">
           {nome}
           {unidadeLabel && (
-            <span className="text-xs text-muted-foreground font-normal ml-1">({unidadeLabel})</span>
+            <span className="ml-1 text-xs font-normal text-muted-foreground">({unidadeLabel})</span>
           )}
         </span>
-        <span className={cn("shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full", badgeClass)}>
-          {status.label}
-        </span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className={cn('rounded-full px-2 py-0.5 text-xs font-semibold', badgeClass)}>
+            {status.label}
+          </span>
+          <Button
+            type="button"
+            size="icon-xs"
+            variant="ghost"
+            onClick={() => setEditConfig((v) => !v)}
+            className="size-7 text-b4 hover:text-foreground"
+            aria-label="Ajustar mínimo e unidade"
+            aria-expanded={editConfig}
+          >
+            <SlidersHorizontal className="size-3.5" />
+          </Button>
+        </div>
       </div>
 
+      {/* Config: mínimo + unidade */}
+      {editConfig && (
+        <div className="flex flex-wrap items-end gap-2 rounded-md bg-ink2 p-2.5">
+          <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+            Mínimo
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={minimoVal}
+              onChange={(e) => setMinimoVal(e.target.value)}
+              className="w-20 rounded border border-border bg-background px-2 py-1 text-sm tabular-nums focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </label>
+          <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+            Unidade
+            <input
+              type="text"
+              value={unidadeVal}
+              onChange={(e) => setUnidadeVal(e.target.value)}
+              placeholder="un, kg, L…"
+              className="w-24 rounded border border-border bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </label>
+          <Button type="button" size="sm" variant="brand" onClick={salvarConfig}>
+            Salvar
+          </Button>
+        </div>
+      )}
+
       {/* Row 2: barra de nível */}
-      <div className="h-2 rounded-full bg-muted overflow-hidden">
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full transition-all", barClass)}
+          className={cn('h-full rounded-full transition-all', barClass)}
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -101,7 +175,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
       {/* Row 3: valores + edição + step buttons */}
       <div className="flex items-center justify-between gap-2">
         {editando ? (
-          <div className="flex items-center gap-2 flex-1">
+          <div className="flex flex-1 items-center gap-2">
             <input
               ref={inputRef}
               type="number"
@@ -118,7 +192,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
             <button
               type="button"
               onClick={handleConfirmar}
-              className={cn("text-xs font-semibold px-2 py-0.5 rounded text-white", "bg-primary")}
+              className="rounded bg-primary px-2 py-0.5 text-xs font-semibold text-bica-fg"
             >
               OK
             </button>
@@ -131,19 +205,19 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
                 setEditando(true)
                 setTimeout(() => inputRef.current?.select(), 50)
               }}
-              className="text-xs text-muted-foreground text-left hover:text-foreground transition-colors"
+              className="text-left text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
               <span className="font-medium text-foreground">{quantidade}</span>
               {unidadeLabel && ` ${unidadeLabel}`}
-              &nbsp;/&nbsp;mín: {minimo} {unidadeLabel}
+              &nbsp;/&nbsp;mín: {minimoState} {unidadeLabel}
             </button>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex shrink-0 items-center gap-1">
               <Button
                 type="button"
                 size="icon-xs"
                 variant="ghost"
                 onClick={() => ajustar(-1)}
-                className="size-7 text-b3 hover:text-danger hover:bg-danger-bg"
+                className="size-7 text-b3 hover:bg-danger-bg hover:text-danger"
                 aria-label="Diminuir 1"
               >
                 <Minus className="size-3.5" />
@@ -153,7 +227,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
                 size="icon-xs"
                 variant="ghost"
                 onClick={() => ajustar(1)}
-                className="size-7 text-b3 hover:text-success hover:bg-success-bg"
+                className="size-7 text-b3 hover:bg-success-bg hover:text-success"
                 aria-label="Aumentar 1"
               >
                 <Plus className="size-3.5" />

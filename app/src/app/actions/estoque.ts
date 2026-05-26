@@ -25,3 +25,36 @@ export async function atualizarQuantidade(itemId: string, novaQuantidade: number
 
   revalidatePath('/estoque')
 }
+
+export async function atualizarItemEstoque(
+  itemId: string,
+  updates: { minimo?: number; unidade?: string | null }
+) {
+  if (!itemId?.trim()) throw new Error('Item inválido')
+
+  const patch: { minimo?: number; unidade?: string | null } = {}
+
+  if (updates.minimo !== undefined) {
+    if (!Number.isFinite(updates.minimo) || updates.minimo < 0) {
+      throw new Error('Mínimo inválido')
+    }
+    patch.minimo = updates.minimo
+  }
+
+  if (updates.unidade !== undefined) {
+    const u = updates.unidade?.trim()
+    patch.unidade = u ? u : null
+  }
+
+  if (Object.keys(patch).length === 0) throw new Error('Nada para atualizar')
+
+  const { supabase, casa } = await requireUser()
+
+  await supabase
+    .from('estoque_itens')
+    .update(patch)
+    .eq('id', itemId)
+    .eq('casa', casa)
+
+  revalidatePath('/estoque')
+}

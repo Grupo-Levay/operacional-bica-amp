@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { Badge } from "@/components/ui/badge"
 import { salvarEscala, removerEscala } from "@/app/actions/escala"
+import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 
 type Membro = {
@@ -69,15 +70,23 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
 
   function handleSave(membroId: string, dataStr: string, turno: string) {
     startTransition(async () => {
-      await salvarEscala(membroId, dataStr, turno)
-      setOpenCell(null)
+      try {
+        await salvarEscala(membroId, dataStr, turno)
+        setOpenCell(null)
+      } catch {
+        toast.error("Não foi possível salvar a escala")
+      }
     })
   }
 
   function handleRemove(id: string) {
     startTransition(async () => {
-      await removerEscala(id)
-      setOpenCell(null)
+      try {
+        await removerEscala(id)
+        setOpenCell(null)
+      } catch {
+        toast.error("Não foi possível remover o turno")
+      }
     })
   }
 
@@ -155,7 +164,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                               className={cn(
                                 "text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50",
                                 item?.turno === t
-                                  ? "bg-primary text-[#14100D]"
+                                  ? "bg-primary text-bica-fg"
                                   : "bg-ink4 text-b3"
                               )}
                             >
@@ -201,10 +210,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                           }
                         >
                           <Badge
-                            className={cn(
-                              "text-[10px] font-bold px-1.5 h-7 border-0",
-                              item.confirmado && "bg-primary text-white"
-                            )}
+                            className="h-7 px-1.5 text-[10px] font-bold"
                             variant={item.confirmado ? "default" : "secondary"}
                           >
                             {TURNO_LABEL[item.turno] ?? item.turno}

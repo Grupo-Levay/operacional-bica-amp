@@ -15,7 +15,7 @@ export function BrandLink({ href, children, badge, className }: BrandLinkProps) 
       href={href}
       className={cn(
         "flex items-center justify-center gap-2 rounded-lg px-4 min-h-[52px]",
-        "bg-bica text-[#14100D] font-semibold transition-opacity",
+        "bg-bica text-bica-fg font-semibold transition-opacity",
         "hover:opacity-90 active:opacity-80",
         className
       )}

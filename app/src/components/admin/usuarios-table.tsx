@@ -2,6 +2,7 @@
 
 import { useTransition } from "react"
 import { atualizarRole } from "@/app/actions/admin"
+import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import type { Role } from "@/lib/roles"
 
@@ -49,7 +50,12 @@ export function UsuariosTable({ perfis, currentUserId }: Props) {
 
   function handleRoleChange(userId: string, novoRole: Role) {
     startTransition(async () => {
-      await atualizarRole(userId, novoRole)
+      try {
+        await atualizarRole(userId, novoRole)
+        toast.success("Permissão atualizada")
+      } catch {
+        toast.error("Não foi possível atualizar a permissão")
+      }
     })
   }
 
