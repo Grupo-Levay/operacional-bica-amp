@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface DateNavProps {
   currentDate: string
@@ -26,20 +27,22 @@ function hojeStr(): string {
   return `${y}-${m}-${dd}`
 }
 
-function formatarLabel(date: string): string {
+function formatarDiaSemana(date: string): string {
   const [ano, mes, dia] = date.split('-').map(Number)
   const d = new Date(ano, mes - 1, dia)
-  const texto = d.toLocaleDateString('pt-BR', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-  })
-  // Remove pontos abreviativos (ex: "seg., 25 de mai.") deixando "seg, 25 mai".
-  return texto.replace(/\./g, '').replace(/ de /g, ' ')
+  return d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')
+}
+
+function formatarDataLonga(date: string): string {
+  const [ano, mes, dia] = date.split('-').map(Number)
+  const d = new Date(ano, mes - 1, dia)
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
 }
 
 export function DateNav({ currentDate }: DateNavProps) {
   const router = useRouter()
+  const hoje = hojeStr()
+  const isHoje = currentDate === hoje
 
   function navegar(date: string) {
     router.push(`/reservas?data=${date}`)
@@ -56,19 +59,20 @@ export function DateNav({ currentDate }: DateNavProps) {
         <ChevronLeft size={20} aria-hidden="true" />
       </button>
 
-      <div className="flex flex-1 flex-col items-center">
-        <span
-          className="text-sm font-medium capitalize text-b2"
-        >
-          {formatarLabel(currentDate)}
-        </span>
-        <button
-          type="button"
-          onClick={() => navegar(hojeStr())}
-          className="text-xs underline underline-offset-2 text-primary"
-        >
-          Hoje
-        </button>
+      <div className="flex flex-1 flex-col items-center gap-0.5">
+        <span className="text-xs text-b3 capitalize">{formatarDiaSemana(currentDate)}</span>
+        <span className="text-sm font-semibold text-b1">{formatarDataLonga(currentDate)}</span>
+        {isHoje ? (
+          <span className="text-xs font-semibold text-primary">Hoje</span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => navegar(hoje)}
+            className={cn('text-xs underline underline-offset-2 text-primary')}
+          >
+            Hoje
+          </button>
+        )}
       </div>
 
       <button

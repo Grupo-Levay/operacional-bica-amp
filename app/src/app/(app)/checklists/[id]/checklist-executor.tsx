@@ -2,9 +2,13 @@
 
 import { useOptimistic, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronLeft, RotateCcw } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { marcarItemChecklist, reabrirChecklist } from '@/app/actions/checklist'
+import { Button } from '@/components/ui/button'
+import { ChecklistProgressBar } from '@/components/checklists/checklist-progress-bar'
+import { ChecklistItem } from '@/components/checklists/checklist-item'
+import { CompletionBanner } from '@/components/checklists/completion-banner'
 
 type Props = {
   checklistId: string
@@ -23,9 +27,9 @@ export function ChecklistExecutor({
   itensConcluidos,
 }: Props) {
   const router = useRouter()
-  const [, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition()
   const isAbertura = turno.toLowerCase() === 'abertura'
-  const corClass = isAbertura ? 'text-bica' : 'text-amp'
+  const corClass = isAbertura ? 'text-primary' : 'text-amp'
 
   const [concluidos, setConcluidos] = useOptimistic(
     new Set(itensConcluidos),
@@ -57,93 +61,52 @@ export function ChecklistExecutor({
   return (
     <main className="p-4 space-y-5 pb-24">
       {/* Voltar */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={() => router.back()}
-        className="flex items-center gap-1 text-sm text-muted-foreground -ml-1 touch-target"
+        className="-ml-2 text-b3 hover:text-b1"
       >
-        <ChevronLeft className="size-4" />
+        <ChevronLeft className="size-4 mr-1" />
         Checklists
-      </button>
+      </Button>
 
       {/* Header */}
-      <div>
-        <span
-          className={cn('text-xs font-semibold uppercase tracking-wide', corClass)}
-        >
+      <div className="bg-ink2 rounded-xl px-4 py-3 space-y-0.5">
+        <span className={cn('text-xs font-medium uppercase tracking-wide', corClass)}>
           {turno}
         </span>
-        <h1 className="font-display text-2xl leading-tight">{nome}</h1>
+        <h1 className="font-display text-2xl leading-tight text-b1">{nome}</h1>
       </div>
 
       {/* Progresso */}
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{concluidos.size} de {itens.length} itens</span>
-          <span>{percent}%</span>
-        </div>
-        <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-          <div
-            className={cn(
-              'h-full rounded-full transition-all duration-300',
-              isAbertura ? 'bg-bica' : 'bg-amp',
-            )}
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      </div>
+      <ChecklistProgressBar
+        total={itens.length}
+        concluidos={concluidos.size}
+        percent={percent}
+        concluido={todosFeitos}
+      />
 
       {/* Concluído banner */}
       {todosFeitos && (
-        <div
-          className={cn(
-            'flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium',
-            isAbertura ? 'bg-bica text-bica-fg' : 'bg-amp text-amp-fg',
-          )}
-        >
-          <div className="flex items-center gap-2">
-            <Check className="size-4" />
-            Checklist concluído!
-          </div>
-          <button
-            type="button"
-            onClick={handleReabrir}
-            className="flex items-center gap-1 text-xs opacity-80 hover:opacity-100"
-          >
-            <RotateCcw className="size-3" />
-            Reabrir
-          </button>
-        </div>
+        <CompletionBanner
+          nome={nome}
+          onReabrir={handleReabrir}
+          isPending={isPending}
+        />
       )}
 
       {/* Lista de itens */}
-      <ul className="divide-y divide-border rounded-lg border shadow-sm overflow-hidden">
-        {itens.map((item) => {
-          const feito = concluidos.has(item)
-          return (
-            <li key={item}>
-              <button
-                type="button"
-                onClick={() => handleToggle(item)}
-                className="w-full flex items-center gap-3 px-4 py-4 text-left bg-card active:bg-muted transition-colors min-h-[52px]"
-              >
-                <span
-                  className={cn(
-                    'shrink-0 size-5 rounded-full border-2 flex items-center justify-center transition-all',
-                    feito && (isAbertura ? 'border-bica bg-bica' : 'border-amp bg-amp'),
-                  )}
-                >
-                  {feito && <Check className="size-3 text-white" strokeWidth={3} />}
-                </span>
-                <span
-                  className={`text-sm flex-1 ${feito ? 'line-through text-muted-foreground' : ''}`}
-                >
-                  {item}
-                </span>
-              </button>
-            </li>
-          )
-        })}
+      <ul className="divide-y divide-border/50 rounded-xl border border-border overflow-hidden">
+        {itens.map((item) => (
+          <ChecklistItem
+            key={item}
+            item={item}
+            concluido={concluidos.has(item)}
+            onToggle={() => handleToggle(item)}
+          />
+        ))}
       </ul>
     </main>
   )

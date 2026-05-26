@@ -2,6 +2,7 @@
 
 import { useTransition } from "react"
 import { atualizarRole } from "@/app/actions/admin"
+import { cn } from "@/lib/utils"
 import type { Role } from "@/lib/roles"
 
 const ROLES: Role[] = ["super_admin", "admin", "operacional", "estoque", "cmv", "bar"]
@@ -13,6 +14,22 @@ const ROLE_LABEL: Record<Role, string> = {
   estoque: "Estoque",
   cmv: "CMV",
   bar: "Bar",
+}
+
+const ROLE_BADGE: Record<Role, string> = {
+  super_admin: "bg-amp-light text-amp border border-amp/20",
+  admin: "bg-primary/10 text-primary border border-primary/20",
+  operacional: "bg-ink4 text-b2 border border-b3/20",
+  estoque: "bg-ink4 text-b3 border border-b3/20",
+  cmv: "bg-ink4 text-b3 border border-b3/20",
+  bar: "bg-ink4 text-b3 border border-b3/20",
+}
+
+function getInitials(nome: string | null): string {
+  if (!nome) return '?'
+  const partes = nome.trim().split(/\s+/)
+  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase()
+  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
 }
 
 type Perfil = {
@@ -40,32 +57,48 @@ export function UsuariosTable({ perfis, currentUserId }: Props) {
     <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
       {perfis.map((perfil) => {
         const isSelf = perfil.id === currentUserId
+        const role = perfil.role as Role
         return (
           <div
             key={perfil.id}
-            className="flex items-center justify-between gap-3 px-4 py-3 bg-ink2"
+            className="flex items-center gap-3 px-4 py-3 bg-ink2"
           >
+            {/* Avatar */}
+            <div className="shrink-0 w-8 h-8 rounded-full bg-ink4 flex items-center justify-center text-xs font-semibold text-b2 select-none">
+              {getInitials(perfil.nome)}
+            </div>
+
+            {/* Nome + role badge */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium leading-tight truncate">
-                {perfil.nome ?? "Sem nome"}
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-medium leading-tight truncate">
+                  {perfil.nome ?? "Sem nome"}
+                </p>
                 {isSelf && (
-                  <span
-                    className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-bica-light text-bica"
-                  >
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-bica-light text-bica shrink-0">
                     você
                   </span>
                 )}
-              </p>
+                <span
+                  className={cn(
+                    "text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0",
+                    ROLE_BADGE[role] ?? "bg-ink4 text-b3 border border-b3/20"
+                  )}
+                >
+                  {ROLE_LABEL[role] ?? role}
+                </span>
+              </div>
               <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
                 {perfil.id.slice(0, 8)}…
               </p>
             </div>
 
+            {/* Select de role */}
             <select
               disabled={isPending || isSelf}
               value={perfil.role}
               onChange={(e) => handleRoleChange(perfil.id, e.target.value as Role)}
-              className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-bica disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>

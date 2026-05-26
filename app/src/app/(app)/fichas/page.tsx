@@ -1,7 +1,8 @@
+import { BookOpen, TrendingUp, Banknote } from 'lucide-react'
 import type { Tables } from "@/types/database.types"
 import { FichasList } from "@/components/fichas/fichas-list"
 import { PageHeader } from "@/components/shared/page-header"
-import { cn } from "@/lib/utils"
+import { StatCard } from "@/components/dashboard/stat-card"
 
 type FichaTecnica = Tables<"fichas_tecnicas">
 
@@ -45,7 +46,6 @@ export default async function FichasPage() {
   const categorias = [...new Set(fichas.map(f => f.categoria ?? "Sem categoria"))].sort()
 
   const cmvDanger = cmvMedio != null && cmvMedio > 30
-  const cmvClass = cmvMedio == null ? undefined : cmvDanger ? 'text-amp' : 'text-success'
 
   return (
     <main className="p-4 space-y-6">
@@ -53,25 +53,27 @@ export default async function FichasPage() {
 
       {fichas.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-lg border shadow-sm bg-card p-3 flex flex-col gap-1">
-            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide leading-none">CMV Médio</span>
-            <span className={cn("text-2xl font-bold tabular-nums leading-none", cmvClass)}>
-              {cmvMedio != null ? `${cmvMedio.toFixed(1)}%` : "—"}
-            </span>
-            <span className="text-[10px] text-muted-foreground">{cmvDanger ? "acima da meta" : "dentro da meta"}</span>
-          </div>
-          <div className="rounded-lg border shadow-sm bg-card p-3 flex flex-col gap-1">
-            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide leading-none">Custo Médio</span>
-            <span className="text-base font-bold tabular-nums leading-snug">
-              {custoMedio != null ? brl.format(custoMedio) : "—"}
-            </span>
-            <span className="text-[10px] text-muted-foreground">por ficha</span>
-          </div>
-          <div className="rounded-lg border shadow-sm bg-card p-3 flex flex-col gap-1">
-            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide leading-none">Total</span>
-            <span className="text-2xl font-bold tabular-nums leading-none">{total}</span>
-            <span className="text-[10px] text-muted-foreground">fichas ativas</span>
-          </div>
+          <StatCard
+            label="CMV Médio"
+            value={cmvMedio != null ? `${cmvMedio.toFixed(1)}%` : '—'}
+            sub={cmvDanger ? 'acima da meta' : 'dentro da meta'}
+            accent={cmvMedio == null ? undefined : cmvDanger ? 'danger' : 'success'}
+            icon={<TrendingUp size={14} />}
+          />
+          <StatCard
+            label="Custo Médio"
+            value={custoMedio != null ? brl.format(custoMedio) : '—'}
+            sub="por ficha"
+            accent="primary"
+            icon={<Banknote size={14} />}
+          />
+          <StatCard
+            label="Total"
+            value={total}
+            sub="fichas ativas"
+            accent="primary"
+            icon={<BookOpen size={14} />}
+          />
         </div>
       )}
 

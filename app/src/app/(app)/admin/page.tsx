@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { UsuariosTable } from "@/components/admin/usuarios-table"
-import { Users } from "lucide-react"
+import { PageHeader } from "@/components/shared/page-header"
 
 async function getAdminData() {
   const supabase = await createClient()
@@ -31,27 +31,15 @@ async function getAdminData() {
 
 export default async function AdminPage() {
   const { user, perfis } = await getAdminData()
+  const total = perfis.length
 
   return (
     <main className="p-4 space-y-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1
-            className="font-display text-2xl text-bica"
-          >
-            Admin
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Gestão de usuários e roles
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 shrink-0">
-          <Users size={13} />
-          <span>
-            {perfis.length} {perfis.length === 1 ? "usuário" : "usuários"}
-          </span>
-        </div>
-      </div>
+      <PageHeader
+        title="Usuários"
+        subtitle="Gestão de usuários e roles"
+        badge={`${total} ${total === 1 ? 'usuário' : 'usuários'}`}
+      />
 
       <UsuariosTable perfis={perfis} currentUserId={user.id} />
     </main>
