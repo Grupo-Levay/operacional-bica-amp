@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-25 | Branch: claude/nifty-mccarthy-q92sY (PR em aberto — 6 commits à frente de main)_
+_Atualizado: 2026-05-26 | Branch: claude/eloquent-dirac-HB4GZ (sessão ativa)_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -59,11 +59,11 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
-2. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
-3. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
-4. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-25)
-5. feat: recuperação de senha + PKCE flow (2026-05-22)
+1. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
+2. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
+3. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
+4. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
+5. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
 
 ## Gaps conhecidos
 - Testes vitest criados para auth/checklist/reservas — expandir para compras/estoque/escala/fichas
