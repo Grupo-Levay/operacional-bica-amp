@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-26 | Branch: claude/eloquent-dirac-HB4GZ (sessão ativa)_
+_Atualizado: 2026-06-01 | Branch: claude/quirky-cray-ZMAkU (sessão ativa)_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -27,19 +27,19 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/components/shared/`                    → PageHeader, EmptyState, SectionLabel — usar em pages
 `src/components/ui/brand-link.tsx`          → Link CTA full-width estilo primary 52px
 `src/components/ui/button.tsx`              → variantes: default, brand (bg-bica), cta (52px w-full)
-`app/src/app/actions/__tests__/`            → testes vitest para auth, checklist e reservas
-`app/vitest.config.ts`                      → configuração vitest
-`app/public/icon-192.png`                   → ícone PWA 192px
-`app/public/icon-512.png`                   → ícone PWA 512px
+`src/app/actions/__tests__/`               → testes vitest para auth, checklist e reservas
+`vitest.config.ts`                          → configuração vitest
+`public/icon-192.png`                       → ícone PWA 192px
+`public/icon-512.png`                       → ícone PWA 512px
 
 ## Estado atual
 ✅ Auth — login, proteção de rotas por role, onboarding, recuperação de senha
 ✅ Multi-tenant — isolamento por `casa` (bica/amp) via getCurrentCasa() + requireUser()
 ✅ Layout — CasaSwitcher, LogoutBtn, AbastecimentoSubnav, sidebar + bottom-nav
-✅ Reservas — CRUD completo, DateNav, status badges, confirmar/cancelar/concluir
+✅ Reservas — CRUD completo, DateNav, status badges, confirmar/cancelar/concluir, validação capacidade/colisão
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
-✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop
+✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop, Bento layout
 ✅ RLS relaxada (isolamento na aplicação) — migration 0002 aplicada
 ✅ Design System v2 — tokens sincronizados, PageHeader/EmptyState/SectionLabel, BrandLink, Button brand
 ✅ Inline styles — sidebar, bottom-nav, login, onboarding migrados para tokens
@@ -52,9 +52,11 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ CI GitHub Actions (lint+typecheck+test) — P2
 ✅ Zod em auth + site-url helper (sem fallback hardcoded) — P2
 ✅ Loading states em todas as páginas + a11y bottom-nav + testes de componente (jsdom) — P3
-✅ Reservas: validação de capacidade e colisão de mesa — P3
+✅ Toasts de feedback + edição inline de fichas/estoque — PR#29
+✅ Auditoria geral P0→P3 — correções de bugs, a11y, tipos, edge cases — PR#30
 ⬜ Alerta de estoque persistente (follow-up documentado em learnings) — P3 pendente
 ⬜ Endurecer RLS no banco (defesa em profundidade) — follow-up P1
+⬜ Expandir testes vitest para compras/estoque/escala/fichas
 ⬜ PRs obsoletos #2 e #3 (Vercel bots) — podem ser fechados
 
 ## Decisões técnicas ativas
@@ -70,13 +72,14 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
-2. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
-3. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
-4. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
-5. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
+1. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
+2. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
+3. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
+4. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
+5. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
 
 ## Gaps conhecidos
 - Testes vitest criados para auth/checklist/reservas — expandir para compras/estoque/escala/fichas
 - Migration 0001 multi_tenant.sql versionada; já aplicada via PR#6 histórico (idempotente)
 - PRs #2 e #3 (Vercel bots) ainda abertos como draft — podem ser fechados sem impacto
+- Alerta de estoque persistente: lógica existe no dashboard mas sem notificação push/banner fixo
