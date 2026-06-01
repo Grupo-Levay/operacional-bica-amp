@@ -47,6 +47,8 @@ export function BottomNav({ role }: BottomNavProps) {
             <Link
               key={href}
               href={href}
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
               className={`flex flex-1 flex-col items-center justify-center gap-0.5 relative z-10 transition-colors ${
                 active ? "text-bica" : "text-b4"
               }`}
@@ -56,7 +58,7 @@ export function BottomNav({ role }: BottomNavProps) {
                   className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] w-8 rounded-full bg-bica"
                 />
               )}
-              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+              <Icon size={22} strokeWidth={active ? 2.5 : 1.8} aria-hidden="true" />
               <span
                 className={`text-[9px] uppercase leading-none tracking-[0.08em] ${active ? "font-semibold" : "font-normal"}`}
               >
