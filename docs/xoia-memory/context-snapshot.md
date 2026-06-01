@@ -19,6 +19,9 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/types/database.types.ts`              → tipos Supabase com coluna `casa` em todas as tabelas
 `supabase/migrations/`                      → 0001 multi_tenant | 0002 relaxa RLS | 0003 perfis.casas | 0004 reserva presente/nao_compareceu
 `src/lib/reservas-availability.ts`           → helper puro: horariosColidem, mesasOcupadas, sugerirMesa (best-fit)
+`src/lib/viz.ts`                             → helpers puros de viz: clampPct, ringGeometry, nivelEstoquePct, severidadeEstoque
+`src/components/ui/progress-ring.tsx`        → anel de progresso SVG (zero dep) accent-aware
+`src/components/ui/level-bar.tsx`            → barra de nível atual/mínimo colorida por severidade
 `src/components/reservas/reserva-form.tsx`   → form genérico criar/editar com disponibilidade + best-fit
 `src/lib/site-url.ts`                        → getSiteUrl() — resolve URL base via env/host (sem fallback hardcoded)
 `src/lib/schemas/auth.ts`                    → schemas Zod (padrão de validação — adoção incremental)
@@ -41,6 +44,7 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Reservas — CRUD completo, DateNav, status badges, validação capacidade/colisão
 ✅ Reservas v2 (S4.1) — check-in/no-show (enum 0004), disponibilidade de mesa no form, best-fit, editar reserva
 ✅ Reservas v3 (UX upgrade) — painel KPIs ao vivo, timeline de mesas, busca+filtro, confirmação WhatsApp — PR#33
+✅ Viz primitives — ProgressRing + LevelBar (SVG/CSS puro, zero dep) + viz.ts testado; dashboard usa ring reutilizável e barras de ruptura
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
 ✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop, Bento layout

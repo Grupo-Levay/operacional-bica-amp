@@ -12,3 +12,4 @@
 {"date":"2026-06-01","mode":"deep","story":"S4.1","agent":"dev","check_attempts":1,"status":"shipped","note":"Reservas operacao real: check-in/no-show (enum 0004) + disponibilidade/best-fit + editar reserva; 88 testes"}
 {"date":"2026-06-01","session_id":"9d127b35-6d29-4799-a8b3-f6cb05c92742","trigger":"auto","compacted_at":"2026-06-01T08:04:59.641Z","line_count":424}
 {"date":"2026-06-01","mode":"standard","story":"reservas-ux-upgrade","agent":"dev","check_attempts":1,"status":"shipped","note":"Reservas UX v2: painel KPIs ao vivo + timeline mesas + busca/filtro + WhatsApp; PR#33 merged; 138 testes"}
+{"date":"2026-06-01","mode":"standard","story":"dashboard-viz-primitives","agent":"dev","check_attempts":1,"status":"shipped","note":"Primitivos de viz sem dependencia: ProgressRing + LevelBar + helpers viz.ts; refatora dashboard (ring reutilizavel + barras de ruptura); 153 testes"}

@@ -15,6 +15,8 @@ import {
   DollarSign
 } from 'lucide-react';
 import { StatCard } from './stat-card';
+import { ProgressRing } from '@/components/ui/progress-ring';
+import { LevelBar } from '@/components/ui/level-bar';
 import { cn } from '@/lib/utils';
 
 interface CriticalItem {
@@ -41,43 +43,6 @@ interface DashboardContentProps {
     scaleList: ScaleMember[];
   };
   dataHoje: string;
-}
-
-function CircularProgress({ percentage, size = 52, strokeWidth = 5 }: { percentage: number; size?: number; strokeWidth?: number }) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg className="transform -rotate-90" width={size} height={size}>
-        <circle
-          className="text-white/5"
-          strokeWidth={strokeWidth}
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-        />
-        <circle
-          className="text-primary transition-all duration-500 ease-in-out"
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-        />
-      </svg>
-      <span className="absolute text-[10px] font-extrabold leading-none text-foreground">
-        {percentage}%
-      </span>
-    </div>
-  );
 }
 
 export function DashboardContent({ initialData, dataHoje }: DashboardContentProps) {
@@ -137,7 +102,12 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
             sub={pendentes === 0 ? "Todos concluídos" : `${pendentes} pendente${pendentes !== 1 ? 's' : ''} hoje`}
             accent={pendentes > 0 ? "warning" : "success"}
             icon={<CheckSquare />}
-            visualIndicator={<CircularProgress percentage={checklistPercentage} />}
+            visualIndicator={
+              <ProgressRing
+                value={checklistPercentage}
+                accent={pendentes > 0 ? "warning" : "success"}
+              />
+            }
           />
           
           <StatCard
@@ -304,11 +274,14 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
             {criticosCount > 0 ? (
               <ul className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
                 {initialData.criticalList.slice(0, 5).map((item, idx) => (
-                  <li key={idx} className="flex justify-between items-center p-2 rounded-lg bg-red-500/5 border border-red-500/10 text-xs">
-                    <span className="font-semibold text-foreground truncate max-w-[120px]">{item.nome}</span>
-                    <span className="text-danger font-mono font-bold text-[11px]">
-                      {item.atual} <span className="text-muted-foreground font-normal">/ {item.minimo} {item.unidade}</span>
-                    </span>
+                  <li key={idx} className="p-2 rounded-lg bg-danger-bg border border-danger/10 text-xs space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-foreground truncate max-w-[120px]">{item.nome}</span>
+                      <span className="text-danger font-mono font-bold text-[11px]">
+                        {item.atual} <span className="text-muted-foreground font-normal">/ {item.minimo} {item.unidade}</span>
+                      </span>
+                    </div>
+                    <LevelBar atual={item.atual} minimo={item.minimo} />
                   </li>
                 ))}
                 {criticosCount > 5 && (
