@@ -40,6 +40,7 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Layout — CasaSwitcher, LogoutBtn, AbastecimentoSubnav, sidebar + bottom-nav
 ✅ Reservas — CRUD completo, DateNav, status badges, validação capacidade/colisão
 ✅ Reservas v2 (S4.1) — check-in/no-show (enum 0004), disponibilidade de mesa no form, best-fit, editar reserva
+✅ Reservas v3 (UX upgrade) — painel KPIs ao vivo, timeline de mesas, busca+filtro, confirmação WhatsApp — PR#33
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
 ✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop, Bento layout
@@ -75,7 +76,8 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
+1. feat: reservas UX upgrade — painel ao vivo, timeline, busca/filtro, WhatsApp — PR#33 (2026-06-01)
+2. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
 2. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
 3. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
 4. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
