@@ -40,3 +40,15 @@ export async function removerEscala(id: string) {
   await supabase.from('escala').delete().eq('id', id).eq('casa', casa)
   revalidatePath('/escala')
 }
+
+export async function confirmarEscala(id: string, confirmado: boolean) {
+  if (!id?.trim()) throw new Error('Registro inválido')
+
+  const { supabase, casa } = await requireUser()
+  await supabase
+    .from('escala')
+    .update({ confirmado })
+    .eq('id', id)
+    .eq('casa', casa)
+  revalidatePath('/escala')
+}

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { Badge } from "@/components/ui/badge"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { salvarEscala, removerEscala } from "@/app/actions/escala"
+import { salvarEscala, removerEscala, confirmarEscala } from "@/app/actions/escala"
 import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 
@@ -80,6 +80,17 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
     })
   }
 
+  function handleConfirmar(id: string, confirmado: boolean) {
+    startTransition(async () => {
+      try {
+        await confirmarEscala(id, confirmado)
+        toast.success(confirmado ? "Turno confirmado" : "Confirmação desfeita")
+      } catch {
+        toast.error("Não foi possível confirmar o turno")
+      }
+    })
+  }
+
 
   const hasEscala = escala.length > 0
 
@@ -87,7 +98,8 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
     <div>
       {canEdit && (
         <p className="text-xs text-muted-foreground mb-3">
-          Toque em uma célula para editar a escala.
+          Toque numa célula para editar. Use <span className="text-success font-bold">✓</span> para
+          confirmar o turno.
         </p>
       )}
       {!hasEscala && !canEdit && (
@@ -162,6 +174,23 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                               {t}
                             </button>
                           ))}
+                          {item && (
+                            <button
+                              type="button"
+                              disabled={isPending}
+                              onClick={() => handleConfirmar(item.id, !item.confirmado)}
+                              aria-pressed={item.confirmado ?? false}
+                              aria-label={item.confirmado ? "Desmarcar confirmação" : "Confirmar turno"}
+                              className={cn(
+                                "text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50",
+                                item.confirmado
+                                  ? "bg-success-bg text-success"
+                                  : "bg-ink4 text-b3"
+                              )}
+                            >
+                              ✓
+                            </button>
+                          )}
                           {item && (
                             <ConfirmDialog
                               trigger={
