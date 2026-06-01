@@ -17,7 +17,10 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/app/(app)/reservas/page.tsx`           → módulo reservas completo com DateNav + form
 `src/components/reservas/`                  → date-nav, nova-reserva-form, reserva-card
 `src/types/database.types.ts`              → tipos Supabase com coluna `casa` em todas as tabelas
-`supabase/migrations/`                      → 0001 multi_tenant SQL | 0002 relaxa RLS
+`supabase/migrations/`                      → 0001 multi_tenant | 0002 relaxa RLS | 0003 perfis.casas
+`src/lib/site-url.ts`                        → getSiteUrl() — resolve URL base via env/host (sem fallback hardcoded)
+`src/lib/schemas/auth.ts`                    → schemas Zod (padrão de validação — adoção incremental)
+`.github/workflows/ci.yml`                   → CI: lint+typecheck+test em PR/push main
 `DESIGN.md`                                 → fonte de verdade do design system (v2.0 — LER antes de UI)
 `src/tokens/tokens.yaml`                    → paleta completa: brand, parchment b0–b4, ink2–ink4, status
 `src/app/globals.css`                       → @theme inline com todos os tokens → classes Tailwind válidas
@@ -43,7 +46,15 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ bar_tables — tabela criada no Supabase; seletor de mesas habilitado no form reservas
 ✅ Ícones PWA — icon-192.png e icon-512.png em public/
 ✅ Testes vitest — auth, checklist e reservas cobertos
-⬜ Testes de integração para Server Actions (coverage parcial — expandir)
+✅ perfis.casas — coluna criada (migration 0003); role não rebaixa mais (P0 corrigido)
+✅ Route guard de role no servidor (layout + x-pathname via proxy) — P1
+✅ Isolamento multi-tenant de usuários no /admin (overlaps casas) — P1
+✅ CI GitHub Actions (lint+typecheck+test) — P2
+✅ Zod em auth + site-url helper (sem fallback hardcoded) — P2
+✅ Loading states em todas as páginas + a11y bottom-nav + testes de componente (jsdom) — P3
+✅ Reservas: validação de capacidade e colisão de mesa — P3
+⬜ Alerta de estoque persistente (follow-up documentado em learnings) — P3 pendente
+⬜ Endurecer RLS no banco (defesa em profundidade) — follow-up P1
 ⬜ PRs obsoletos #2 e #3 (Vercel bots) — podem ser fechados
 
 ## Decisões técnicas ativas
