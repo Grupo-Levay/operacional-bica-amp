@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentCasa } from '@/lib/tenant'
 import type { Role } from '@/lib/roles'
 
 const ROLES_VALIDOS: Role[] = [
@@ -30,6 +31,21 @@ export async function atualizarRole(userId: string, novoRole: Role) {
 
   if (!meu || !['super_admin', 'admin'].includes(meu.role)) {
     throw new Error('Sem permissão')
+  }
+
+  // Isolamento multi-tenant: admin só altera usuários da sua casa.
+  // super_admin pode alterar qualquer usuário.
+  if (meu.role !== 'super_admin') {
+    const casa = await getCurrentCasa()
+    const { data: alvo } = await supabase
+      .from('perfis')
+      .select('casas')
+      .eq('id', userId)
+      .single()
+
+    if (!alvo || !alvo.casas?.includes(casa)) {
+      throw new Error('Sem permissão para alterar este usuário')
+    }
   }
 
   await supabase

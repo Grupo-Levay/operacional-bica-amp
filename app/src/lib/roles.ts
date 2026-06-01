@@ -16,3 +16,15 @@ export function rotasPermitidas(role: Role): string[] {
     .filter(([, roles]) => roles.includes(role))
     .map(([href]) => href)
 }
+
+/**
+ * Valida se um role pode acessar a rota correspondente ao pathname.
+ * Resolve o segmento base (ex: "/escala/123" → "/escala"). Rotas não mapeadas
+ * em ROUTE_PERMISSIONS são liberadas (não são áreas restritas por role).
+ */
+export function podeAcessarRota(role: Role, pathname: string): boolean {
+  const base = '/' + (pathname.split('/').filter(Boolean)[0] ?? '')
+  const permitidos = ROUTE_PERMISSIONS[base]
+  if (!permitidos) return true
+  return permitidos.includes(role)
+}
