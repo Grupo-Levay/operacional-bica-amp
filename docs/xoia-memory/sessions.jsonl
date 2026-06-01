@@ -10,3 +10,4 @@
 {"date":"2026-06-01","mode":"standard","story":"auditoria-geral","agent":"dev","check_attempts":1,"status":"shipped","note":"P2 CI workflow + Zod em auth + site-url helper + .env.example"}
 {"date":"2026-06-01","mode":"standard","story":"auditoria-geral","agent":"dev","check_attempts":1,"status":"shipped","note":"P3 loading states + a11y + testes componente + colisao/capacidade mesa; 59 testes"}
 {"date":"2026-06-01","mode":"deep","story":"S4.1","agent":"dev","check_attempts":1,"status":"shipped","note":"Reservas operacao real: check-in/no-show (enum 0004) + disponibilidade/best-fit + editar reserva; 88 testes"}
+{"date":"2026-06-01","session_id":"9d127b35-6d29-4799-a8b3-f6cb05c92742","trigger":"auto","compacted_at":"2026-06-01T08:04:59.641Z","line_count":424}

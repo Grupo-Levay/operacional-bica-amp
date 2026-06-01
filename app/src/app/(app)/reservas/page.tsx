@@ -1,12 +1,10 @@
-import { CalendarCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentCasa } from '@/lib/tenant'
 import { DateNav } from '@/components/reservas/date-nav'
 import { NovaReservaForm } from '@/components/reservas/nova-reserva-form'
-import { ReservaCard } from '@/components/reservas/reserva-card'
 import { ReservaCounters } from '@/components/reservas/reserva-counters'
+import { ReservasView } from '@/components/reservas/reservas-view'
 import { PageHeader } from '@/components/shared/page-header'
-import { EmptyState } from '@/components/shared/empty-state'
 import type { Tables } from '@/types/database.types'
 
 type Reserva = Tables<'reservations'>
@@ -42,6 +40,11 @@ async function getReservasData(
   }
 }
 
+const NOME_CASA: Record<string, string> = {
+  bica: 'BiCA',
+  amp: 'AMP',
+}
+
 export default async function ReservasPage({
   searchParams,
 }: {
@@ -50,10 +53,9 @@ export default async function ReservasPage({
   const { data } = await searchParams
   const casa = await getCurrentCasa()
   const dataAlvo = data ?? new Date().toISOString().split('T')[0]
+  const nomeCasa = NOME_CASA[casa] ?? casa.toUpperCase()
 
   const { reservas, mesas } = await getReservasData(casa, dataAlvo)
-
-  const mesasPorId = new Map(mesas.map((m) => [m.id, m]))
 
   const contagens = {
     pendente: reservas.filter((r) => r.status === 'pendente').length,
@@ -83,27 +85,12 @@ export default async function ReservasPage({
 
       <NovaReservaForm tables={mesas} reservasDoDia={reservas} defaultDate={dataAlvo} />
 
-      {reservas.length === 0 ? (
-        <EmptyState
-          icon={<CalendarCheck strokeWidth={1.2} />}
-          message="Nenhuma reserva para este dia."
-        />
-      ) : (
-        <div className="space-y-3">
-          {reservas.map((reserva) => {
-            const mesa = reserva.table_id ? mesasPorId.get(reserva.table_id) : null
-            return (
-              <ReservaCard
-                key={reserva.id}
-                reserva={reserva}
-                mesa={mesa ? { number: mesa.number, location: mesa.location } : null}
-                tables={mesas}
-                reservasDoDia={reservas}
-              />
-            )
-          })}
-        </div>
-      )}
+      <ReservasView
+        reservas={reservas}
+        mesas={mesas}
+        dataAlvo={dataAlvo}
+        nomeCasa={nomeCasa}
+      />
     </main>
   )
 }
