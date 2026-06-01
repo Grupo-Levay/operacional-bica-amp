@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toast'
 import { rotasPermitidas, podeAcessarRota, type Role } from '@/lib/roles'
 import { getOnboardingConfig } from '@/lib/onboarding'
 import { getCurrentCasa, CASAS, type Casa } from '@/lib/tenant'
+import { EstoqueAlertBanner } from '@/components/layout/estoque-alert-banner'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -28,6 +29,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const rotas = rotasPermitidas(role)
   const onboardingPendente = perfil?.onboarding_completo === false
 
+  const { data: estoqueItens } = await supabase
+    .from('estoque_itens')
+    .select('atual, minimo')
+    .eq('casa', currentCasa)
+    .eq('ativo', true)
+
+  const estoqueCriticoCount = (estoqueItens ?? []).filter(
+    (i) => (i.minimo ?? 0) > 0 && (i.atual ?? 0) < (i.minimo ?? 0)
+  ).length
+
   // Route guard de role no servidor (proxy só faz checagem otimista de auth).
   // Bloqueia acesso direto a rotas restritas que o sidebar/nav já ocultam.
   const pathname = (await headers()).get('x-pathname') ?? ''
@@ -47,6 +58,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       {/* Conteúdo principal */}
       <div className="flex flex-col flex-1 md:pl-56">
+        <EstoqueAlertBanner count={estoqueCriticoCount} />
         <main className="flex-1 pb-20 md:pb-8">{children}</main>
         {/* Bottom nav — mobile only */}
         <BottomNav role={role} />
