@@ -188,6 +188,7 @@ export type Database = {
           funcao: string
           id: string
           nome: string
+          perfil_id: string | null
           turno: string | null
         }
         Insert: {
@@ -197,6 +198,7 @@ export type Database = {
           funcao: string
           id?: string
           nome: string
+          perfil_id?: string | null
           turno?: string | null
         }
         Update: {
@@ -206,6 +208,7 @@ export type Database = {
           funcao?: string
           id?: string
           nome?: string
+          perfil_id?: string | null
           turno?: string | null
         }
         Relationships: []

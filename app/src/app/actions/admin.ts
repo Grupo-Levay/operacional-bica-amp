@@ -55,3 +55,49 @@ export async function atualizarRole(userId: string, novoRole: Role) {
 
   revalidatePath('/admin')
 }
+
+/**
+ * Vincula (ou desvincula, com equipeId=null) uma conta a um membro da equipe.
+ * Mantém 1 conta ↔ 1 membro por casa: limpa o vínculo anterior antes de definir.
+ */
+export async function vincularPerfilEquipe(perfilId: string, equipeId: string | null) {
+  if (!perfilId?.trim()) throw new Error('Usuário inválido')
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Não autenticado')
+
+  const { data: meu } = await supabase
+    .from('perfis')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!meu || !['super_admin', 'admin'].includes(meu.role)) {
+    throw new Error('Sem permissão')
+  }
+
+  const casa = await getCurrentCasa()
+
+  // Limpa qualquer vínculo anterior deste perfil nesta casa.
+  await supabase
+    .from('equipe')
+    .update({ perfil_id: null })
+    .eq('perfil_id', perfilId)
+    .eq('casa', casa)
+
+  // Define o novo vínculo, se informado.
+  if (equipeId) {
+    await supabase
+      .from('equipe')
+      .update({ perfil_id: perfilId })
+      .eq('id', equipeId)
+      .eq('casa', casa)
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/perfil')
+}

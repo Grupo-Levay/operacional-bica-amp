@@ -1,7 +1,7 @@
 "use client"
 
 import { useTransition } from "react"
-import { atualizarRole } from "@/app/actions/admin"
+import { atualizarRole, vincularPerfilEquipe } from "@/app/actions/admin"
 import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import type { Role } from "@/lib/roles"
@@ -40,12 +40,20 @@ type Perfil = {
   created_at: string | null
 }
 
+type EquipeMembro = {
+  id: string
+  nome: string
+  funcao: string
+  perfil_id: string | null
+}
+
 type Props = {
   perfis: Perfil[]
+  equipe: EquipeMembro[]
   currentUserId: string
 }
 
-export function UsuariosTable({ perfis, currentUserId }: Props) {
+export function UsuariosTable({ perfis, equipe, currentUserId }: Props) {
   const [isPending, startTransition] = useTransition()
 
   function handleRoleChange(userId: string, novoRole: Role) {
@@ -55,6 +63,17 @@ export function UsuariosTable({ perfis, currentUserId }: Props) {
         toast.success("Permissão atualizada")
       } catch {
         toast.error("Não foi possível atualizar a permissão")
+      }
+    })
+  }
+
+  function handleVincular(userId: string, equipeId: string) {
+    startTransition(async () => {
+      try {
+        await vincularPerfilEquipe(userId, equipeId || null)
+        toast.success(equipeId ? "Conta vinculada à equipe" : "Vínculo removido")
+      } catch {
+        toast.error("Não foi possível vincular à equipe")
       }
     })
   }
@@ -99,19 +118,41 @@ export function UsuariosTable({ perfis, currentUserId }: Props) {
               </p>
             </div>
 
-            {/* Select de role */}
-            <select
-              disabled={isPending || isSelf}
-              value={perfil.role}
-              onChange={(e) => handleRoleChange(perfil.id, e.target.value as Role)}
-              className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-            >
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {ROLE_LABEL[r]}
-                </option>
-              ))}
-            </select>
+            {/* Selects: role + vínculo de equipe */}
+            <div className="flex shrink-0 flex-col gap-1">
+              <select
+                disabled={isPending || isSelf}
+                value={perfil.role}
+                onChange={(e) => handleRoleChange(perfil.id, e.target.value as Role)}
+                className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={`Permissão de ${perfil.nome ?? 'usuário'}`}
+              >
+                {ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {ROLE_LABEL[r]}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                disabled={isPending}
+                value={equipe.find((m) => m.perfil_id === perfil.id)?.id ?? ""}
+                onChange={(e) => handleVincular(perfil.id, e.target.value)}
+                className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={`Vincular ${perfil.nome ?? 'usuário'} à equipe`}
+              >
+                <option value="">Sem vínculo de equipe</option>
+                {equipe.map((m) => {
+                  const ocupadoPorOutro = m.perfil_id != null && m.perfil_id !== perfil.id
+                  return (
+                    <option key={m.id} value={m.id} disabled={ocupadoPorOutro}>
+                      {m.nome} · {m.funcao}
+                      {ocupadoPorOutro ? " (já vinculado)" : ""}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
           </div>
         )
       })}
