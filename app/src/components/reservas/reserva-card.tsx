@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ReservaForm } from '@/components/reservas/reserva-form'
+import { WhatsAppButton } from '@/components/reservas/whatsapp-button'
 import { atualizarStatusReserva } from '@/app/actions/reservas'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
@@ -18,6 +19,7 @@ interface ReservaCardProps {
   /** Mesas e reservas do dia, necessárias para o modo de edição inline. */
   tables: Tables<'bar_tables'>[]
   reservasDoDia: ReservaSlot[]
+  nomeCasa?: string
 }
 
 type Status = Enums<'reservation_status'>
@@ -70,7 +72,7 @@ function formatarHora(time: string): string {
   return time.slice(0, 5)
 }
 
-export function ReservaCard({ reserva, mesa, tables, reservasDoDia }: ReservaCardProps) {
+export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = 'BiCA' }: ReservaCardProps) {
   const [isPending, startTransition] = useTransition()
   const [erro, setErro] = useState<string | null>(null)
   const [editando, setEditando] = useState(false)
@@ -176,25 +178,28 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia }: ReservaCar
         {erro && <p className="text-xs text-danger">{erro}</p>}
 
         {status === 'pendente' && (
-          <div className="flex items-center gap-2 pt-1">
-            <Button
-              variant="brand"
-              size="sm"
-              disabled={isPending}
-              onClick={() => mudarStatus('confirmada')}
-              className="min-h-[52px] flex-1"
-            >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Confirmar'}
-            </Button>
-            <Button
-              size="sm"
-              variant="destructive"
-              disabled={isPending}
-              onClick={() => mudarStatus('cancelada')}
-              className="min-h-[52px]"
-            >
-              Cancelar
-            </Button>
+          <div className="flex flex-col gap-2 pt-1">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="brand"
+                size="sm"
+                disabled={isPending}
+                onClick={() => mudarStatus('confirmada')}
+                className="min-h-[52px] flex-1"
+              >
+                {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Confirmar'}
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={isPending}
+                onClick={() => mudarStatus('cancelada')}
+                className="min-h-[52px]"
+              >
+                Cancelar
+              </Button>
+            </div>
+            <WhatsAppButton reserva={reserva} nomeCasa={nomeCasa} />
           </div>
         )}
 
