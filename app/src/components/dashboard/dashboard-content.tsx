@@ -41,9 +41,34 @@ interface DashboardContentProps {
     equipeCount: number;
     criticalList: CriticalItem[];
     scaleList: ScaleMember[];
+    mediaCmv: number | null;
   };
   dataHoje: string;
 }
+
+const META_CMV = 30;
+
+/** Severidade do CMV frente à meta: ≤30% ok, ≤40% atenção, acima disso alto. */
+function cmvSeveridade(cmv: number | null): 'ok' | 'warning' | 'danger' | 'muted' {
+  if (cmv === null) return 'muted';
+  if (cmv <= META_CMV) return 'ok';
+  if (cmv <= 40) return 'warning';
+  return 'danger';
+}
+
+const cmvText: Record<'ok' | 'warning' | 'danger' | 'muted', string> = {
+  ok: 'text-success',
+  warning: 'text-warning',
+  danger: 'text-danger',
+  muted: 'text-muted-foreground',
+};
+
+const cmvBar: Record<'ok' | 'warning' | 'danger' | 'muted', string> = {
+  ok: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+  muted: 'bg-muted-foreground',
+};
 
 export function DashboardContent({ initialData, dataHoje }: DashboardContentProps) {
   const [brand, setBrand] = useState<'bica' | 'amp'>('bica');
@@ -68,6 +93,17 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
   
   const criticosCount = initialData.criticalList.length;
 
+  const cmv = initialData.mediaCmv;
+  const cmvSev = cmvSeveridade(cmv);
+  const cmvLabel = cmv !== null ? `${cmv.toFixed(1)}%` : '—';
+  const cmvBarWidth = cmv !== null ? Math.min(100, (cmv / 50) * 100) : 0;
+  const cmvCaption =
+    cmv === null
+      ? 'Sem fichas com CMV calculável ainda.'
+      : cmv <= META_CMV
+        ? `Dentro da meta de ${META_CMV}%.`
+        : `Acima da meta de ${META_CMV}%.`;
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-10 gap-6 p-4 md:p-6 pb-24 md:pb-6">
       {/* Coluna Esquerda: Estatísticas e Ações (7 colunas no desktop) */}
@@ -87,8 +123,8 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
           
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
             </span>
             Conexão Supabase OK
           </div>
@@ -118,7 +154,7 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
             icon={<Package />}
             visualIndicator={
               criticosCount > 0 ? (
-                <div className="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center text-danger border border-danger/20 pulse-glow-primary">
+                <div className="h-10 w-10 rounded-full bg-danger/10 flex items-center justify-center text-danger border border-danger/20 pulse-glow-primary">
                   <AlertTriangle className="size-5" />
                 </div>
               ) : null
@@ -238,17 +274,23 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
               </div>
             </Link>
             
-            <div className="relative flex flex-col justify-between p-4 rounded-xl border border-white/5 bg-black/10">
+            <Link
+              href="/fichas"
+              className="group relative flex flex-col justify-between p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all hover:scale-[1.02] hover:-translate-y-0.5 active:scale-95 duration-200"
+            >
               <div className="flex justify-between items-start">
-                <div className="p-2 rounded-lg bg-white/5 text-muted-foreground">
+                <div className={cn('p-2 rounded-lg bg-primary/10', cmvText[cmvSev])}>
                   <TrendingUp className="size-5" />
                 </div>
+                <ChevronRight className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <div className="mt-4">
-                <h3 className="text-sm font-semibold text-muted-foreground">Metas & CMV</h3>
-                <p className="text-[11px] text-muted-foreground/60">Análise em breve</p>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Metas & CMV <span className={cn('font-bold tabular-nums', cmvText[cmvSev])}>{cmvLabel}</span>
+                </h3>
+                <p className="text-[11px] text-muted-foreground">{cmvCaption}</p>
               </div>
-            </div>
+            </Link>
 
           </div>
         </section>
@@ -291,7 +333,7 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
                 )}
               </ul>
             ) : (
-              <div className="p-3 text-center rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-[11px] text-emerald-500 font-medium">
+              <div className="p-3 text-center rounded-lg bg-success-bg border border-success/10 text-[11px] text-success font-medium">
                 Tudo OK. Sem rupturas no estoque!
               </div>
             )}
@@ -316,7 +358,7 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
                     </div>
                     <span className={cn(
                       "text-[9px] font-bold px-2 py-0.5 rounded-full",
-                      membro.confirmado ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
+                      membro.confirmado ? "bg-success-bg text-success border border-success/20" : "bg-warning-bg text-warning border border-warning/20"
                     )}>
                       {membro.confirmado ? 'Confirmado' : 'Pendente'}
                     </span>
@@ -332,7 +374,7 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
           
           <hr className="border-white/5" />
 
-          {/* Resumo Financeiro Curto (Simulado para Visual de POS) */}
+          {/* Resumo Financeiro — CMV real das fichas ativas */}
           <div className="space-y-3">
             <h3 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
               <DollarSign size={14} className="text-primary" />
@@ -341,12 +383,15 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
             <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5 space-y-2">
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Média CMV Geral</span>
-                <span className="font-bold text-emerald-400">28.4%</span>
+                <span className={cn('font-bold tabular-nums', cmvText[cmvSev])}>{cmvLabel}</span>
               </div>
               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full" style={{ width: '85%' }}></div>
+                <div
+                  className={cn('h-full rounded-full transition-all', cmvBar[cmvSev])}
+                  style={{ width: `${cmvBarWidth}%` }}
+                />
               </div>
-              <p className="text-[10px] text-muted-foreground/60 leading-tight">CMV dentro da meta estipulada de 30%.</p>
+              <p className="text-[10px] text-muted-foreground/60 leading-tight">{cmvCaption}</p>
             </div>
           </div>
 
