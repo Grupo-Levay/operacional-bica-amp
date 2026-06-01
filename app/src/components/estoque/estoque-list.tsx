@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Package, AlertTriangle } from "lucide-react"
+import { Package, AlertTriangle, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { ItemEstoque } from "@/components/estoque/item-estoque"
+import { NovoItemForm } from "@/components/estoque/novo-item-form"
 import type { Database } from "@/types/database.types"
 
 type Categoria = Database["public"]["Tables"]["estoque_categorias"]["Row"]
@@ -86,6 +88,17 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
 
   return (
     <>
+      {/* Novo item */}
+      <NovoItemForm
+        categorias={categorias}
+        trigger={
+          <Button variant="brand" size="cta" className="justify-center">
+            <Plus className="size-4" />
+            Novo item
+          </Button>
+        }
+      />
+
       {/* Alertas */}
       <AlertasEstoque itens={itens} />
 
