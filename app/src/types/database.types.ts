@@ -619,7 +619,7 @@ export type Database = {
       member_has_casa: { Args: { p_casa: string }; Returns: boolean }
     }
     Enums: {
-      reservation_status: "pendente" | "confirmada" | "cancelada" | "concluida"
+      reservation_status: "pendente" | "confirmada" | "presente" | "cancelada" | "nao_compareceu" | "concluida"
       team_role: "admin" | "atendente"
     }
     CompositeTypes: {
@@ -748,7 +748,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      reservation_status: ["pendente", "confirmada", "cancelada", "concluida"],
+      reservation_status: ["pendente", "confirmada", "presente", "cancelada", "nao_compareceu", "concluida"],
       team_role: ["admin", "atendente"],
     },
   },

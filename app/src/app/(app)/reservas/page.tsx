@@ -58,8 +58,10 @@ export default async function ReservasPage({
   const contagens = {
     pendente: reservas.filter((r) => r.status === 'pendente').length,
     confirmada: reservas.filter((r) => r.status === 'confirmada').length,
+    presente: reservas.filter((r) => r.status === 'presente').length,
     concluida: reservas.filter((r) => r.status === 'concluida').length,
     cancelada: reservas.filter((r) => r.status === 'cancelada').length,
+    naoCompareceu: reservas.filter((r) => r.status === 'nao_compareceu').length,
   }
 
   return (
@@ -72,12 +74,14 @@ export default async function ReservasPage({
         <ReservaCounters
           pendente={contagens.pendente}
           confirmada={contagens.confirmada}
+          presente={contagens.presente}
           concluida={contagens.concluida}
           cancelada={contagens.cancelada}
+          naoCompareceu={contagens.naoCompareceu}
         />
       )}
 
-      <NovaReservaForm tables={mesas} defaultDate={dataAlvo} />
+      <NovaReservaForm tables={mesas} reservasDoDia={reservas} defaultDate={dataAlvo} />
 
       {reservas.length === 0 ? (
         <EmptyState
@@ -93,6 +97,8 @@ export default async function ReservasPage({
                 key={reserva.id}
                 reserva={reserva}
                 mesa={mesa ? { number: mesa.number, location: mesa.location } : null}
+                tables={mesas}
+                reservasDoDia={reservas}
               />
             )
           })}

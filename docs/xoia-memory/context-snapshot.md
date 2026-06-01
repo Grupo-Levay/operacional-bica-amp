@@ -17,7 +17,9 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/app/(app)/reservas/page.tsx`           → módulo reservas completo com DateNav + form
 `src/components/reservas/`                  → date-nav, nova-reserva-form, reserva-card
 `src/types/database.types.ts`              → tipos Supabase com coluna `casa` em todas as tabelas
-`supabase/migrations/`                      → 0001 multi_tenant | 0002 relaxa RLS | 0003 perfis.casas
+`supabase/migrations/`                      → 0001 multi_tenant | 0002 relaxa RLS | 0003 perfis.casas | 0004 reserva presente/nao_compareceu
+`src/lib/reservas-availability.ts`           → helper puro: horariosColidem, mesasOcupadas, sugerirMesa (best-fit)
+`src/components/reservas/reserva-form.tsx`   → form genérico criar/editar com disponibilidade + best-fit
 `src/lib/site-url.ts`                        → getSiteUrl() — resolve URL base via env/host (sem fallback hardcoded)
 `src/lib/schemas/auth.ts`                    → schemas Zod (padrão de validação — adoção incremental)
 `.github/workflows/ci.yml`                   → CI: lint+typecheck+test em PR/push main
@@ -36,7 +38,8 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Auth — login, proteção de rotas por role, onboarding, recuperação de senha
 ✅ Multi-tenant — isolamento por `casa` (bica/amp) via getCurrentCasa() + requireUser()
 ✅ Layout — CasaSwitcher, LogoutBtn, AbastecimentoSubnav, sidebar + bottom-nav
-✅ Reservas — CRUD completo, DateNav, status badges, confirmar/cancelar/concluir, validação capacidade/colisão
+✅ Reservas — CRUD completo, DateNav, status badges, validação capacidade/colisão
+✅ Reservas v2 (S4.1) — check-in/no-show (enum 0004), disponibilidade de mesa no form, best-fit, editar reserva
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
 ✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop, Bento layout

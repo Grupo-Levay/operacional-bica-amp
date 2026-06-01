@@ -1,18 +1,23 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Users, Phone, MapPin, StickyNote, Loader2 } from 'lucide-react'
+import { Users, Phone, MapPin, StickyNote, Loader2, Pencil } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ReservaForm } from '@/components/reservas/reserva-form'
 import { atualizarStatusReserva } from '@/app/actions/reservas'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
+import type { ReservaSlot } from '@/lib/reservas-availability'
 import type { Tables, Enums } from '@/types/database.types'
 
 interface ReservaCardProps {
   reserva: Tables<'reservations'>
   mesa?: { number: string; location: string | null } | null
+  /** Mesas e reservas do dia, necessárias para o modo de edição inline. */
+  tables: Tables<'bar_tables'>[]
+  reservasDoDia: ReservaSlot[]
 }
 
 type Status = Enums<'reservation_status'>
@@ -20,45 +25,55 @@ type Status = Enums<'reservation_status'>
 const STATUS_LABEL: Record<Status, string> = {
   pendente: 'Pendente',
   confirmada: 'Confirmada',
+  presente: 'Na casa',
   concluida: 'Concluída',
   cancelada: 'Cancelada',
+  nao_compareceu: 'Não compareceu',
 }
 
 const STATUS_BORDER: Record<Status, string> = {
   pendente: 'border-l-warning',
   confirmada: 'border-l-primary',
-  concluida: 'border-l-success',
+  presente: 'border-l-success',
+  concluida: 'border-l-b3',
   cancelada: 'border-l-danger/40',
+  nao_compareceu: 'border-l-warning/50',
 }
+
+const STATUS_BADGE: Record<Status, React.ComponentProps<typeof Badge>['variant']> = {
+  pendente: 'secondary',
+  confirmada: 'outline',
+  presente: 'default',
+  concluida: 'success',
+  cancelada: 'destructive',
+  nao_compareceu: 'warning',
+}
+
+const STATUS_DONE_LABEL: Record<Status, string> = {
+  pendente: 'Reserva atualizada',
+  confirmada: 'Reserva confirmada',
+  presente: 'Cliente registrado na casa',
+  concluida: 'Reserva concluída',
+  cancelada: 'Reserva cancelada',
+  nao_compareceu: 'Marcada como não compareceu',
+}
+
+/** Estados não-terminais permitem edição. */
+const STATUS_EDITAVEL: ReadonlySet<Status> = new Set<Status>([
+  'pendente',
+  'confirmada',
+  'presente',
+])
 
 /** Corta segundos de um horário 'HH:MM:SS' -> 'HH:MM'. */
 function formatarHora(time: string): string {
   return time.slice(0, 5)
 }
 
-const STATUS_DONE_LABEL: Record<Status, string> = {
-  pendente: 'Reserva atualizada',
-  confirmada: 'Reserva confirmada',
-  concluida: 'Reserva concluída',
-  cancelada: 'Reserva cancelada',
-}
-
-function StatusBadge({ status }: { status: Status }) {
-  if (status === 'confirmada') {
-    return <Badge className="shrink-0">{STATUS_LABEL[status]}</Badge>
-  }
-  if (status === 'concluida') {
-    return <Badge variant="success" className="shrink-0">{STATUS_LABEL[status]}</Badge>
-  }
-  if (status === 'cancelada') {
-    return <Badge variant="destructive" className="shrink-0">{STATUS_LABEL[status]}</Badge>
-  }
-  return <Badge variant="secondary" className="shrink-0">{STATUS_LABEL[status]}</Badge>
-}
-
-export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
+export function ReservaCard({ reserva, mesa, tables, reservasDoDia }: ReservaCardProps) {
   const [isPending, startTransition] = useTransition()
   const [erro, setErro] = useState<string | null>(null)
+  const [editando, setEditando] = useState(false)
   const status = reserva.status
 
   function mudarStatus(novo: Status) {
@@ -75,7 +90,21 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
     })
   }
 
+  if (editando) {
+    return (
+      <ReservaForm
+        tables={tables}
+        reservasDoDia={reservasDoDia}
+        defaultDate={reserva.reservation_date}
+        reserva={reserva}
+        onCancel={() => setEditando(false)}
+        onSuccess={() => setEditando(false)}
+      />
+    )
+  }
+
   const cancelada = status === 'cancelada'
+  const editavel = STATUS_EDITAVEL.has(status)
 
   return (
     <Card
@@ -100,7 +129,20 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
               {reserva.customer_name}
             </p>
           </div>
-          <StatusBadge status={status} />
+          <div className="flex items-center gap-1.5 shrink-0">
+            {editavel && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Editar reserva"
+                disabled={isPending}
+                onClick={() => setEditando(true)}
+              >
+                <Pencil size={14} aria-hidden="true" />
+              </Button>
+            )}
+            <Badge variant={STATUS_BADGE[status]}>{STATUS_LABEL[status]}</Badge>
+          </div>
         </div>
 
         {/* Detalhes */}
@@ -110,7 +152,7 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
             {reserva.guest_count} {reserva.guest_count === 1 ? 'pessoa' : 'pessoas'}
           </span>
           {mesa && (
-            <span className={cn('flex items-center gap-1', status === 'confirmada' && 'text-primary')}>
+            <span className={cn('flex items-center gap-1', (status === 'confirmada' || status === 'presente') && 'text-primary')}>
               <MapPin size={13} aria-hidden="true" />
               Mesa {mesa.number}
               {mesa.location ? ` · ${mesa.location}` : ''}
@@ -157,6 +199,40 @@ export function ReservaCard({ reserva, mesa }: ReservaCardProps) {
         )}
 
         {status === 'confirmada' && (
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="success"
+                disabled={isPending}
+                onClick={() => mudarStatus('presente')}
+                className="min-h-[52px] flex-1"
+              >
+                {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Cliente chegou'}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isPending}
+                onClick={() => mudarStatus('nao_compareceu')}
+                className="min-h-[52px]"
+              >
+                Não veio
+              </Button>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={isPending}
+              onClick={() => mudarStatus('cancelada')}
+              className="min-h-[44px] w-full text-danger hover:text-danger"
+            >
+              Cancelar reserva
+            </Button>
+          </div>
+        )}
+
+        {status === 'presente' && (
           <div className="flex items-center gap-2 pt-1">
             <Button
               size="sm"

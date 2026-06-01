@@ -4,7 +4,7 @@ const { requireUserMock } = vi.hoisted(() => ({ requireUserMock: vi.fn() }))
 vi.mock('@/lib/auth-guard', () => ({ requireUser: requireUserMock }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-import { criarReserva } from '../reservas'
+import { criarReserva, editarReserva, atualizarStatusReserva } from '../reservas'
 
 // Builder Supabase encadeável; thenable para queries de lista (sem .single()).
 function makeBuilder({ single, list, insert }: {
@@ -13,7 +13,7 @@ function makeBuilder({ single, list, insert }: {
   insert?: unknown
 } = {}) {
   const b: Record<string, unknown> = {}
-  for (const m of ['select', 'eq', 'neq', 'lt', 'gt', 'update', 'order']) {
+  for (const m of ['select', 'eq', 'neq', 'in', 'lt', 'gt', 'update', 'order']) {
     b[m] = vi.fn(() => b)
   }
   b.single = vi.fn().mockResolvedValue(single ?? { data: null })
@@ -22,14 +22,19 @@ function makeBuilder({ single, list, insert }: {
   return b
 }
 
-function mockSupabase({ mesa, conflitos, perfil }: {
+function mockSupabase({ mesa, conflitos, perfil, reservaAtual }: {
   mesa?: unknown
   conflitos?: unknown[]
   perfil?: unknown
+  reservaAtual?: unknown
 } = {}) {
   const builders: Record<string, ReturnType<typeof makeBuilder>> = {
     bar_tables: makeBuilder({ single: { data: mesa ?? null } }),
-    reservations: makeBuilder({ list: { data: conflitos ?? [] }, insert: { error: null } }),
+    reservations: makeBuilder({
+      single: { data: reservaAtual ?? null },
+      list: { data: conflitos ?? [] },
+      insert: { error: null },
+    }),
     perfis: makeBuilder({ single: { data: perfil ?? { nome: 'Equipe' } } }),
   }
   return { from: vi.fn((t: string) => builders[t] ?? makeBuilder()) }
@@ -123,5 +128,95 @@ describe('criarReserva — mesa: capacidade e colisão', () => {
   it('cria reserva quando a mesa comporta e não há colisão', async () => {
     setSupabase({ mesa: { capacity: 4, is_active: true }, conflitos: [] })
     await expect(criarReserva({ ...base, tableId: 't1' })).resolves.toBeUndefined()
+  })
+})
+
+describe('editarReserva', () => {
+  const editavel = { ...base, id: 'r1' }
+
+  it('lança erro quando a reserva não existe', async () => {
+    setSupabase({ reservaAtual: null })
+    await expect(editarReserva(editavel)).rejects.toThrow('Reserva não encontrada')
+  })
+
+  it('lança erro ao editar reserva em estado terminal (concluída)', async () => {
+    setSupabase({ reservaAtual: { status: 'concluida' } })
+    await expect(editarReserva(editavel)).rejects.toThrow('não pode mais ser editada')
+  })
+
+  it('lança erro ao editar reserva cancelada', async () => {
+    setSupabase({ reservaAtual: { status: 'cancelada' } })
+    await expect(editarReserva(editavel)).rejects.toThrow('não pode mais ser editada')
+  })
+
+  it('valida campos antes de buscar a reserva', async () => {
+    setSupabase({ reservaAtual: { status: 'pendente' } })
+    await expect(editarReserva({ ...editavel, customerName: '' })).rejects.toThrow(
+      'Nome do cliente é obrigatório',
+    )
+  })
+
+  it('edita quando status é editável e não há mesa', async () => {
+    setSupabase({ reservaAtual: { status: 'pendente' } })
+    await expect(editarReserva(editavel)).resolves.toBeUndefined()
+  })
+
+  it('detecta colisão de mesa ao editar (outra reserva)', async () => {
+    setSupabase({
+      reservaAtual: { status: 'confirmada' },
+      mesa: { capacity: 4, is_active: true },
+      conflitos: [{ id: 'outra' }],
+    })
+    await expect(editarReserva({ ...editavel, tableId: 't1' })).rejects.toThrow(
+      'Já existe uma reserva para esta mesa no horário selecionado',
+    )
+  })
+
+  it('edita com mesa válida e sem colisão', async () => {
+    setSupabase({
+      reservaAtual: { status: 'presente' },
+      mesa: { capacity: 4, is_active: true },
+      conflitos: [],
+    })
+    await expect(editarReserva({ ...editavel, tableId: 't1' })).resolves.toBeUndefined()
+  })
+})
+
+describe('atualizarStatusReserva — máquina de estados', () => {
+  it('permite confirmada → presente (check-in)', async () => {
+    setSupabase({ reservaAtual: { status: 'confirmada' } })
+    await expect(atualizarStatusReserva('r1', 'presente')).resolves.toBeUndefined()
+  })
+
+  it('permite confirmada → nao_compareceu (no-show)', async () => {
+    setSupabase({ reservaAtual: { status: 'confirmada' } })
+    await expect(atualizarStatusReserva('r1', 'nao_compareceu')).resolves.toBeUndefined()
+  })
+
+  it('permite presente → concluida', async () => {
+    setSupabase({ reservaAtual: { status: 'presente' } })
+    await expect(atualizarStatusReserva('r1', 'concluida')).resolves.toBeUndefined()
+  })
+
+  it('bloqueia transição inválida pendente → concluida', async () => {
+    setSupabase({ reservaAtual: { status: 'pendente' } })
+    await expect(atualizarStatusReserva('r1', 'concluida')).rejects.toThrow('não permitida')
+  })
+
+  it('bloqueia transição inválida confirmada → concluida (precisa passar por presente)', async () => {
+    setSupabase({ reservaAtual: { status: 'confirmada' } })
+    await expect(atualizarStatusReserva('r1', 'concluida')).rejects.toThrow('não permitida')
+  })
+
+  it('bloqueia saída de estado terminal (nao_compareceu)', async () => {
+    setSupabase({ reservaAtual: { status: 'nao_compareceu' } })
+    await expect(atualizarStatusReserva('r1', 'confirmada')).rejects.toThrow('não permitida')
+  })
+
+  it('lança erro quando a reserva não existe', async () => {
+    setSupabase({ reservaAtual: null })
+    await expect(atualizarStatusReserva('r1', 'confirmada')).rejects.toThrow(
+      'Reserva não encontrada',
+    )
   })
 })

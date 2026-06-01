@@ -40,3 +40,15 @@ Formato de entrada:
 **Aprendizado:** Evitar meia-feature ilusória. Regra documentada como follow-up: criar tabela + check em atualizarQuantidade() + tela de alertas, ou centralizar a regra num helper server-side `getItensCriticos(casa)` como single source of truth.
 **Aplicar quando:** Retomar P3 / pedido de notificações de estoque.
 ---
+
+## [2026-06-01] — Enum Postgres ADD VALUE é seguro em migração isolada
+**Contexto:** Adicionar estados `presente`/`nao_compareceu` ao enum reservation_status (check-in/no-show em Reservas).
+**Aprendizado:** `ALTER TYPE ... ADD VALUE IF NOT EXISTS 'x' AFTER 'y'` aplica via apply_migration sem custo; o valor novo não pode ser USADO na mesma transação, mas migração que só declara (sem usar) é segura. Sincronizar manualmente os 2 pontos do enum em database.types.ts (union type + Constants array).
+**Aplicar quando:** ampliar enums de status/máquina de estados no Supabase remoto.
+---
+
+## [2026-06-01] — Lógica de disponibilidade como helper puro evita duplicação client/server
+**Contexto:** Reservas precisava calcular mesas ocupadas + best-fit no form (client) e validar colisão (server action).
+**Aprendizado:** Extrair `src/lib/reservas-availability.ts` (horariosColidem, mesasOcupadas, sugerirMesa) como funções puras tornou a mesma regra testável isoladamente (vitest, sem mock de DB) e reutilizável nos dois lados. ReservaSlot é subset de Tables<'reservations'> → passa direto por structural typing.
+**Aplicar quando:** regra de negócio precisa rodar no client (UX otimista) e no server (validação autoritativa).
+---
