@@ -4,16 +4,23 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { setCurrentCasa, type Casa } from '@/lib/tenant'
+import { getSiteUrl } from '@/lib/site-url'
+import { credentialsSchema, emailSchema, passwordUpdateSchema } from '@/lib/schemas/auth'
 
 export async function signIn(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const parsed = credentialsSchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+  })
+  if (!parsed.success) {
+    return { error: 'E-mail ou senha incorretos.' }
+  }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error } = await supabase.auth.signInWithPassword(parsed.data)
 
   if (error) {
     return { error: 'E-mail ou senha incorretos.' }
@@ -32,8 +39,9 @@ export async function setCasaAction(casa: Casa) {
   try {
     await setCurrentCasa(casa)
     revalidatePath('/', 'layout')
-  } catch {
-    // ignore tenant switch errors
+  } catch (e) {
+    console.error('[auth] setCasaAction error:', e)
+    throw new Error('Não foi possível trocar de casa.')
   }
 }
 
@@ -41,11 +49,15 @@ export async function resetPassword(
   _prevState: { error: string; success: boolean } | null,
   formData: FormData,
 ): Promise<{ error: string; success: boolean }> {
-  const email = formData.get('email') as string
+  const parsed = emailSchema.safeParse(formData.get('email'))
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message, success: false }
+  }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bica-bar-system.vercel.app'}/auth/callback?next=/atualizar-senha`,
+  const siteUrl = await getSiteUrl()
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+    redirectTo: `${siteUrl}/auth/callback?next=/atualizar-senha`,
   })
 
   if (error) {
@@ -59,18 +71,16 @@ export async function updatePassword(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
-  const password = formData.get('password') as string
-  const confirm = formData.get('confirm') as string
-
-  if (password !== confirm) {
-    return { error: 'As senhas não coincidem.' }
-  }
-  if (password.length < 8) {
-    return { error: 'A senha deve ter pelo menos 8 caracteres.' }
+  const parsed = passwordUpdateSchema.safeParse({
+    password: formData.get('password'),
+    confirm: formData.get('confirm'),
+  })
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message }
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.updateUser({ password })
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
 
   if (error) {
     return { error: 'Não foi possível atualizar a senha. Tente novamente.' }

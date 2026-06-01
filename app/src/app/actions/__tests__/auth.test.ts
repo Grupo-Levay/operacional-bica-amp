@@ -20,6 +20,7 @@ vi.mock('@/lib/supabase/server', () => ({
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 vi.mock('@/lib/tenant', () => ({ setCurrentCasa: vi.fn() }))
+vi.mock('@/lib/site-url', () => ({ getSiteUrl: vi.fn().mockResolvedValue('https://test.local') }))
 
 import { signIn, updatePassword, resetPassword } from '../auth'
 

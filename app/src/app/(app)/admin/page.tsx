@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { getCurrentCasa } from "@/lib/tenant"
 import { UsuariosTable } from "@/components/admin/usuarios-table"
 import { PageHeader } from "@/components/shared/page-header"
 
@@ -21,10 +22,19 @@ async function getAdminData() {
     redirect("/dashboard")
   }
 
-  const { data: perfis } = await supabase
+  // Isolamento multi-tenant: admin vê apenas usuários da casa atual;
+  // super_admin enxerga todos.
+  let query = supabase
     .from("perfis")
-    .select("id, nome, role, created_at")
+    .select("id, nome, role, casas, created_at")
     .order("created_at")
+
+  if (meu.role !== "super_admin") {
+    const casa = await getCurrentCasa()
+    query = query.overlaps("casas", [casa])
+  }
+
+  const { data: perfis } = await query
 
   return { user, perfis: perfis ?? [] }
 }

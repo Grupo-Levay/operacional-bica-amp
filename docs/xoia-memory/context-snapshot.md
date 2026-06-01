@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-05-25 | Branch: claude/nifty-mccarthy-q92sY (PR em aberto — 6 commits à frente de main)_
+_Atualizado: 2026-05-26 | Branch: claude/eloquent-dirac-HB4GZ (sessão ativa)_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -17,7 +17,10 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/app/(app)/reservas/page.tsx`           → módulo reservas completo com DateNav + form
 `src/components/reservas/`                  → date-nav, nova-reserva-form, reserva-card
 `src/types/database.types.ts`              → tipos Supabase com coluna `casa` em todas as tabelas
-`supabase/migrations/`                      → 0001 multi_tenant SQL | 0002 relaxa RLS
+`supabase/migrations/`                      → 0001 multi_tenant | 0002 relaxa RLS | 0003 perfis.casas
+`src/lib/site-url.ts`                        → getSiteUrl() — resolve URL base via env/host (sem fallback hardcoded)
+`src/lib/schemas/auth.ts`                    → schemas Zod (padrão de validação — adoção incremental)
+`.github/workflows/ci.yml`                   → CI: lint+typecheck+test em PR/push main
 `DESIGN.md`                                 → fonte de verdade do design system (v2.0 — LER antes de UI)
 `src/tokens/tokens.yaml`                    → paleta completa: brand, parchment b0–b4, ink2–ink4, status
 `src/app/globals.css`                       → @theme inline com todos os tokens → classes Tailwind válidas
@@ -43,7 +46,15 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ bar_tables — tabela criada no Supabase; seletor de mesas habilitado no form reservas
 ✅ Ícones PWA — icon-192.png e icon-512.png em public/
 ✅ Testes vitest — auth, checklist e reservas cobertos
-⬜ Testes de integração para Server Actions (coverage parcial — expandir)
+✅ perfis.casas — coluna criada (migration 0003); role não rebaixa mais (P0 corrigido)
+✅ Route guard de role no servidor (layout + x-pathname via proxy) — P1
+✅ Isolamento multi-tenant de usuários no /admin (overlaps casas) — P1
+✅ CI GitHub Actions (lint+typecheck+test) — P2
+✅ Zod em auth + site-url helper (sem fallback hardcoded) — P2
+✅ Loading states em todas as páginas + a11y bottom-nav + testes de componente (jsdom) — P3
+✅ Reservas: validação de capacidade e colisão de mesa — P3
+⬜ Alerta de estoque persistente (follow-up documentado em learnings) — P3 pendente
+⬜ Endurecer RLS no banco (defesa em profundidade) — follow-up P1
 ⬜ PRs obsoletos #2 e #3 (Vercel bots) — podem ser fechados
 
 ## Decisões técnicas ativas
@@ -59,11 +70,11 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
-2. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
-3. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
-4. feat: multi-tenant + Tier 2 — escala editável, admin panel, alertas estoque (2026-05-25)
-5. feat: recuperação de senha + PKCE flow (2026-05-22)
+1. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
+2. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
+3. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
+4. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
+5. feat: isolamento multi-tenant + hardening + módulo Reservas — PR#23 (2026-05-25)
 
 ## Gaps conhecidos
 - Testes vitest criados para auth/checklist/reservas — expandir para compras/estoque/escala/fichas

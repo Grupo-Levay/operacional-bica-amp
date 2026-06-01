@@ -11,7 +11,8 @@ export async function proxy(request: NextRequest) {
 
   if (isAsset) return NextResponse.next()
 
-  const { supabaseResponse, user } = await updateSession(request)
+  // Injeta o pathname num header para o route guard de role (lido no layout do app).
+  const { supabaseResponse, user } = await updateSession(request, { 'x-pathname': pathname })
 
   if (!isPublic && !user) {
     const url = request.nextUrl.clone()

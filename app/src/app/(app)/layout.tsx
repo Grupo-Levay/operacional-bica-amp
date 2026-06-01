@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Sidebar } from '@/components/layout/sidebar'
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal'
 import { Toaster } from '@/components/ui/toast'
-import { rotasPermitidas, type Role } from '@/lib/roles'
+import { rotasPermitidas, podeAcessarRota, type Role } from '@/lib/roles'
 import { getOnboardingConfig } from '@/lib/onboarding'
 import { getCurrentCasa, CASAS, type Casa } from '@/lib/tenant'
 
@@ -26,6 +27,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const role = (perfil?.role ?? 'operacional') as Role
   const rotas = rotasPermitidas(role)
   const onboardingPendente = perfil?.onboarding_completo === false
+
+  // Route guard de role no servidor (proxy só faz checagem otimista de auth).
+  // Bloqueia acesso direto a rotas restritas que o sidebar/nav já ocultam.
+  const pathname = (await headers()).get('x-pathname') ?? ''
+  if (pathname && !podeAcessarRota(role, pathname)) {
+    redirect('/dashboard')
+  }
 
   // casas disponíveis para o usuário (null/vazio → ambas as casas para admin, só a atual para demais)
   const rawCasas = perfil?.casas as Casa[] | null

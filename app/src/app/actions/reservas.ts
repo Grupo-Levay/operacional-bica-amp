@@ -42,6 +42,39 @@ export async function criarReserva(input: CriarReservaInput) {
     throw new Error('Horário de fim deve ser maior que o de início')
   }
 
+  // Quando há mesa selecionada: validar capacidade e ausência de colisão de horário.
+  if (input.tableId) {
+    const { data: mesa } = await supabase
+      .from('bar_tables')
+      .select('capacity, is_active')
+      .eq('id', input.tableId)
+      .eq('casa', casa)
+      .single()
+
+    if (!mesa || !mesa.is_active) {
+      throw new Error('Mesa indisponível')
+    }
+    if (guestCount > mesa.capacity) {
+      throw new Error(`Mesa comporta no máximo ${mesa.capacity} ${mesa.capacity === 1 ? 'pessoa' : 'pessoas'}`)
+    }
+
+    // Colisão: mesma mesa/data, horários sobrepostos [start, end), exceto canceladas.
+    // Sobreposição ⇔ start_existente < end_nova E end_existente > start_nova.
+    const { data: conflitos } = await supabase
+      .from('reservations')
+      .select('id')
+      .eq('casa', casa)
+      .eq('table_id', input.tableId)
+      .eq('reservation_date', input.reservationDate)
+      .neq('status', 'cancelada')
+      .lt('start_time', input.endTime)
+      .gt('end_time', input.startTime)
+
+    if (conflitos && conflitos.length > 0) {
+      throw new Error('Já existe uma reserva para esta mesa no horário selecionado')
+    }
+  }
+
   // Buscar o nome do perfil para registrar created_by_name.
   // NÃO gravar created_by (FK aponta para team_members, não para usuários do app).
   const { data: perfil } = await supabase

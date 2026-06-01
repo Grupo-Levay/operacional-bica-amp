@@ -28,3 +28,15 @@ Formato de entrada:
 **Aprendizado:** Para PRs órfãos arquiteturalmente sólidos mas grandes, NÃO rebase direto. Cherry-pick por camadas: (1) foundation/infra → (2) auth/layout → (3) features por módulo → (4) features novas → (5) UX. Cada camada vira PR draft separado, validado antes de ir pra próxima. Reduz risco e permite parar/replanejar entre camadas.
 **Aplicar quando:** Recuperação de feature branch grande (>10 commits) com conflitos esperados.
 ---
+
+## [2026-06-01] — Deriva schema↔types rebaixa role silenciosamente
+**Contexto:** Auditoria geral; `layout.tsx` fazia `.select(...,casas)` mas a coluna `casas` não existia em `perfis` (só em database.types.ts). PostgREST erro 42703 → perfil null → role caía no fallback 'operacional' para TODOS, inclusive super_admin.
+**Aprendizado:** Tipos gerados podem divergir do banco real. Ao depender de coluna nova, verificar no banco (list_tables/execute_sql), não confiar só em database.types.ts. Fallback de role mascara o bug — falha vira "downgrade silencioso", não erro visível.
+**Aplicar quando:** Selecionar colunas recém-adicionadas; debugar permissões/role inesperadas.
+---
+
+## [2026-06-01] — Follow-up: alerta de estoque persistente (não implementado)
+**Contexto:** Auditoria P3. Alerta de estoque crítico (atual<minimo) hoje só existe no frontend. Persistir corretamente exige tabela `estoque_alertas` + geração/resolução server-side + UI de gestão = ciclo próprio.
+**Aprendizado:** Evitar meia-feature ilusória. Regra documentada como follow-up: criar tabela + check em atualizarQuantidade() + tela de alertas, ou centralizar a regra num helper server-side `getItensCriticos(casa)` como single source of truth.
+**Aplicar quando:** Retomar P3 / pedido de notificações de estoque.
+---

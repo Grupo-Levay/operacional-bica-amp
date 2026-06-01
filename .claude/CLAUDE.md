@@ -11,36 +11,23 @@
 - Se /context > 120K tokens usados: execute /clear e retome via context-snapshot
 - Nunca deixe compaction automático decidir — prefira /clear + resumo manual
 
-## Ciclo (PLAN → BUILD → CHECK → SHIP)
+## Ciclo
+| Modo | Quando | Ciclo |
+|------|--------|-------|
+| Quick | fix, ajuste, hotfix | BUILD→CHECK→SHIP |
+| Standard | feature, integração | PLAN→BUILD→CHECK→SHIP |
+| Deep | arquitetura, brownfield | PLAN→BUILD→CHECK→SHIP |
 
-| Modo | Detectado quando | Ciclo |
-|------|-----------------|-------|
-| **Quick** | Bug fix, ajuste, config, hotfix | BUILD→CHECK→SHIP |
-| **Standard** | Feature, landing page, integração | PLAN→BUILD→CHECK→SHIP |
-| **Deep** | Arquitetura nova, brownfield | PLAN→BUILD→CHECK→SHIP |
+Ver `rules/workflow.md` para passos detalhados.
 
-**PLAN** — Story em `docs/stories/` (Standard/Deep). Quick pula.
-**BUILD** — Implementa. Commits atômicos.
-**CHECK** — `npm run lint && npm test && npm run typecheck`. Max 3 tentativas.
-**SHIP** — Commit → push → PR.
-
-Para quando: ambiguidade, decisão de negócio, credenciais, 3 falhas.
-
-## Agentes
-
-| Agente | Persona | Expertise | Ativar |
-|--------|---------|-----------|--------|
-| `@xoia` | Nova | Orquestração, routing | `/XOIA:agents:xoia` |
-| `@dev` | Dex | Código, testes, PRs | `/XOIA:agents:dev` |
-| `@architect` | Aria | Arquitetura, DB, MarTech | `/XOIA:agents:architect` |
-| `@qa` | Quinn | Qualidade, CRO | `/XOIA:agents:qa` |
-| `@product` | Sage | Stories, priorização | `/XOIA:agents:product` |
-
-## Qualidade — CHECK automático
+## Qualidade — CHECK
 ```bash
 npm run lint && npm test && npm run typecheck
 ```
-Landing pages: CCD 7 princípios | MECLABS C = 4m + 3v + 2(i-f) - 2a | LCP < 2.5s, CLS < 0.1, INP < 200ms
+Ver `rules/quality.md` para CRO e CodeRabbit.
+
+## Agentes
+Ver `rules/agents.md` — @dev, @architect, @qa, @product, @xoia.
 
 ## Convenções
 - Conventional commits: `feat:` `fix:` `docs:` `chore:`
