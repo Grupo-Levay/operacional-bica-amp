@@ -90,6 +90,7 @@ export default async function ReservasPage({
         mesas={mesas}
         dataAlvo={dataAlvo}
         nomeCasa={nomeCasa}
+        casa={casa}
       />
     </main>
   )

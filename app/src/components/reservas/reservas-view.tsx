@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { LayoutList, GitBranch } from 'lucide-react'
+import { LayoutList, GitBranch, Radio } from 'lucide-react'
 import { PainelServico } from '@/components/reservas/painel-servico'
 import { ReservasToolbar } from '@/components/reservas/reservas-toolbar'
 import { ReservaCard } from '@/components/reservas/reserva-card'
@@ -9,6 +9,7 @@ import { ReservasTimeline } from '@/components/reservas/reservas-timeline'
 import { EmptyState } from '@/components/shared/empty-state'
 import { CalendarCheck } from 'lucide-react'
 import { ordenarPorRelevancia } from '@/lib/reservas-tempo'
+import { useRealtimeTable } from '@/hooks/use-realtime-table'
 import type { Tables, Enums } from '@/types/database.types'
 
 type Reserva = Tables<'reservations'>
@@ -20,16 +21,20 @@ interface ReservasViewProps {
   mesas: Mesa[]
   dataAlvo: string
   nomeCasa: string
+  casa: string
 }
 
 function isHojeCheck(dataAlvo: string): boolean {
   return dataAlvo === new Date().toISOString().split('T')[0]
 }
 
-export function ReservasView({ reservas, mesas, dataAlvo, nomeCasa }: ReservasViewProps) {
+export function ReservasView({ reservas, mesas, dataAlvo, nomeCasa, casa }: ReservasViewProps) {
   const agora = useMemo(() => new Date(), [])
   const isHoje = isHojeCheck(dataAlvo)
   const mesasPorId = new Map(mesas.map((m) => [m.id, m]))
+
+  // Operação ao vivo: revalida a lista a cada mudança nas reservas desta casa.
+  useRealtimeTable({ table: 'reservations', casa })
 
   const [busca, setBusca] = useState('')
   const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>('todos')
@@ -63,6 +68,16 @@ export function ReservasView({ reservas, mesas, dataAlvo, nomeCasa }: ReservasVi
 
   return (
     <div className="space-y-4">
+      {/* Indicador de operação ao vivo */}
+      <div className="flex items-center gap-1.5 text-[11px] font-medium text-success">
+        <span className="relative flex h-2 w-2" aria-hidden="true">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+        </span>
+        <Radio size={12} aria-hidden="true" />
+        Atualização ao vivo
+      </div>
+
       {/* Painel de serviço — KPIs ao vivo */}
       {reservas.length > 0 && (
         <PainelServico reservas={reservas} agora={agora} isHoje={isHoje} />

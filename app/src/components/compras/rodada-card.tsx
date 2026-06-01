@@ -3,6 +3,7 @@
 import { useTransition, useOptimistic } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { Tables } from "@/types/database.types"
 import { marcarItemComprado, fecharRodada } from "@/app/actions/compras"
 import { toast } from "@/components/ui/toast"
@@ -50,16 +51,6 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
     })
   }
 
-  function handleFechar() {
-    startTransition(async () => {
-      try {
-        await fecharRodada(rodada.id)
-        toast.success("Rodada fechada", rodada.nome)
-      } catch {
-        toast.error("Não foi possível fechar a rodada")
-      }
-    })
-  }
 
   return (
     <Card
@@ -113,13 +104,22 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
         )}
 
         <div className="flex items-center justify-between border-t pt-2">
-          <button
-            type="button"
-            onClick={handleFechar}
-            className="text-xs text-muted-foreground underline underline-offset-2"
-          >
-            Fechar rodada
-          </button>
+          <ConfirmDialog
+            trigger={
+              <button
+                type="button"
+                className="text-xs text-muted-foreground underline underline-offset-2"
+              >
+                Fechar rodada
+              </button>
+            }
+            title="Fechar esta rodada?"
+            description="Uma rodada fechada não pode ser reaberta nem editada."
+            confirmLabel="Fechar rodada"
+            destructive
+            successMessage={`Rodada fechada · ${rodada.nome}`}
+            onConfirm={() => fecharRodada(rodada.id)}
+          />
           <p className="text-sm font-bold">
             Total:{" "}
             <span className="text-primary">{formatarMoeda(total)}</span>

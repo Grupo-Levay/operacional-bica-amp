@@ -22,6 +22,9 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `src/lib/viz.ts`                             → helpers puros de viz: clampPct, ringGeometry, nivelEstoquePct, severidadeEstoque
 `src/components/ui/progress-ring.tsx`        → anel de progresso SVG (zero dep) accent-aware
 `src/components/ui/level-bar.tsx`            → barra de nível atual/mínimo colorida por severidade
+`src/components/ui/confirm-dialog.tsx`       → diálogo de confirmação reutilizável (ações destrutivas)
+`src/hooks/use-realtime-table.ts`            → hook Realtime: assina postgres_changes por casa → router.refresh()
+`src/lib/dashboard-metrics.ts`               → mediaCmv(fichas) — CMV médio real das fichas ativas
 `src/components/reservas/reserva-form.tsx`   → form genérico criar/editar com disponibilidade + best-fit
 `src/lib/site-url.ts`                        → getSiteUrl() — resolve URL base via env/host (sem fallback hardcoded)
 `src/lib/schemas/auth.ts`                    → schemas Zod (padrão de validação — adoção incremental)
@@ -45,6 +48,7 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Reservas v2 (S4.1) — check-in/no-show (enum 0004), disponibilidade de mesa no form, best-fit, editar reserva
 ✅ Reservas v3 (UX upgrade) — painel KPIs ao vivo, timeline de mesas, busca+filtro, confirmação WhatsApp — PR#33
 ✅ Viz primitives — ProgressRing + LevelBar (SVG/CSS puro, zero dep) + viz.ts testado; dashboard usa ring reutilizável e barras de ruptura
+✅ Operação ao Vivo — Realtime nas reservas (publication supabase_realtime + filter por casa); CMV real no dashboard; drift de tokens migrado; ConfirmDialog + guards P0 (escala/rodada/ficha)
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
 ✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop, Bento layout

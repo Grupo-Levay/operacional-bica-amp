@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { Badge } from "@/components/ui/badge"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { salvarEscala, removerEscala } from "@/app/actions/escala"
 import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
@@ -79,16 +80,6 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
     })
   }
 
-  function handleRemove(id: string) {
-    startTransition(async () => {
-      try {
-        await removerEscala(id)
-        setOpenCell(null)
-      } catch {
-        toast.error("Não foi possível remover o turno")
-      }
-    })
-  }
 
   const hasEscala = escala.length > 0
 
@@ -172,14 +163,26 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                             </button>
                           ))}
                           {item && (
-                            <button
-                              type="button"
-                              disabled={isPending}
-                              onClick={() => handleRemove(item.id)}
-                              className="text-[10px] font-bold px-1 py-1 rounded transition-opacity disabled:opacity-50 bg-danger-bg text-danger"
-                            >
-                              ✕
-                            </button>
+                            <ConfirmDialog
+                              trigger={
+                                <button
+                                  type="button"
+                                  disabled={isPending}
+                                  className="text-[10px] font-bold px-1 py-1 rounded transition-opacity disabled:opacity-50 bg-danger-bg text-danger"
+                                >
+                                  ✕
+                                </button>
+                              }
+                              title="Remover turno?"
+                              description="O turno escalado será removido. Esta ação não pode ser desfeita."
+                              confirmLabel="Remover"
+                              destructive
+                              successMessage="Turno removido"
+                              onConfirm={async () => {
+                                await removerEscala(item.id)
+                                setOpenCell(null)
+                              }}
+                            />
                           )}
                         </div>
                         <button

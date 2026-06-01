@@ -1,4 +1,5 @@
 import { DashboardContent } from "@/components/dashboard/dashboard-content"
+import { mediaCmv } from "@/lib/dashboard-metrics"
 
 interface CriticoItem {
   nome: string
@@ -21,6 +22,7 @@ interface DashboardData {
   equipeCount: number
   criticalList: CriticoItem[]
   scaleList: ScaleMember[]
+  mediaCmv: number | null
 }
 
 const EMPTY: DashboardData = {
@@ -30,6 +32,7 @@ const EMPTY: DashboardData = {
   equipeCount: 0,
   criticalList: [],
   scaleList: [],
+  mediaCmv: null,
 }
 
 async function getDashboardData(): Promise<DashboardData> {
@@ -46,6 +49,7 @@ async function getDashboardData(): Promise<DashboardData> {
       { data: estoqueItens },
       { count: rodadasCount },
       { data: escalaData },
+      { data: fichasData },
     ] = await Promise.all([
       supabase
         .from("checklists")
@@ -73,6 +77,11 @@ async function getDashboardData(): Promise<DashboardData> {
         .select("confirmado, turno, equipe(nome, funcao)")
         .eq("casa", casa)
         .eq("data", hoje),
+      supabase
+        .from("fichas_tecnicas")
+        .select("custo_total, preco_venda")
+        .eq("casa", casa)
+        .eq("ativo", true),
     ])
 
     const criticalList = (estoqueItens ?? [])
@@ -111,6 +120,7 @@ async function getDashboardData(): Promise<DashboardData> {
       equipeCount: scaleList.length,
       criticalList,
       scaleList,
+      mediaCmv: mediaCmv(fichasData ?? []),
     }
   } catch (e) {
     console.error("[dashboard] getDashboardData error:", e)

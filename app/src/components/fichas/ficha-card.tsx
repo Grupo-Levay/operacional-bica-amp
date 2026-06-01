@@ -1,10 +1,12 @@
 "use client"
 
-import { Pencil } from "lucide-react"
+import { Pencil, Archive } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { FichaFormDialog } from "@/components/fichas/ficha-form-dialog"
+import { arquivarFicha } from "@/app/actions/fichas"
 import { cn } from "@/lib/utils"
 import type { Tables } from "@/types/database.types"
 
@@ -57,6 +59,24 @@ export function FichaCard({ ficha }: FichaCardProps) {
                   <Pencil className="size-3.5" />
                 </Button>
               }
+            />
+            <ConfirmDialog
+              trigger={
+                <Button
+                  size="icon-xs"
+                  variant="ghost"
+                  className="size-7 text-b4 hover:text-danger"
+                  aria-label={`Arquivar ${ficha.nome}`}
+                >
+                  <Archive className="size-3.5" />
+                </Button>
+              }
+              title="Arquivar ficha?"
+              description={`"${ficha.nome}" deixará de aparecer na lista. Você pode recriá-la depois.`}
+              confirmLabel="Arquivar"
+              destructive
+              successMessage="Ficha arquivada"
+              onConfirm={() => arquivarFicha(ficha.id)}
             />
           </div>
         </div>
