@@ -19,7 +19,7 @@ vi.mock('@/lib/auth-guard', () => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-import { salvarEscala, removerEscala } from '../escala'
+import { salvarEscala, removerEscala, confirmarEscala } from '../escala'
 
 describe('salvarEscala — validações', () => {
   it('lança erro com membroId vazio', async () => {
@@ -46,5 +46,19 @@ describe('removerEscala — validações', () => {
 
   it('aceita id válido', async () => {
     await expect(removerEscala('esc-1')).resolves.toBeUndefined()
+  })
+})
+
+describe('confirmarEscala — validações', () => {
+  it('lança erro com id vazio', async () => {
+    await expect(confirmarEscala('', true)).rejects.toThrow('Registro inválido')
+  })
+
+  it('aceita confirmar turno', async () => {
+    await expect(confirmarEscala('esc-1', true)).resolves.toBeUndefined()
+  })
+
+  it('aceita desfazer confirmação', async () => {
+    await expect(confirmarEscala('esc-1', false)).resolves.toBeUndefined()
   })
 })
