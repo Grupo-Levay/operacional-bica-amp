@@ -15,7 +15,7 @@ vi.mock('@/lib/supabase/server', () => ({
 vi.mock('@/lib/tenant', () => ({ getCurrentCasa: vi.fn() }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-import { atualizarRole } from '../admin'
+import { atualizarRole, vincularPerfilEquipe } from '../admin'
 import { getCurrentCasa } from '@/lib/tenant'
 
 describe('atualizarRole — validações', () => {
@@ -66,5 +66,27 @@ describe('atualizarRole — isolamento multi-tenant', () => {
     await atualizarRole('alvo-1', 'admin')
     expect(getCurrentCasa).not.toHaveBeenCalled()
     expect(update).toHaveBeenCalledWith({ role: 'admin' })
+  })
+})
+
+describe('vincularPerfilEquipe — validações e permissão', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('lança erro com perfilId vazio', async () => {
+    await expect(vincularPerfilEquipe('', 'eq-1')).rejects.toThrow('Usuário inválido')
+  })
+
+  it('lança erro quando não autenticado', async () => {
+    getUser.mockResolvedValue({ data: { user: null } })
+    await expect(vincularPerfilEquipe('p-1', 'eq-1')).rejects.toThrow('Não autenticado')
+  })
+
+  it('bloqueia usuário sem permissão de admin', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'u-1' } } })
+    single.mockResolvedValueOnce({ data: { role: 'bar' } })
+    await expect(vincularPerfilEquipe('p-1', 'eq-1')).rejects.toThrow('Sem permissão')
+    expect(update).not.toHaveBeenCalled()
   })
 })

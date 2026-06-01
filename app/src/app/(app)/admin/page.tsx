@@ -36,22 +36,31 @@ async function getAdminData() {
 
   const { data: perfis } = await query
 
-  return { user, perfis: perfis ?? [] }
+  // Membros da equipe da casa atual, para vincular a contas.
+  const casaAtual = await getCurrentCasa()
+  const { data: equipe } = await supabase
+    .from('equipe')
+    .select('id, nome, funcao, perfil_id')
+    .eq('casa', casaAtual)
+    .eq('ativo', true)
+    .order('nome')
+
+  return { user, perfis: perfis ?? [], equipe: equipe ?? [] }
 }
 
 export default async function AdminPage() {
-  const { user, perfis } = await getAdminData()
+  const { user, perfis, equipe } = await getAdminData()
   const total = perfis.length
 
   return (
     <main className="p-4 space-y-4">
       <PageHeader
         title="Usuários"
-        subtitle="Gestão de usuários e roles"
+        subtitle="Gestão de usuários, permissões e equipe"
         badge={`${total} ${total === 1 ? 'usuário' : 'usuários'}`}
       />
 
-      <UsuariosTable perfis={perfis} currentUserId={user.id} />
+      <UsuariosTable perfis={perfis} equipe={equipe} currentUserId={user.id} />
     </main>
   )
 }
