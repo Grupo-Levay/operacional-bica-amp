@@ -17,7 +17,12 @@ vi.mock('@/lib/auth-guard', () => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-import { atualizarQuantidade, atualizarItemEstoque } from '../estoque'
+import {
+  atualizarQuantidade,
+  atualizarItemEstoque,
+  criarItemEstoque,
+  arquivarItemEstoque,
+} from '../estoque'
 
 describe('atualizarQuantidade — validações', () => {
   it('lança erro com itemId vazio', async () => {
@@ -54,5 +59,51 @@ describe('atualizarItemEstoque — validações', () => {
     await expect(
       atualizarItemEstoque('item-1', { minimo: 5, unidade: 'kg' })
     ).resolves.toBeUndefined()
+  })
+})
+
+describe('criarItemEstoque — validações', () => {
+  it('lança erro com nome vazio', async () => {
+    await expect(criarItemEstoque({ nome: '' })).rejects.toThrow('Nome do item é obrigatório')
+  })
+
+  it('lança erro com nome só espaços', async () => {
+    await expect(criarItemEstoque({ nome: '   ' })).rejects.toThrow('Nome do item é obrigatório')
+  })
+
+  it('lança erro com mínimo negativo', async () => {
+    await expect(criarItemEstoque({ nome: 'Gin', minimo: -1 })).rejects.toThrow('Mínimo inválido')
+  })
+
+  it('lança erro com quantidade inicial negativa', async () => {
+    await expect(criarItemEstoque({ nome: 'Gin', atual: -3 })).rejects.toThrow(
+      'Quantidade inicial inválida',
+    )
+  })
+
+  it('aceita item válido com defaults', async () => {
+    await expect(criarItemEstoque({ nome: 'Gin Tanqueray' })).resolves.toBeUndefined()
+  })
+
+  it('aceita item válido com todos os campos', async () => {
+    await expect(
+      criarItemEstoque({
+        nome: 'Vodka',
+        categoriaId: 'cat-1',
+        minimo: 5,
+        unidade: 'un',
+        atual: 10,
+      }),
+    ).resolves.toBeUndefined()
+  })
+})
+
+describe('arquivarItemEstoque — validações', () => {
+  it('lança erro com itemId vazio', async () => {
+    await expect(arquivarItemEstoque('')).rejects.toThrow('Item inválido')
+  })
+
+  it('aceita itemId válido', async () => {
+    await expect(arquivarItemEstoque('item-1')).resolves.toBeUndefined()
   })
 })

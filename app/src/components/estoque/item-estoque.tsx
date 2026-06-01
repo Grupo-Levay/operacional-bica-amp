@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useTransition, useRef } from 'react'
-import { Plus, Minus, SlidersHorizontal } from 'lucide-react'
+import { Plus, Minus, SlidersHorizontal, Archive } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { toast } from '@/components/ui/toast'
-import { atualizarQuantidade, atualizarItemEstoque } from '@/app/actions/estoque'
+import { atualizarQuantidade, atualizarItemEstoque, arquivarItemEstoque } from '@/app/actions/estoque'
 
 type ItemEstoqueProps = {
   id: string
@@ -161,6 +162,25 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
           <Button type="button" size="sm" variant="brand" onClick={salvarConfig}>
             Salvar
           </Button>
+          <ConfirmDialog
+            trigger={
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="text-danger hover:bg-danger-bg hover:text-danger"
+              >
+                <Archive className="size-3.5" />
+                Arquivar
+              </Button>
+            }
+            title="Arquivar item?"
+            description={`"${nome}" deixará de aparecer no estoque. Você pode recriá-lo depois.`}
+            confirmLabel="Arquivar"
+            destructive
+            successMessage="Item arquivado"
+            onConfirm={() => arquivarItemEstoque(id)}
+          />
         </div>
       )}
 

@@ -3,6 +3,55 @@
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth-guard'
 
+export async function criarItemEstoque(input: {
+  nome: string
+  categoriaId?: string | null
+  minimo?: number | null
+  unidade?: string | null
+  atual?: number | null
+}) {
+  const nome = input.nome?.trim()
+  if (!nome) throw new Error('Nome do item é obrigatório')
+
+  const minimo = input.minimo ?? 0
+  if (!Number.isFinite(minimo) || minimo < 0) throw new Error('Mínimo inválido')
+
+  const atual = input.atual ?? 0
+  if (!Number.isFinite(atual) || atual < 0) throw new Error('Quantidade inicial inválida')
+
+  const unidade = input.unidade?.trim() || null
+  const categoriaId = input.categoriaId?.trim() || null
+
+  const { supabase, casa } = await requireUser()
+
+  const { error } = await supabase.from('estoque_itens').insert({
+    nome,
+    categoria_id: categoriaId,
+    minimo,
+    atual,
+    unidade,
+    casa,
+    ativo: true,
+  })
+  if (error) throw new Error('Não foi possível criar o item')
+
+  revalidatePath('/estoque')
+}
+
+export async function arquivarItemEstoque(itemId: string) {
+  if (!itemId?.trim()) throw new Error('Item inválido')
+
+  const { supabase, casa } = await requireUser()
+
+  await supabase
+    .from('estoque_itens')
+    .update({ ativo: false })
+    .eq('id', itemId)
+    .eq('casa', casa)
+
+  revalidatePath('/estoque')
+}
+
 export async function atualizarQuantidade(itemId: string, novaQuantidade: number) {
   if (!itemId?.trim()) throw new Error('Item inválido')
   if (!Number.isFinite(novaQuantidade) || novaQuantidade < 0) {
