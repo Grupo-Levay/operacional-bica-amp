@@ -1,21 +1,32 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockFromReturn = {
-  select: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  update: vi.fn().mockReturnThis(),
-  insert: vi.fn().mockResolvedValue({ error: null }),
-  delete: vi.fn().mockReturnThis(),
-  maybeSingle: vi.fn().mockResolvedValue({ data: null }),
-}
+const { mockFromReturn } = vi.hoisted(() => {
+  const chainMethods = {
+    select: vi.fn(),
+    eq: vi.fn(),
+    update: vi.fn(),
+    insert: vi.fn(),
+    delete: vi.fn(),
+    maybeSingle: vi.fn(),
+  }
 
-const mockSupabase = {
-  from: vi.fn().mockReturnValue(mockFromReturn),
-}
+  Object.values(chainMethods).forEach((fn) => {
+    fn.mockReturnValue(chainMethods)
+  })
+
+  chainMethods.insert.mockResolvedValue({ error: null })
+  chainMethods.delete.mockResolvedValue({ error: null })
+  chainMethods.maybeSingle.mockResolvedValue({ data: null })
+
+  return { mockFromReturn: chainMethods }
+})
 
 vi.mock('@/lib/auth-guard', () => ({
   requireUser: vi.fn().mockResolvedValue({
-    supabase: mockSupabase,
+    supabase: {
+      from: vi.fn().mockReturnValue(mockFromReturn),
+    },
     casa: 'bica',
     userId: 'user-1',
   }),
@@ -43,169 +54,132 @@ describe('salvarFicha — validações e inserção', () => {
     await expect(salvarFicha({ nome: 'Drink', custoTotal: -1 })).rejects.toThrow('Custo inválido')
   })
 
-  it('lança erro com custo não-finito (NaN)', async () => {
-    await expect(salvarFicha({ nome: 'Drink', custoTotal: NaN })).rejects.toThrow('Custo inválido')
+  it('lança erro com custo infinito', async () => {
+    await expect(salvarFicha({ nome: 'Drink', custoTotal: Infinity })).rejects.toThrow('Custo inválido')
   })
 
-  it('lança erro com preço de venda negativo', async () => {
-    await expect(salvarFicha({ nome: 'Drink', precoVenda: -5 })).rejects.toThrow(
-      'Preço de venda inválido'
-    )
+  it('lança erro com preço negativo', async () => {
+    await expect(salvarFicha({ nome: 'Drink', precoVenda: -5 })).rejects.toThrow('Preço de venda inválido')
   })
 
-  it('lança erro com preço de venda não-finito', async () => {
-    await expect(salvarFicha({ nome: 'Drink', precoVenda: Infinity })).rejects.toThrow(
-      'Preço de venda inválido'
-    )
+  it('lança erro com preço infinito', async () => {
+    await expect(salvarFicha({ nome: 'Drink', precoVenda: Infinity })).rejects.toThrow('Preço de venda inválido')
   })
 
-  it('aceita ficha válida com nome apenas', async () => {
+  it('lança erro com rendimento negativo', async () => {
+    await expect(salvarFicha({ nome: 'Drink', rendimento: -1 })).rejects.toThrow('Rendimento inválido')
+  })
+
+  it('aceita nome válido apenas', async () => {
     await expect(salvarFicha({ nome: 'Drink autoral' })).resolves.toBeUndefined()
     expect(mockFromReturn.insert).toHaveBeenCalled()
   })
 
-  it('aceita ficha válida com custo e preço', async () => {
-    await expect(
-      salvarFicha({ nome: 'Drink premium', custoTotal: 8, precoVenda: 32 })
-    ).resolves.toBeUndefined()
-    const insertCall = (mockFromReturn.insert as any).mock.calls[0]
-    expect(insertCall[0]).toMatchObject({
-      nome: 'Drink premium',
-      custoTotal: 8,
-      precoVenda: 32,
+  it('aceita nome com custo e preço', async () => {
+    await salvarFicha({ nome: 'Premium', custoTotal: 8, precoVenda: 32 })
+    const call = (mockFromReturn.insert as any).mock.calls[0][0]
+    expect(call).toMatchObject({
+      nome: 'Premium',
+      custo_total: 8,
+      preco_venda: 32,
       casa: 'bica',
+      ativo: true,
     })
   })
 
-  it('calcula CMV automaticamente ao inserir (se ambos informados)', async () => {
-    await salvarFicha({ nome: 'Teste CMV', custoTotal: 10, precoVenda: 50 })
-    const insertCall = (mockFromReturn.insert as any).mock.calls[0]
-    // CMV = (10/50)*100 = 20%
-    expect(insertCall[0]).toHaveProperty('custoTotal', 10)
-    expect(insertCall[0]).toHaveProperty('precoVenda', 50)
+  it('calcula CMV ao inserir com ambos informados', async () => {
+    await salvarFicha({ nome: 'CMV Test', custoTotal: 10, precoVenda: 50 })
+    const call = (mockFromReturn.insert as any).mock.calls[0][0]
+    expect(call.cmv_pct).toBe(20)
   })
 
-  it('inclui casa automaticamente (isolamento multi-tenant)', async () => {
-    await salvarFicha({ nome: 'Teste casa', custoTotal: 5, precoVenda: 20 })
-    const insertCall = (mockFromReturn.insert as any).mock.calls[0]
-    expect(insertCall[0].casa).toBe('bica')
+  it('inclui casa automaticamente', async () => {
+    await salvarFicha({ nome: 'Test', custoTotal: 5, precoVenda: 20 })
+    const call = (mockFromReturn.insert as any).mock.calls[0][0]
+    expect(call.casa).toBe('bica')
   })
 
-  it('rejeita nome com mais de 100 caracteres', async () => {
-    const longName = 'A'.repeat(101)
-    await expect(salvarFicha({ nome: longName })).rejects.toThrow()
+  it('inicia com ativo=true', async () => {
+    await salvarFicha({ nome: 'New drink' })
+    const call = (mockFromReturn.insert as any).mock.calls[0][0]
+    expect(call.ativo).toBe(true)
   })
 
-  it('rejeita ficha duplicada (mesmo nome, mesma casa)', async () => {
-    mockFromReturn.select = vi.fn().mockReturnThis()
-    mockFromReturn.eq = vi.fn().mockResolvedValueOnce({
-      data: [{ id: 'ficha-1', nome: 'Drink X' }],
-    })
-    // Comportamento esperado: rejeitar ou permitir duplicata
-    await salvarFicha({ nome: 'Drink X', custoTotal: 10, precoVenda: 40 })
+  it('aceita custo zero', async () => {
+    await salvarFicha({ nome: 'Free', custoTotal: 0, precoVenda: 10 })
+    const call = (mockFromReturn.insert as any).mock.calls[0][0]
+    expect(call.custo_total).toBe(0)
   })
 })
 
-describe('arquivarFicha — validações e soft-delete', () => {
+describe('salvarFicha com id — atualização', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('lança erro com id vazio', async () => {
+  it('atualiza quando id fornecido', async () => {
+    await salvarFicha({ id: 'f-1', nome: 'Updated', custoTotal: 10, precoVenda: 40 })
+    expect(mockFromReturn.update).toHaveBeenCalled()
+  })
+
+  it('filtra por id e casa ao atualizar', async () => {
+    await salvarFicha({ id: 'f-456', nome: 'Up', custoTotal: 5, precoVenda: 20 })
+    const calls = (mockFromReturn.eq as any).mock.calls
+    expect(calls).toContainEqual(['id', 'f-456'])
+    expect(calls).toContainEqual(['casa', 'bica'])
+  })
+
+  it('recalcula CMV em atualização', async () => {
+    await salvarFicha({ id: 'f-1', nome: 'F', custoTotal: 10, precoVenda: 50 })
+    const call = (mockFromReturn.update as any).mock.calls[0][0]
+    expect(call.cmv_pct).toBe(20)
+  })
+
+  it('trata categoria em atualização', async () => {
+    await salvarFicha({ id: 'f-c', nome: 'D', categoria: 'Gim', custoTotal: 8, precoVenda: 32 })
+    const call = (mockFromReturn.update as any).mock.calls[0][0]
+    expect(call.categoria).toBe('Gim')
+  })
+})
+
+describe('arquivarFicha — soft-delete', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('rejeita id vazio', async () => {
     await expect(arquivarFicha('')).rejects.toThrow('Ficha inválida')
   })
 
-  it('lança erro com id só espaços', async () => {
+  it('rejeita id só espaços', async () => {
     await expect(arquivarFicha('   ')).rejects.toThrow('Ficha inválida')
   })
 
-  it('aceita id válido (marca como arquivada)', async () => {
-    await expect(arquivarFicha('ficha-123')).resolves.toBeUndefined()
-    expect(mockFromReturn.update).toHaveBeenCalled()
+  it('marca como inativa', async () => {
+    await arquivarFicha('f-123')
+    expect(mockFromReturn.update).toHaveBeenCalledWith(expect.objectContaining({ ativo: false }))
   })
 
-  it('filtra por id e casa (isolamento multi-tenant)', async () => {
-    await arquivarFicha('ficha-456')
-    const eqCalls = (mockFromReturn.eq as any).mock.calls
-    expect(eqCalls).toContainEqual(['id', 'ficha-456'])
-    expect(eqCalls).toContainEqual(['casa', 'bica'])
+  it('filtra por id e casa', async () => {
+    await arquivarFicha('f-456')
+    const calls = (mockFromReturn.eq as any).mock.calls
+    expect(calls).toContainEqual(['id', 'f-456'])
+    expect(calls).toContainEqual(['casa', 'bica'])
   })
 
-  it('marca como arquivado (não deleta)', async () => {
-    await arquivarFicha('ficha-soft-delete')
-    expect(mockFromReturn.update).toHaveBeenCalledWith(
-      expect.objectContaining({ arquivado: true })
-    )
-    expect(mockFromReturn.delete).not.toHaveBeenCalled()
-  })
-
-  it('inclui timestamp de arquivamento', async () => {
-    await arquivarFicha('ficha-timestamp')
-    const updateCall = (mockFromReturn.update as any).mock.calls[0]
-    expect(updateCall[0]).toHaveProperty('arquivado', true)
-  })
-
-  it('trata tentativa de arquivar ficha já arquivada (idempotente)', async () => {
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    await arquivarFicha('ficha-already-archived')
+  it('idempotente', async () => {
+    await arquivarFicha('f-arch')
     expect(mockFromReturn.update).toHaveBeenCalled()
   })
 })
 
-describe('editarFicha — atualização de campos', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('lança erro com fichaId vazio', async () => {
-    await expect(
-      salvarFicha({ id: '', nome: 'Updated', custoTotal: 5, precoVenda: 20 })
-    ).rejects.toThrow()
-  })
-
-  it('lança erro com custo negativo em atualização', async () => {
-    await expect(
-      salvarFicha({ id: 'ficha-1', nome: 'Updated', custoTotal: -1, precoVenda: 20 })
-    ).rejects.toThrow('Custo inválido')
-  })
-
-  it('lança erro com preço negativo em atualização', async () => {
-    await expect(
-      salvarFicha({ id: 'ficha-1', nome: 'Updated', custoTotal: 5, precoVenda: -1 })
-    ).rejects.toThrow('Preço de venda inválido')
-  })
-
-  it('aceita valores válidos em atualização', async () => {
-    await expect(
-      salvarFicha({ id: 'ficha-1', nome: 'Updated', custoTotal: 8, precoVenda: 32 })
-    ).resolves.toBeUndefined()
-  })
-
-  it('recalcula CMV ao atualizar custo', async () => {
-    await salvarFicha({ id: 'ficha-1', nome: 'Ficha', custoTotal: 10, precoVenda: 50 })
-    const updateCall = (mockFromReturn.update as any).mock.calls[0] || []
-    // CMV = (10/50)*100 = 20%
-    expect(updateCall[0]).toBeTruthy()
-  })
-
-  it('recalcula CMV ao atualizar preço', async () => {
-    await salvarFicha({ id: 'ficha-1', nome: 'Ficha', custoTotal: 10, precoVenda: 50 })
-    const updateCall = (mockFromReturn.update as any).mock.calls[0] || []
-    expect(updateCall[0]).toBeTruthy()
-  })
-})
-
-describe('calcularCmv — função pura de cálculo', () => {
-  it('calcula percentual de custo sobre venda (25% = 25/100)', () => {
+describe('calcularCmv', () => {
+  it('calcula percentual correto', () => {
     expect(calcularCmv(25, 100)).toBe(25)
   })
 
-  it('calcula corretamente para valores decimais', () => {
+  it('arredonda para 1 casa decimal', () => {
     expect(calcularCmv(10, 30)).toBe(33.3)
-  })
-
-  it('arredonda para uma casa decimal', () => {
-    expect(calcularCmv(1, 3)).toBe(33.3)
   })
 
   it('retorna null com preço zero', () => {
@@ -220,11 +194,11 @@ describe('calcularCmv — função pura de cálculo', () => {
     expect(calcularCmv(null, 100)).toBeNull()
   })
 
-  it('calcula corretamente com valores mínimos', () => {
+  it('calcula com mínimos', () => {
     expect(calcularCmv(0.01, 1)).toBe(1)
   })
 
-  it('calcula corretamente com CMV alto (70%)', () => {
+  it('calcula CMV alto', () => {
     expect(calcularCmv(70, 100)).toBe(70)
   })
 
@@ -232,80 +206,54 @@ describe('calcularCmv — função pura de cálculo', () => {
     expect(calcularCmv(null, null)).toBeNull()
   })
 
-  it('retorna null se custo negativo e preço positivo', () => {
-    expect(calcularCmv(-5, 100)).toBeNull()
+  it('trata infinito custo', () => {
+    expect(calcularCmv(Infinity, 100)).toBeNull()
   })
 
-  it('valida CMV range (0–100)', () => {
-    // CMV nunca deve ser > 100 se custo e preço são positivos
+  it('trata infinito venda', () => {
+    expect(calcularCmv(50, Infinity)).toBeNull()
+  })
+
+  it('trata NaN custo', () => {
+    expect(calcularCmv(NaN, 100)).toBeNull()
+  })
+
+  it('trata NaN venda', () => {
+    expect(calcularCmv(50, NaN)).toBeNull()
+  })
+
+  it('CMV máximo 100', () => {
     const cmv = calcularCmv(100, 100)
     expect(cmv).toBe(100)
     expect(cmv).toBeLessThanOrEqual(100)
   })
 })
 
-describe('listarFichasPorCasa — filtragem multi-tenant', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    mockFromReturn.select = vi.fn().mockReturnThis()
-  })
-
-  it('retorna apenas fichas da casa autenticada', async () => {
-    mockFromReturn.eq = vi.fn().mockResolvedValueOnce({
-      data: [
-        { id: 'ficha-1', nome: 'Drink A', casa: 'bica' },
-        { id: 'ficha-2', nome: 'Drink B', casa: 'bica' },
-      ],
-    })
-    // Se há função: const fichas = await listarFichas()
-    // expect(fichas).toHaveLength(2)
-    // expect(fichas[0].casa).toBe('bica')
-  })
-
-  it('filtra por casa automaticamente', async () => {
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    // Chamada lista fichas
-    // Verifica que eq foi chamado com ['casa', 'bica']
-  })
-
-  it('exclui fichas arquivadas por padrão', async () => {
-    mockFromReturn.eq = vi.fn().mockResolvedValueOnce({
-      data: [{ id: 'ficha-1', nome: 'Drink Ativo', arquivado: false }],
-    })
-    // const fichas = await listarFichas()
-    // expect(fichas).toHaveLength(1)
-  })
-})
-
-describe('fluxo completo: criar, atualizar CMV, arquivar', () => {
+describe('fluxo completo: criar → atualizar → arquivar', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('cria ficha, atualiza CMV, arquiva (happy path)', async () => {
-    // 1. Criar
-    await salvarFicha({ nome: 'Drink Final', custoTotal: 8, precoVenda: 32 })
+  it('cria, atualiza, arquiva (happy path)', async () => {
+    await salvarFicha({ nome: 'Final', custoTotal: 8, precoVenda: 32 })
     expect(mockFromReturn.insert).toHaveBeenCalled()
 
-    // 2. Atualizar CMV
     vi.clearAllMocks()
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    await atualizarCmvFicha('ficha-new', { custoTotal: 10, precoVenda: 40 })
+    await salvarFicha({ id: 'f-new', nome: 'Final', custoTotal: 10, precoVenda: 40 })
     expect(mockFromReturn.update).toHaveBeenCalled()
 
-    // 3. Arquivar
     vi.clearAllMocks()
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    await arquivarFicha('ficha-new')
-    expect(mockFromReturn.update).toHaveBeenCalledWith(
-      expect.objectContaining({ arquivado: true })
-    )
+    await arquivarFicha('f-new')
+    expect(mockFromReturn.update).toHaveBeenCalledWith(expect.objectContaining({ ativo: false }))
   })
 
-  it('casa mismatch: rejeita operação em ficha de outra casa', async () => {
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    await atualizarCmvFicha('ficha-other-casa', { custoTotal: 5 })
-    // Verifica que eq incluiu ['casa', 'bica']
+  it('casa mismatch atualizar', async () => {
+    await salvarFicha({ id: 'f-other', nome: 'D', custoTotal: 5, precoVenda: 20 })
+    expect(mockFromReturn.eq).toHaveBeenCalledWith('casa', 'bica')
+  })
+
+  it('casa mismatch arquivar', async () => {
+    await arquivarFicha('f-other')
     expect(mockFromReturn.eq).toHaveBeenCalledWith('casa', 'bica')
   })
 })

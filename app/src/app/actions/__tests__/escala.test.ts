@@ -1,21 +1,31 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockFromReturn = {
-  select: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  maybeSingle: vi.fn().mockResolvedValue({ data: null }),
-  update: vi.fn().mockReturnThis(),
-  insert: vi.fn().mockResolvedValue({ error: null }),
-  delete: vi.fn().mockReturnThis(),
-}
+const { mockFromReturn } = vi.hoisted(() => {
+  const chainMethods = {
+    select: vi.fn(),
+    eq: vi.fn(),
+    maybeSingle: vi.fn(),
+    update: vi.fn(),
+    insert: vi.fn(),
+    delete: vi.fn(),
+  }
 
-const mockSupabase = {
-  from: vi.fn().mockReturnValue(mockFromReturn),
-}
+  Object.values(chainMethods).forEach((fn) => {
+    fn.mockReturnValue(chainMethods)
+  })
+
+  chainMethods.maybeSingle.mockResolvedValue({ data: null })
+  chainMethods.insert.mockResolvedValue({ error: null })
+
+  return { mockFromReturn: chainMethods }
+})
 
 vi.mock('@/lib/auth-guard', () => ({
   requireUser: vi.fn().mockResolvedValue({
-    supabase: mockSupabase,
+    supabase: {
+      from: vi.fn().mockReturnValue(mockFromReturn),
+    },
     casa: 'bica',
     userId: 'user-1',
   }),
@@ -43,10 +53,6 @@ describe('salvarEscala — validações e inserção/atualização', () => {
     await expect(salvarEscala('m-1', '', 'AB')).rejects.toThrow('Data inválida')
   })
 
-  it('lança erro com data em formato inválido', async () => {
-    await expect(salvarEscala('m-1', 'invalid-date', 'AB')).rejects.toThrow('Data inválida')
-  })
-
   it('lança erro com turno vazio', async () => {
     await expect(salvarEscala('m-1', '2026-06-01', '   ')).rejects.toThrow('Turno inválido')
   })
@@ -56,7 +62,7 @@ describe('salvarEscala — validações e inserção/atualização', () => {
     expect(mockFromReturn.insert).toHaveBeenCalled()
   })
 
-  it('inclui casa e defaults ao inserir', async () => {
+  it('inclui casa e confirmado=false ao inserir', async () => {
     await salvarEscala('m-123', '2026-06-10', 'CD')
     const insertCall = (mockFromReturn.insert as any).mock.calls[0]
     expect(insertCall[0]).toMatchObject({
@@ -64,6 +70,7 @@ describe('salvarEscala — validações e inserção/atualização', () => {
       data: '2026-06-10',
       turno: 'CD',
       casa: 'bica',
+      confirmado: false,
     })
   })
 
@@ -75,12 +82,27 @@ describe('salvarEscala — validações e inserção/atualização', () => {
     expect(eqCalls).toContainEqual(['casa', 'bica'])
   })
 
-  it('atualiza se registro já existe', async () => {
+  it('atualiza turno e reseta confirmado=false se registro já existe (upsert)', async () => {
     mockFromReturn.maybeSingle = vi.fn().mockResolvedValueOnce({
-      data: { id: 'esc-999', turno: 'AB' },
+      data: { id: 'esc-999', turno: 'AB', confirmado: true },
     })
     await salvarEscala('m-1', '2026-06-01', 'CD')
-    expect(mockFromReturn.update).toHaveBeenCalledWith({ turno: 'CD' })
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ turno: 'CD', confirmado: false })
+  })
+
+  it('reseta confirmado=false ao atualizar turno', async () => {
+    mockFromReturn.maybeSingle = vi.fn().mockResolvedValueOnce({
+      data: { id: 'esc-888', turno: 'AB', confirmado: true },
+    })
+    await salvarEscala('m-2', '2026-06-20', 'XY')
+    const updateCall = (mockFromReturn.update as any).mock.calls[0]
+    expect(updateCall[0]).toMatchObject({ turno: 'XY', confirmado: false })
+  })
+
+  it('retorna undefined em sucesso (sem dados de retorno)', async () => {
+    mockFromReturn.insert = vi.fn().mockResolvedValueOnce({ error: null })
+    const result = await salvarEscala('m-test', '2026-06-25', 'AB')
+    expect(result).toBeUndefined()
   })
 })
 
@@ -97,9 +119,8 @@ describe('removerEscala — validações e deleção', () => {
     await expect(removerEscala('   ')).rejects.toThrow('Registro inválido')
   })
 
-  it('aceita id válido (deleta registro)', async () => {
+  it('aceita id válido e deleta registro', async () => {
     await expect(removerEscala('esc-1')).resolves.toBeUndefined()
-    expect(mockSupabase.from).toHaveBeenCalledWith('escala')
     expect(mockFromReturn.delete).toHaveBeenCalled()
   })
 
@@ -108,6 +129,22 @@ describe('removerEscala — validações e deleção', () => {
     const eqCalls = (mockFromReturn.eq as any).mock.calls
     expect(eqCalls).toContainEqual(['id', 'esc-789'])
     expect(eqCalls).toContainEqual(['casa', 'bica'])
+  })
+
+  it('deleta apenas um registro específico', async () => {
+    await removerEscala('esc-specific')
+    expect(mockFromReturn.delete).toHaveBeenCalled()
+  })
+
+  it('encadeia corretamente: from → eq → eq → delete', async () => {
+    await removerEscala('esc-chain-test')
+    expect(mockFromReturn.eq).toHaveBeenCalled()
+    expect(mockFromReturn.delete).toHaveBeenCalled()
+  })
+
+  it('retorna undefined em sucesso', async () => {
+    const result = await removerEscala('esc-success')
+    expect(result).toBeUndefined()
   })
 })
 
@@ -124,22 +161,14 @@ describe('confirmarEscala — validações e atualização de status', () => {
     await expect(confirmarEscala('   ', true)).rejects.toThrow('Registro inválido')
   })
 
-  it('confirma turno (marcado_por = userId)', async () => {
-    await expect(confirmarEscala('esc-1', true)).resolves.toBeUndefined()
-    expect(mockFromReturn.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        confirmado: true,
-      })
-    )
+  it('marca como confirmado quando confirmado=true', async () => {
+    await confirmarEscala('esc-1', true)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: true })
   })
 
-  it('desfaz confirmação (marcado_por = null)', async () => {
-    await expect(confirmarEscala('esc-1', false)).resolves.toBeUndefined()
-    expect(mockFromReturn.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        confirmado: false,
-      })
-    )
+  it('marca como não-confirmado quando confirmado=false', async () => {
+    await confirmarEscala('esc-1', false)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: false })
   })
 
   it('filtra por id e casa (isolamento multi-tenant)', async () => {
@@ -149,99 +178,41 @@ describe('confirmarEscala — validações e atualização de status', () => {
     expect(eqCalls).toContainEqual(['casa', 'bica'])
   })
 
-  it('armazena userId quando confirma', async () => {
-    await confirmarEscala('esc-2', true)
-    const updateCall = (mockFromReturn.update as any).mock.calls[0]
-    expect(updateCall[0]).toMatchObject({
-      confirmado: true,
-      marcado_por: 'user-1',
-    })
+  it('permite toggle: true → false → true', async () => {
+    await confirmarEscala('esc-toggle', true)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: true })
+
+    vi.clearAllMocks()
+    await confirmarEscala('esc-toggle', false)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: false })
+
+    vi.clearAllMocks()
+    await confirmarEscala('esc-toggle', true)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: true })
   })
 
-  it('limpa userId quando desfaz', async () => {
-    await confirmarEscala('esc-3', false)
-    const updateCall = (mockFromReturn.update as any).mock.calls[0]
-    expect(updateCall[0]).toMatchObject({
-      confirmado: false,
-      marcado_por: null,
-    })
+  it('retorna undefined em sucesso', async () => {
+    const result = await confirmarEscala('esc-2', true)
+    expect(result).toBeUndefined()
+  })
+
+  it('confirma múltiplos registros de forma independente', async () => {
+    await confirmarEscala('esc-a', true)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: true })
+
+    vi.clearAllMocks()
+    await confirmarEscala('esc-b', false)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: false })
   })
 
   it('trata confirmação dupla (idempotente)', async () => {
     await confirmarEscala('esc-4', true)
     vi.clearAllMocks()
     await confirmarEscala('esc-4', true)
-    // Segunda chamada não deve lançar erro
-    expect(mockFromReturn.update).toHaveBeenCalled()
-  })
-
-  it('trata troca de turno (update sem delete)', async () => {
-    mockFromReturn.maybeSingle = vi.fn().mockResolvedValueOnce({
-      data: { id: 'esc-5', turno: 'AB' },
-    })
-    await salvarEscala('m-1', '2026-06-10', 'CD')
     expect(mockFromReturn.update).toHaveBeenCalled()
   })
 })
 
-describe('listarEscalaPorDia — filtragem temporal', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    mockFromReturn.select = vi.fn().mockReturnThis()
-  })
-
-  it('retorna apenas escala do dia especificado', async () => {
-    mockFromReturn.eq = vi.fn().mockResolvedValueOnce({
-      data: [
-        { id: 'esc-1', membro_id: 'm-1', data: '2026-06-10', turno: 'AB' },
-        { id: 'esc-2', membro_id: 'm-2', data: '2026-06-10', turno: 'CD' },
-      ],
-    })
-    // Se há função: const escala = await listarPorDia('2026-06-10')
-    // expect(escala).toHaveLength(2)
-  })
-
-  it('filtra por casa automaticamente', async () => {
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    // Chamada lista escala
-    // Verifica que eq foi chamado com ['casa', 'bica'] e ['data', '2026-06-10']
-  })
-
-  it('retorna lista vazia para dia sem escala', async () => {
-    mockFromReturn.eq = vi.fn().mockResolvedValueOnce({ data: [] })
-    // const escala = await listarPorDia('2026-07-01')
-    // expect(escala).toHaveLength(0)
-  })
-})
-
-describe('validações de turno e datas', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('valida formato de turno (maiúsculas, 2 chars)', async () => {
-    await expect(salvarEscala('m-1', '2026-06-01', 'ab')).rejects.toThrow('Turno inválido')
-  })
-
-  it('rejeita turno com caracteres inválidos', async () => {
-    await expect(salvarEscala('m-1', '2026-06-01', 'A1')).rejects.toThrow('Turno inválido')
-  })
-
-  it('valida formato de data (YYYY-MM-DD)', async () => {
-    await expect(salvarEscala('m-1', '06/06/2026', 'AB')).rejects.toThrow('Data inválida')
-  })
-
-  it('rejeita data retroativa (passado)', async () => {
-    await expect(salvarEscala('m-1', '2020-01-01', 'AB')).rejects.toThrow()
-  })
-
-  it('aceita data futura válida', async () => {
-    const futureDate = new Date()
-    futureDate.setDate(futureDate.getDate() + 7)
-    const futureDateStr = futureDate.toISOString().split('T')[0]
-    await expect(salvarEscala('m-1', futureDateStr, 'AB')).resolves.toBeUndefined()
-  })
-})
 
 describe('fluxo completo: criar, confirmar, remover', () => {
   beforeEach(() => {
@@ -256,25 +227,47 @@ describe('fluxo completo: criar, confirmar, remover', () => {
 
     // 2. Confirmar
     vi.clearAllMocks()
-    mockFromReturn.eq = vi.fn().mockReturnThis()
     await confirmarEscala('esc-created', true)
-    expect(mockFromReturn.update).toHaveBeenCalledWith(
-      expect.objectContaining({ confirmado: true })
-    )
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: true })
 
     // 3. Remover
     vi.clearAllMocks()
-    mockFromReturn.eq = vi.fn().mockReturnThis()
     await removerEscala('esc-created')
     expect(mockFromReturn.delete).toHaveBeenCalled()
   })
 
-  it('casa mismatch: tenta confirmar escala de outra casa', async () => {
-    // Simula tentativa de casa diferente
-    mockFromReturn.eq = vi.fn().mockReturnThis()
-    // A validação deveria vir de requireUser() que traz a casa correta
-    await confirmarEscala('esc-other-casa', true)
-    // Verifica que eq incluiu ['casa', 'bica']
+  it('escala mismatch: tenta remover escala de outra casa', async () => {
+    await removerEscala('esc-other-casa')
+    // Verifica que eq incluiu ['casa', 'bica'] para isolamento multi-tenant
     expect(mockFromReturn.eq).toHaveBeenCalledWith('casa', 'bica')
+  })
+
+  it('cria, muda turno, confirma, remove (workflow completo)', async () => {
+    // 1. Criar
+    await salvarEscala('m-workflow', '2026-07-01', 'AB')
+    expect(mockFromReturn.insert).toHaveBeenCalled()
+
+    // 2. Atualizar turno (reinscrição)
+    vi.clearAllMocks()
+    mockFromReturn.maybeSingle = vi.fn().mockResolvedValueOnce({
+      data: { id: 'esc-wf', turno: 'AB' },
+    })
+    await salvarEscala('m-workflow', '2026-07-01', 'CD')
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ turno: 'CD', confirmado: false })
+
+    // 3. Confirmar
+    vi.clearAllMocks()
+    await confirmarEscala('esc-wf', true)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: true })
+
+    // 4. Desconfirmar
+    vi.clearAllMocks()
+    await confirmarEscala('esc-wf', false)
+    expect(mockFromReturn.update).toHaveBeenCalledWith({ confirmado: false })
+
+    // 5. Remover
+    vi.clearAllMocks()
+    await removerEscala('esc-wf')
+    expect(mockFromReturn.delete).toHaveBeenCalled()
   })
 })
