@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth-guard'
+import { withAnalytics } from './instrumented'
 import { calcularCmv } from '@/lib/fichas'
 
 export interface SalvarFichaInput {
@@ -15,46 +16,53 @@ export interface SalvarFichaInput {
 }
 
 export async function salvarFicha(input: SalvarFichaInput) {
-  const nome = input.nome?.trim()
-  if (!nome) throw new Error('Nome é obrigatório')
+  const editando = !!input.id?.trim()
+  return withAnalytics(
+    editando ? 'ficha.editar' : 'ficha.criar',
+    async () => {
+      const nome = input.nome?.trim()
+      if (!nome) throw new Error('Nome é obrigatório')
 
-  const custo = input.custoTotal ?? null
-  const venda = input.precoVenda ?? null
-  if (custo !== null && (!Number.isFinite(custo) || custo < 0)) {
-    throw new Error('Custo inválido')
-  }
-  if (venda !== null && (!Number.isFinite(venda) || venda < 0)) {
-    throw new Error('Preço de venda inválido')
-  }
-  if (input.rendimento != null && (!Number.isFinite(input.rendimento) || input.rendimento < 0)) {
-    throw new Error('Rendimento inválido')
-  }
+      const custo = input.custoTotal ?? null
+      const venda = input.precoVenda ?? null
+      if (custo !== null && (!Number.isFinite(custo) || custo < 0)) {
+        throw new Error('Custo inválido')
+      }
+      if (venda !== null && (!Number.isFinite(venda) || venda < 0)) {
+        throw new Error('Preço de venda inválido')
+      }
+      if (input.rendimento != null && (!Number.isFinite(input.rendimento) || input.rendimento < 0)) {
+        throw new Error('Rendimento inválido')
+      }
 
-  const cmv = calcularCmv(custo, venda)
+      const cmv = calcularCmv(custo, venda)
 
-  const { supabase, casa } = await requireUser()
+      const { supabase, casa } = await requireUser()
 
-  const payload = {
-    nome,
-    categoria: input.categoria?.trim() || null,
-    custo_total: custo,
-    preco_venda: venda,
-    cmv_pct: cmv,
-    rendimento: input.rendimento ?? null,
-    unidade_rendimento: input.unidadeRendimento?.trim() || null,
-  }
+      const payload = {
+        nome,
+        categoria: input.categoria?.trim() || null,
+        custo_total: custo,
+        preco_venda: venda,
+        cmv_pct: cmv,
+        rendimento: input.rendimento ?? null,
+        unidade_rendimento: input.unidadeRendimento?.trim() || null,
+      }
 
-  if (input.id?.trim()) {
-    await supabase
-      .from('fichas_tecnicas')
-      .update(payload)
-      .eq('id', input.id)
-      .eq('casa', casa)
-  } else {
-    await supabase.from('fichas_tecnicas').insert({ ...payload, casa, ativo: true })
-  }
+      if (editando) {
+        await supabase
+          .from('fichas_tecnicas')
+          .update(payload)
+          .eq('id', input.id!)
+          .eq('casa', casa)
+      } else {
+        await supabase.from('fichas_tecnicas').insert({ ...payload, casa, ativo: true })
+      }
 
-  revalidatePath('/fichas')
+      revalidatePath('/fichas')
+    },
+    { editando },
+  )
 }
 
 export async function arquivarFicha(id: string) {

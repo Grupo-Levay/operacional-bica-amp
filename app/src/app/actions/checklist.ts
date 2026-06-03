@@ -2,8 +2,21 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth-guard'
+import { withAnalytics } from './instrumented'
 
 export async function marcarItemChecklist(
+  checklistId: string,
+  itemNome: string,
+  marcar: boolean,
+) {
+  return withAnalytics(
+    'checklist.marcar_item',
+    () => marcarItemChecklistImpl(checklistId, itemNome, marcar),
+    { marcar },
+  )
+}
+
+async function marcarItemChecklistImpl(
   checklistId: string,
   itemNome: string,
   marcar: boolean,

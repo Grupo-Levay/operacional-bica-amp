@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth-guard'
+import { withAnalytics } from './instrumented'
 import { STATUS_OCUPA_MESA } from '@/lib/reservas-availability'
 import { criarMaquinaEstados } from '@/lib/state-machine'
 import type { Enums } from '@/types/database.types'
@@ -121,42 +122,48 @@ async function validarMesa(
 }
 
 export async function criarReserva(input: CriarReservaInput) {
-  const { supabase, userId, casa } = await requireUser()
+  return withAnalytics(
+    'reserva.criar',
+    async () => {
+      const { supabase, userId, casa } = await requireUser()
 
-  const { customerName, guestCount, phone, notes, tableId } = normalizarInput(input)
+      const { customerName, guestCount, phone, notes, tableId } = normalizarInput(input)
 
-  if (tableId) {
-    await validarMesa(supabase, casa, tableId, guestCount, input)
-  }
+      if (tableId) {
+        await validarMesa(supabase, casa, tableId, guestCount, input)
+      }
 
-  // Buscar o nome do perfil para registrar created_by_name.
-  // NÃO gravar created_by (FK aponta para team_members, não para usuários do app).
-  const { data: perfil } = await supabase
-    .from('perfis')
-    .select('nome')
-    .eq('id', userId)
-    .single()
+      // Buscar o nome do perfil para registrar created_by_name.
+      // NÃO gravar created_by (FK aponta para team_members, não para usuários do app).
+      const { data: perfil } = await supabase
+        .from('perfis')
+        .select('nome')
+        .eq('id', userId)
+        .single()
 
-  const createdByName = perfil?.nome?.trim() || 'Equipe'
+      const createdByName = perfil?.nome?.trim() || 'Equipe'
 
-  const { error } = await supabase.from('reservations').insert({
-    casa,
-    customer_name: customerName,
-    customer_phone: phone,
-    reservation_date: input.reservationDate,
-    start_time: input.startTime,
-    end_time: input.endTime,
-    guest_count: guestCount,
-    table_id: tableId,
-    notes,
-    created_by_name: createdByName,
-  })
+      const { error } = await supabase.from('reservations').insert({
+        casa,
+        customer_name: customerName,
+        customer_phone: phone,
+        reservation_date: input.reservationDate,
+        start_time: input.startTime,
+        end_time: input.endTime,
+        guest_count: guestCount,
+        table_id: tableId,
+        notes,
+        created_by_name: createdByName,
+      })
 
-  if (error) {
-    throw new Error(`Erro ao criar reserva: ${error.message}`)
-  }
+      if (error) {
+        throw new Error(`Erro ao criar reserva: ${error.message}`)
+      }
 
-  revalidatePath('/reservas')
+      revalidatePath('/reservas')
+    },
+    { guest_count: Math.trunc(Number(input.guestCount)) || null, has_table: !!input.tableId },
+  )
 }
 
 export async function editarReserva(input: EditarReservaInput) {

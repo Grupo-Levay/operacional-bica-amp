@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          action: string
+          casa: string
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          metadata: Json
+          status: string
+          user_id: string | null
+          value: number | null
+        }
+        Insert: {
+          action: string
+          casa: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          status?: string
+          user_id?: string | null
+          value?: number | null
+        }
+        Update: {
+          action?: string
+          casa?: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          status?: string
+          user_id?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
       bar_tables: {
         Row: {
           capacity: number
