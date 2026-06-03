@@ -101,6 +101,66 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ⏳ E2E Playwright — Pronto para Phase 4 se necessário
 ⏳ PRs #2 #3 (Vercel bots) — Podem ser fechados sem impacto
 
+---
+
+## Próximos Epics
+
+### S6.0 — Equipe: Perfis, Gestão e Distribuição de Tarefas
+**Status:** doing (Fase 1 ✅, Fases 2-3 ⬜)
+
+**Fase 1 — Perfil & Gestão de Equipe** ✅ SHIPPED
+- ✅ Migration 0006: `equipe.perfil_id` (FK perfis)
+- ✅ `/perfil` — self profile com responsabilidades, módulos, próximos turnos
+- ✅ `/admin` — vincular conta ↔ membro da equipe
+- ✅ Nav: `/perfil` no sidebar e bottom-nav
+- ✅ Testes de permissão + validação
+
+**Fase 2 — Tarefas & Kanban** (PRÓXIMO)
+- [ ] Migration: tabela `tarefas` (titulo, descricao, perfil_id, status, prioridade, prazo, casa)
+- [ ] Actions: criar/atribuir/mover/concluir (máquina a_fazer → fazendo → concluida)
+- [ ] Kanban board admin (distribuição) + "minhas tarefas" no perfil
+- [ ] Testes de máquina de estados
+
+**Fase 3 — Metas & Evolução**
+- [ ] Migration: tabela `metas` (escopo individual/equipe, perfil_id, alvo, atual, periodo)
+- [ ] Actions: definir meta, atualizar progresso
+- [ ] UI: metas no perfil (individual + equipe) + evolução
+- [ ] Painel de metas da equipe no admin
+
+**Arquivo:** `docs/stories/S6.0-equipe-perfis-tarefas.md`
+
+---
+
+### S8 — Performance & Analytics (Planejado)
+**Status:** planned
+
+**Escopo Potencial:**
+- **Performance Audit** — LCP/CLS/INP (Lighthouse), bundle size analysis, image optimization
+- **Analytics Integration** — Eventos de user behavior (check-in, compra, ficha criada), funnels
+- **Monitoring & Alertas** — Health checks, error tracking (Sentry), uptime monitoring
+- **Observability** — Request tracing, slow query identification, API latency baseline
+
+**Não Escopo S8:**
+- Refactoring de performance (cacheamento, virtualization) — defer até dados mostrem gargalos
+- Analytics no produto (dashboard de métricas) — só instrumentação; dashboard é S9+
+
+**Dependências:** S7 ✅ concluído, S6 Fase 2+ pronto
+
+---
+
+### Roadmap Visual
+```
+S6.0 Fase 1 ✅
+  ↓
+S7 (completo) ✅
+  ↓
+S6.0 Fases 2-3 ← PRÓXIMO (Kanban + Metas)
+  ↓
+S8 Performance & Analytics ← Post-Fase2
+  ↓
+S9+ (produto features: dashboards, reports, integrações)
+```
+
 ## Decisões técnicas ativas
 - `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação
 - `requireUser()` em actions: ponto único de auth+casa, lança Error se não autenticado
