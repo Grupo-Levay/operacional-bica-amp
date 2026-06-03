@@ -174,7 +174,7 @@ S9+ (produto features: dashboards, reports, integrações)
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. **✅ S7 UI Evolution COMPLETE** — Phase 1 (tech debt cleanup) + Phase 2 (design v3) + Phase 3 (5 pages redesigned) → PR#43 MERGED (2026-06-03)
+1. **✅ S7 UI Evolution COMPLETE** — Phase 1 (tech debt cleanup) + Phase 2 (design v3) + Phase 3 (5 pages redesigned) → PR#44 READY FOR MERGE (2026-06-03, 290 tests passing, lint clean, build OK)
 2. feat: reservas UX upgrade — painel ao vivo, timeline, busca/filtro, WhatsApp — PR#33 (2026-06-01)
 3. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
 4. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
