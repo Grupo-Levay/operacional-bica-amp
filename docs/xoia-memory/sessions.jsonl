@@ -17,3 +17,4 @@
 {"date":"2026-06-01","mode":"standard","story":"estoque-crud-completo","agent":"dev","check_attempts":1,"status":"shipped","note":"Completa CRUD estoque: criarItemEstoque + arquivarItemEstoque + form novo item + arquivar na UI (reusa ConfirmDialog); 170 testes"}
 {"date":"2026-06-01","mode":"standard","story":"escala-confirmacao","agent":"dev","check_attempts":1,"status":"shipped","note":"Completa confirmacao da escala (estado morto): action confirmarEscala + toggle ✓ no popover + dica; 173 testes"}
 {"date":"2026-06-01","mode":"deep","story":"S6.0-fase1","agent":"dev","check_attempts":1,"status":"shipped","note":"Equipe Fase 1: migration equipe.perfil_id + /perfil (self: funcao/responsabilidades/escala) + admin vincula conta<->equipe + nav; 176 testes"}
+{"date":"2026-06-03","session_id":"665371e7-df5a-4a28-8c3e-f0ff3407cc28","trigger":"auto","compacted_at":"2026-06-03T05:13:09.929Z","line_count":987}

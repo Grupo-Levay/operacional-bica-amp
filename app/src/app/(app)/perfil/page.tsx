@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation'
-import { ShieldCheck, CalendarDays, ListChecks, Target } from 'lucide-react'
+import { ShieldCheck, CalendarDays, Target } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentCasa } from '@/lib/tenant'
 import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { rotuloRole, responsabilidadesRole, rotasPermitidas, type Role } from '@/lib/roles'
+import { MinhasTarefas } from '@/components/tarefas/minhas-tarefas'
 
 const TURNO_LABEL: Record<string, string> = {
   AB: 'Abertura',
@@ -75,6 +76,18 @@ export default async function PerfilPage() {
       .limit(7)
     proximosTurnos = (data as TurnoEscala[]) ?? []
   }
+
+  // Tarefas atribuídas ao perfil do usuário nesta casa
+  const { data: tarefas } = perfil
+    ? await supabase
+        .from('tarefas')
+        .select('id, titulo, descricao, status, prioridade, prazo')
+        .eq('casa', casa)
+        .eq('perfil_id', user.id)
+        .neq('status', 'concluida')
+        .order('created_at', { ascending: false })
+        .limit(20)
+    : { data: [] }
 
   const responsabilidades = responsabilidadesRole(role)
   const modulos = rotasPermitidas(role).filter((r) => r !== '/perfil')
@@ -163,19 +176,15 @@ export default async function PerfilPage() {
         )}
       </section>
 
-      {/* Teasers das próximas fases */}
-      <section className="grid grid-cols-2 gap-3">
-        <div className="rounded-lg border border-dashed border-border p-3 text-center">
-          <ListChecks size={18} className="mx-auto text-muted-foreground/60" aria-hidden="true" />
-          <p className="mt-1 text-xs font-medium text-foreground">Minhas tarefas</p>
-          <p className="text-[10px] text-muted-foreground">Em breve</p>
-        </div>
-        <div className="rounded-lg border border-dashed border-border p-3 text-center">
-          <Target size={18} className="mx-auto text-muted-foreground/60" aria-hidden="true" />
-          <p className="mt-1 text-xs font-medium text-foreground">Metas & evolução</p>
-          <p className="text-[10px] text-muted-foreground">Em breve</p>
-        </div>
-      </section>
+      {/* Minhas tarefas */}
+      <MinhasTarefas tarefas={tarefas ?? []} />
+
+      {/* Teaser Metas */}
+      <div className="rounded-lg border border-dashed border-border p-3 text-center">
+        <Target size={18} className="mx-auto text-muted-foreground/60" aria-hidden="true" />
+        <p className="mt-1 text-xs font-medium text-foreground">Metas & evolução</p>
+        <p className="text-[10px] text-muted-foreground">Em breve</p>
+      </div>
     </main>
   )
 }
