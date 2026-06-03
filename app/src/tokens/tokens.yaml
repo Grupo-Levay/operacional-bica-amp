@@ -60,16 +60,50 @@ spacing:
   16:  "4rem"      # 64px
 
 typography:
+  # ── Fontes ────────────────────────────────────────────────────────
   font-sans:     "'Jost', system-ui, sans-serif"
   font-display:  "'DM Serif Display', serif"
   font-mono:     "'JetBrains Mono', monospace"
-  text-xs:       "0.75rem"
-  text-sm:       "0.875rem"
-  text-base:     "1rem"
-  text-lg:       "1.125rem"
-  text-xl:       "1.25rem"
-  text-2xl:      "1.5rem"
-  text-3xl:      "1.875rem"
+
+  # ── Tamanhos (base) ───────────────────────────────────────────────
+  text-xs:       "0.75rem"     # 12px
+  text-sm:       "0.875rem"    # 14px
+  text-base:     "1rem"        # 16px
+  text-lg:       "1.125rem"    # 18px
+  text-xl:       "1.25rem"     # 20px
+  text-2xl:      "1.5rem"      # 24px
+  text-3xl:      "1.875rem"    # 30px
+
+  # ── Escalas Semânticas: Headings ──────────────────────────────────
+  text-h1:       "2.25rem"     # 36px — primary heading
+  text-h2:       "1.875rem"    # 30px — secondary heading
+  text-h3:       "1.5rem"      # 24px — tertiary heading
+  line-h1:       "2.75rem"     # 1.22x multiplier
+  line-h2:       "2.25rem"     # 1.20x multiplier
+  line-h3:       "2rem"        # 1.33x multiplier
+
+  # ── Escalas Semânticas: Body ──────────────────────────────────────
+  text-body-lg:  "1.125rem"    # 18px — large body text
+  text-body:     "1rem"        # 16px — regular body text (alias text-base)
+  text-body-sm:  "0.875rem"    # 14px — small body text
+  line-body-lg:  "1.75rem"     # 1.56x multiplier (good for reading)
+  line-body:     "1.5rem"      # 1.50x multiplier (standard)
+  line-body-sm:  "1.25rem"     # 1.43x multiplier
+
+  # ── Escalas Semânticas: UI (labels, captions, etc) ────────────────
+  text-label:    "0.875rem"    # 14px — form labels, badges
+  text-caption:  "0.75rem"     # 12px — helper text, metadata
+  line-label:    "1.25rem"     # 1.43x multiplier
+  line-caption:  "1rem"        # 1.33x multiplier
+
+  # ── Letter-spacing (otimizado para legibilidade) ──────────────────
+  letter-h1:     "-0.02em"     # tight tracking para headings grandes
+  letter-h2:     "-0.01em"
+  letter-h3:     "0em"
+  letter-body:   "0em"         # normal tracking
+  letter-ui:     "0.01em"      # subtle tracking para UI pequeno
+
+  # ── Pesos ─────────────────────────────────────────────────────────
   font-normal:   "400"
   font-medium:   "500"
   font-semibold: "600"

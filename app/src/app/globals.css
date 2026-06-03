@@ -85,6 +85,21 @@
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
   --focus-ring: 0 0 0 var(--focus-ring-offset) var(--color-ink), 0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--color-primary-dynamic);
+
+  /* ── v3 Typography: Escalas Semânticas ────────────────────────── */
+  /* Headings */
+  --text-h1:      2.25rem;    --line-h1:       2.75rem;    --letter-h1: -0.02em;
+  --text-h2:      1.875rem;   --line-h2:       2.25rem;    --letter-h2: -0.01em;
+  --text-h3:      1.5rem;     --line-h3:       2rem;       --letter-h3: 0em;
+  /* Body */
+  --text-body-lg: 1.125rem;   --line-body-lg:  1.75rem;
+  --text-body:    1rem;       --line-body:     1.5rem;
+  --text-body-sm: 0.875rem;   --line-body-sm:  1.25rem;
+  --letter-body:  0em;
+  /* UI */
+  --text-label:   0.875rem;   --line-label:    1.25rem;
+  --text-caption: 0.75rem;    --line-caption:  1rem;
+  --letter-ui:    0.01em;
 }
 
 /* Override variables for AMP 213 tenant dynamic branding */
@@ -187,6 +202,20 @@
   --shadow-glow-brand:   var(--shadow-glow-brand);
   --shadow-glow-brand-sm:var(--shadow-glow-brand-sm);
   --shadow-inner-hairline: var(--shadow-inner-hairline);
+  /* ── v3 Typography: Escalas Semânticas ────────────────────── */
+  /* Headings */
+  --text-h1:      var(--text-h1);     --line-h1:     var(--line-h1);     --letter-h1: var(--letter-h1);
+  --text-h2:      var(--text-h2);     --line-h2:     var(--line-h2);     --letter-h2: var(--letter-h2);
+  --text-h3:      var(--text-h3);     --line-h3:     var(--line-h3);     --letter-h3: var(--letter-h3);
+  /* Body */
+  --text-body-lg: var(--text-body-lg); --line-body-lg: var(--line-body-lg);
+  --text-body:    var(--text-body);    --line-body:    var(--line-body);
+  --text-body-sm: var(--text-body-sm); --line-body-sm: var(--line-body-sm);
+  --letter-body:  var(--letter-body);
+  /* UI */
+  --text-label:   var(--text-label);   --line-label:   var(--line-label);
+  --text-caption: var(--text-caption); --line-caption: var(--line-caption);
+  --letter-ui:    var(--letter-ui);
 }
 
 /* ── Dark theme como padrão (app operacional noturno) ────────── */
