@@ -70,3 +70,15 @@ Resultado: 0 hardcoded colors detectável via grep, visual hierarchy 100% consis
 **Aprendizado:** Desses 3, `npm run typecheck` é o mais custoso (~3s) mas critica (catches refactor breaks). Rodar em paralelo (3 bash calls) reduz feedback latency. Se algum falhar, marcar e parar ANTES de commit/push — regressions mascaradas por "ainda builds" são caras.
 **Aplicar quando:** Final de qualquer feature. Não confiar em "pareceu funcionar" sem rodar todos os 3. Pipeline CI não substitui — é verificação extra.
 ---
+
+## [2026-06-03] — Snapshot pode estar stale: verificar git+DB antes de reimplementar fase "próxima"
+**Contexto:** Retomada da S6 — snapshot dizia "Fase 2 = PRÓXIMO", mas git mostrava commits `feat(S6.0-fase2/fase3)` já em HEAD; `origin/main == HEAD` (0 diff); tabelas `tarefas`/`metas` existiam em produção. Reimplementar teria duplicado tudo.
+**Aprendizado:** Antes de "construir" uma fase marcada como próxima no snapshot, validar a realidade: `git rev-list origin/main..HEAD`, `git merge-base --is-ancestor <sha> origin/main`, e `list_tables`/`execute_sql` no DB. O snapshot é estado declarado, não verdade — confirmar com fontes autoritativas (git, GitHub, banco). Reconciliar registros (story→done, snapshot, sessions) é a retomada correta, não reimplementar.
+**Aplicar quando:** Resume de projeto onde snapshot e estado git/DB podem divergir.
+---
+
+## [2026-06-03] — Supabase GitHub integration ignora migrations fora de `app/supabase`
+**Contexto:** PR da S6 fase2/3 — bot Supabase comentou "ignored because no changes detected in `app/supabase` directory". Migrations do repo ficam em `supabase/migrations/` (raiz), não em `app/supabase`.
+**Aprendizado:** A integração Supabase↔GitHub só dispara branching/aplicação quando há mudança no diretório configurado (`app/supabase`). Migrations versionadas na raiz NÃO são aplicadas automaticamente em preview/prod — precisam ser aplicadas manualmente via MCP `execute_sql`/`apply_migration`. Por isso verificar `list_tables` no DB é obrigatório após merge de migration.
+**Aplicar quando:** Adicionar migration ao repo; validar se schema de produção reflete o SQL versionado.
+---

@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-06-03 | S7 SHIPPED — main branch pronto para produção_
+_Atualizado: 2026-06-03 | S6.0 (3 fases) + S7 SHIPPED em main — produção. main == origin/main == branch atual_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -106,28 +106,29 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ## Próximos Epics
 
 ### S6.0 — Equipe: Perfis, Gestão e Distribuição de Tarefas
-**Status:** doing (Fase 1 ✅, Fases 2-3 ⬜)
+**Status:** done ✅ (Fases 1-3 SHIPPED em main)
 
-**Fase 1 — Perfil & Gestão de Equipe** ✅ SHIPPED
+**Fase 1 — Perfil & Gestão de Equipe** ✅ SHIPPED (PR #38)
 - ✅ Migration 0006: `equipe.perfil_id` (FK perfis)
 - ✅ `/perfil` — self profile com responsabilidades, módulos, próximos turnos
 - ✅ `/admin` — vincular conta ↔ membro da equipe
 - ✅ Nav: `/perfil` no sidebar e bottom-nav
 - ✅ Testes de permissão + validação
 
-**Fase 2 — Tarefas & Kanban** (PRÓXIMO)
-- [ ] Migration: tabela `tarefas` (titulo, descricao, perfil_id, status, prioridade, prazo, casa)
-- [ ] Actions: criar/atribuir/mover/concluir (máquina a_fazer → fazendo → concluida)
-- [ ] Kanban board admin (distribuição) + "minhas tarefas" no perfil
-- [ ] Testes de máquina de estados
+**Fase 2 — Tarefas & Kanban** ✅ SHIPPED (PR #39 · `fd79cc8`)
+- ✅ Migration 0007: tabela `tarefas` — aplicada em produção (10 colunas verificadas)
+- ✅ Actions criar/atribuir/mover/concluir (máquina a_fazer → fazendo → concluida) — `actions/tarefas.ts`
+- ✅ Kanban board admin + "minhas tarefas" no perfil — `components/tarefas/`
+- ✅ Testes de máquina de estados — `state-machine.test.ts` + `tarefas.test.ts`
 
-**Fase 3 — Metas & Evolução**
-- [ ] Migration: tabela `metas` (escopo individual/equipe, perfil_id, alvo, atual, periodo)
-- [ ] Actions: definir meta, atualizar progresso
-- [ ] UI: metas no perfil (individual + equipe) + evolução
-- [ ] Painel de metas da equipe no admin
+**Fase 3 — Metas & Evolução** ✅ SHIPPED (PR #40 · `5061b6f`)
+- ✅ Migration 0008: tabela `metas` — aplicada em produção (14 colunas verificadas)
+- ✅ Actions: definir meta, atualizar progresso
+- ✅ UI: metas no perfil (individual + equipe) + evolução — `admin/metas/page.tsx`
+- ✅ Painel de metas da equipe no admin
 
 **Arquivo:** `docs/stories/S6.0-equipe-perfis-tarefas.md`
+**Nota de reconciliação (2026-06-03):** snapshot anterior listava Fase 2 como "PRÓXIMO" por estar desatualizado. Verificação git+DB confirmou as 3 fases já mergeadas em main e tabelas em produção. PR #41 (session-log) era o único cabo solto.
 
 ---
 
@@ -150,13 +151,9 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 
 ### Roadmap Visual
 ```
-S6.0 Fase 1 ✅
+S6.0 Fase 1 ✅ → S6.0 Fases 2-3 ✅ (Kanban + Metas) → S7 (completo) ✅
   ↓
-S7 (completo) ✅
-  ↓
-S6.0 Fases 2-3 ← PRÓXIMO (Kanban + Metas)
-  ↓
-S8 Performance & Analytics ← Post-Fase2
+S8 Performance & Analytics ← PRÓXIMO
   ↓
 S9+ (produto features: dashboards, reports, integrações)
 ```
