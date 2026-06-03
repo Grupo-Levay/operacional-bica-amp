@@ -9,6 +9,7 @@ import { rotasPermitidas, podeAcessarRota, type Role } from '@/lib/roles'
 import { getOnboardingConfig } from '@/lib/onboarding'
 import { getCurrentCasa, CASAS, type Casa } from '@/lib/tenant'
 import { EstoqueAlertBanner } from '@/components/layout/estoque-alert-banner'
+import { WebVitalsReporter } from '@/components/observability/web-vitals-reporter'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -73,6 +74,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       )}
 
       <Toaster />
+      <WebVitalsReporter />
     </div>
   )
 }
