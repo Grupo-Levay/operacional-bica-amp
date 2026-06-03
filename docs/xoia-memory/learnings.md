@@ -52,3 +52,21 @@ Formato de entrada:
 **Aprendizado:** Extrair `src/lib/reservas-availability.ts` (horariosColidem, mesasOcupadas, sugerirMesa) como funções puras tornou a mesma regra testável isoladamente (vitest, sem mock de DB) e reutilizável nos dois lados. ReservaSlot é subset de Tables<'reservations'> → passa direto por structural typing.
 **Aplicar quando:** regra de negócio precisa rodar no client (UX otimista) e no server (validação autoritativa).
 ---
+
+## [2026-06-03] — S7: Padrão de redesign page modular reduz drift visual
+**Contexto:** 5 pages (Dashboard, Reservas, Escala, Fichas, Estoque) precisavam evoluir de visual antigo para v3 moderno mantendo funcionalidade intacta.
+**Aprendizado:** Aplicar padrão atômico a TODAS as pages antes de merge evita duplicação de esforço:
+1. Layout wrapper: `min-h-screen bg-background p-4 md:p-6 space-y-6 pb-24`
+2. Section headers: `text-label font-semibold text-muted-foreground uppercase tracking-wide`
+3. Microinterações: `[@media(hover:hover)]:hover:-translate-y-0.5` + shadow transitions (não hover:shadow senão quebra mobile)
+4. Responsive spacing: sempre `space-y-6` (nunca varia), padding ajusta em `md:`
+5. Accent colors: mapear status a semântica (primary/success/warning/danger) via constantes, não inline
+Resultado: 0 hardcoded colors detectável via grep, visual hierarchy 100% consistente, pages são refatorações PURAS (sem lógica quebrada).
+**Aplicar quando:** Redesign UI de múltiplas pages. Validar pattern na 1ª page, replicate atomicamente nas restantes, merge tudo junto (não page por page — drift garante).
+---
+
+## [2026-06-03] — Check obrigatório pré-merge: lint + typecheck + test em paralelo
+**Contexto:** S7 Phase 3 completou 5 pages. QA verificação: `npm run lint && npm test && npm run typecheck` — todos em <10s total.
+**Aprendizado:** Desses 3, `npm run typecheck` é o mais custoso (~3s) mas critica (catches refactor breaks). Rodar em paralelo (3 bash calls) reduz feedback latency. Se algum falhar, marcar e parar ANTES de commit/push — regressions mascaradas por "ainda builds" são caras.
+**Aplicar quando:** Final de qualquer feature. Não confiar em "pareceu funcionar" sem rodar todos os 3. Pipeline CI não substitui — é verificação extra.
+---
