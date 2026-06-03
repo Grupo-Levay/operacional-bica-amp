@@ -6,7 +6,7 @@ export default defineConfig({
     // Default node; testes de componente declaram `// @vitest-environment jsdom`.
     environment: 'node',
     globals: true,
-    exclude: ['e2e/**'],
+    exclude: ['e2e/**', 'node_modules/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
