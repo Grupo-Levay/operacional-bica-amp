@@ -37,7 +37,6 @@ export async function validarCasaDoUsuario(
   userId: string,
   requestedCasa: Casa | undefined,
 ): Promise<Casa> {
-  const supabase = (await createClient()) as AppClient
   const userCasa = await getCurrentCasa()
 
   if (!requestedCasa) {
