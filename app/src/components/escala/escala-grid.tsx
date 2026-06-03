@@ -38,11 +38,24 @@ const TURNO_LABEL: Record<string, string> = {
   FE: "FE",
 }
 
-function formatDia(date: Date) {
+function formatDiaSemana(date: Date) {
   return new Intl.DateTimeFormat("pt-BR", {
     weekday: "short",
+  }).format(date).replace(".", "")
+}
+
+function formatDiaNumero(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
     day: "numeric",
   }).format(date)
+}
+
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  )
 }
 
 export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
@@ -56,6 +69,8 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
       </div>
     )
   }
+
+  const hoje = new Date()
 
   const escalaIndex = new Map<string, EscalaItem>()
   for (const item of escala) {
@@ -98,8 +113,8 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
     <div>
       {canEdit && (
         <p className="text-xs text-muted-foreground mb-3">
-          Toque numa célula para editar. Use <span className="text-success font-bold">✓</span> para
-          confirmar o turno.
+          Toque numa célula para editar. Use{" "}
+          <span className="text-success font-bold">✓</span> para confirmar o turno.
         </p>
       )}
       {!hasEscala && !canEdit && (
@@ -111,33 +126,60 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
       <div className="overflow-x-auto scroll-smooth snap-x snap-mandatory -mx-4 px-4">
         <div className="min-w-[480px]">
           <div
-            className="grid gap-1 mb-1"
+            className="grid gap-1 mb-2"
             style={{ gridTemplateColumns: `180px repeat(${dias.length}, 1fr)` }}
           >
-            <div className="text-xs text-muted-foreground font-medium py-1">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground/70 font-semibold py-1 self-end">
               Membro
             </div>
-            {dias.map((dia) => (
-              <div
-                key={dia.toISOString()}
-                className="text-xs text-muted-foreground font-medium text-center py-1 capitalize snap-start"
-              >
-                {formatDia(dia)}
-              </div>
-            ))}
+            {dias.map((dia) => {
+              const today = isSameDay(dia, hoje)
+              return (
+                <div
+                  key={dia.toISOString()}
+                  aria-current={today ? "date" : undefined}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 rounded-lg py-1.5 snap-start transition-colors",
+                    today
+                      ? "bg-gradient-surface-raised shadow-inner-hairline ring-1 ring-primary/30 shadow-glow-brand-sm"
+                      : "ring-1 ring-transparent"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "text-[10px] uppercase tracking-wide font-semibold capitalize",
+                      today ? "text-primary" : "text-muted-foreground/70"
+                    )}
+                  >
+                    {formatDiaSemana(dia)}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-sm font-bold leading-none tabular-nums",
+                      today ? "text-primary" : "text-foreground/80"
+                    )}
+                  >
+                    {formatDiaNumero(dia)}
+                  </span>
+                  {today && (
+                    <span className="sr-only">hoje</span>
+                  )}
+                </div>
+              )
+            })}
           </div>
 
           <div className="flex flex-col gap-1">
             {membros.map((membro) => (
               <div
                 key={membro.id}
-                className="grid gap-1 items-center"
+                className="grid gap-1 items-center rounded-lg bg-gradient-surface ring-1 ring-foreground/5 shadow-inner-hairline px-1 [@media(hover:hover)]:hover:ring-foreground/10 transition-colors"
                 style={{
                   gridTemplateColumns: `180px repeat(${dias.length}, 1fr)`,
                 }}
               >
-                <div className="flex flex-col py-2 pr-2">
-                  <span className="font-semibold text-sm leading-tight truncate">
+                <div className="flex flex-col py-2 px-2 min-w-0">
+                  <span className="font-semibold text-sm leading-tight truncate text-foreground">
                     {membro.nome}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">
@@ -150,12 +192,13 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                   const key = `${membro.id}__${dataStr}`
                   const item = escalaIndex.get(key)
                   const isOpen = openCell === key
+                  const today = isSameDay(dia, hoje)
 
                   if (canEdit && isOpen) {
                     return (
                       <div
                         key={dataStr}
-                        className="flex flex-col items-center gap-0.5 h-auto py-1"
+                        className="flex flex-col items-center gap-1 h-auto py-1.5 px-1 rounded-lg bg-gradient-surface-raised ring-1 ring-primary/25 shadow-glow-brand-sm"
                       >
                         <div className="flex gap-0.5">
                           {["AB", "FE"].map((t) => (
@@ -165,10 +208,10 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                               disabled={isPending}
                               onClick={() => handleSave(membro.id, dataStr, t)}
                               className={cn(
-                                "text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50",
+                                "text-[10px] font-bold px-2 py-1.5 rounded-md transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 focus-ring-brand [@media(hover:hover)]:hover:-translate-y-px motion-reduce:hover:translate-y-0 active:translate-y-0",
                                 item?.turno === t
-                                  ? "bg-primary text-bica-fg"
-                                  : "bg-ink4 text-b3"
+                                  ? "bg-gradient-brand text-bica-fg shadow-glow-brand-sm"
+                                  : "bg-ink4 text-b3 [@media(hover:hover)]:hover:bg-ink4/80 [@media(hover:hover)]:hover:text-foreground"
                               )}
                             >
                               {t}
@@ -182,10 +225,10 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                               aria-pressed={item.confirmado ?? false}
                               aria-label={item.confirmado ? "Desmarcar confirmação" : "Confirmar turno"}
                               className={cn(
-                                "text-[10px] font-bold px-1.5 py-1 rounded transition-opacity disabled:opacity-50",
+                                "text-[10px] font-bold px-2 py-1.5 rounded-md transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 focus-ring-brand [@media(hover:hover)]:hover:-translate-y-px motion-reduce:hover:translate-y-0 active:translate-y-0",
                                 item.confirmado
-                                  ? "bg-success-bg text-success"
-                                  : "bg-ink4 text-b3"
+                                  ? "border border-success/25 bg-success-bg text-success shadow-sm"
+                                  : "bg-ink4 text-b3 [@media(hover:hover)]:hover:bg-success-bg [@media(hover:hover)]:hover:text-success"
                               )}
                             >
                               ✓
@@ -197,7 +240,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                                 <button
                                   type="button"
                                   disabled={isPending}
-                                  className="text-[10px] font-bold px-1 py-1 rounded transition-opacity disabled:opacity-50 bg-danger-bg text-danger"
+                                  className="text-[10px] font-bold px-2 py-1.5 rounded-md transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 focus-ring-brand bg-danger-bg text-danger border border-destructive/25 [@media(hover:hover)]:hover:-translate-y-px [@media(hover:hover)]:hover:bg-destructive/20 motion-reduce:hover:translate-y-0 active:translate-y-0"
                                 >
                                   ✕
                                 </button>
@@ -217,7 +260,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                         <button
                           type="button"
                           onClick={() => setOpenCell(null)}
-                          className="text-[9px] text-muted-foreground/60 leading-none"
+                          className="text-[9px] text-muted-foreground/60 leading-none rounded focus-ring-brand [@media(hover:hover)]:hover:text-muted-foreground transition-colors"
                         >
                           fechar
                         </button>
@@ -228,23 +271,31 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                   return (
                     <div
                       key={dataStr}
-                      className="flex items-center justify-center h-10"
+                      className={cn(
+                        "flex items-center justify-center h-10 rounded-lg",
+                        today && "bg-primary/[0.06] ring-1 ring-primary/15"
+                      )}
                     >
                       {item ? (
                         <button
                           type="button"
                           onClick={() => handleCellClick(key)}
                           disabled={isPending}
-                          className={
+                          aria-label={`${TURNO_LABEL[item.turno] ?? item.turno} — ${item.confirmado ? "confirmado" : "pendente"}`}
+                          className={cn(
+                            "rounded-full transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand",
                             canEdit
-                              ? "cursor-pointer hover:opacity-80 transition-opacity"
+                              ? "cursor-pointer [@media(hover:hover)]:hover:-translate-y-px [@media(hover:hover)]:hover:brightness-110 motion-reduce:hover:translate-y-0 active:translate-y-0"
                               : "cursor-default"
-                          }
+                          )}
                         >
                           <Badge
-                            className="h-7 px-1.5 text-[10px] font-bold"
-                            variant={item.confirmado ? "default" : "secondary"}
+                            className="h-7 px-2 text-[10px] font-bold"
+                            variant={item.confirmado ? "success" : "warning"}
                           >
+                            {item.confirmado && (
+                              <span aria-hidden className="text-success">✓</span>
+                            )}
                             {TURNO_LABEL[item.turno] ?? item.turno}
                           </Badge>
                         </button>
@@ -253,12 +304,13 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
                           type="button"
                           onClick={() => handleCellClick(key)}
                           disabled={isPending}
-                          className="w-8 h-8 rounded flex items-center justify-center text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/50 transition-colors text-base"
+                          aria-label="Adicionar turno"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground/40 [@media(hover:hover)]:hover:text-primary [@media(hover:hover)]:hover:bg-primary/10 [@media(hover:hover)]:hover:ring-1 [@media(hover:hover)]:hover:ring-primary/20 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] text-base focus-ring-brand"
                         >
                           +
                         </button>
                       ) : (
-                        <span className="text-xs text-muted-foreground/50">
+                        <span className="text-xs text-muted-foreground/40" aria-hidden>
                           –
                         </span>
                       )}
@@ -271,21 +323,19 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
         <span>
-          <span className="font-semibold">AB</span> = Abertura
+          <span className="font-semibold text-foreground/80">AB</span> = Abertura
         </span>
         <span>
-          <span className="font-semibold">FE</span> = Fechamento
+          <span className="font-semibold text-foreground/80">FE</span> = Fechamento
         </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
-          Confirmado
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-sm bg-secondary" />
-          Não confirmado
-        </span>
+        <Badge variant="success" className="h-5 gap-1 text-[10px]">
+          <span aria-hidden>✓</span> Confirmado
+        </Badge>
+        <Badge variant="warning" className="h-5 text-[10px]">
+          Pendente
+        </Badge>
       </div>
     </div>
   )
