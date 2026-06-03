@@ -423,6 +423,60 @@ export type Database = {
         }
         Relationships: []
       }
+      tarefas: {
+        Row: {
+          casa: string
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          id: string
+          perfil_id: string | null
+          prazo: string | null
+          prioridade: string
+          status: string
+          titulo: string
+        }
+        Insert: {
+          casa: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          perfil_id?: string | null
+          prazo?: string | null
+          prioridade?: string
+          status?: string
+          titulo: string
+        }
+        Update: {
+          casa?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          perfil_id?: string | null
+          prazo?: string | null
+          prioridade?: string
+          status?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarefas_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tarefas_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       reservations: {
         Row: {
           casa: string
