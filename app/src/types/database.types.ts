@@ -399,6 +399,72 @@ export type Database = {
         }
         Relationships: []
       }
+      metas: {
+        Row: {
+          ativa: boolean
+          alvo: number
+          atual: number
+          casa: string
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          escopo: string
+          id: string
+          perfil_id: string | null
+          periodo: string
+          periodo_ref: string
+          titulo: string
+          unidade: string
+        }
+        Insert: {
+          ativa?: boolean
+          alvo: number
+          atual?: number
+          casa: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          escopo?: string
+          id?: string
+          perfil_id?: string | null
+          periodo?: string
+          periodo_ref: string
+          titulo: string
+          unidade?: string
+        }
+        Update: {
+          ativa?: boolean
+          alvo?: number
+          atual?: number
+          casa?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          escopo?: string
+          id?: string
+          perfil_id?: string | null
+          periodo?: string
+          periodo_ref?: string
+          titulo?: string
+          unidade?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metas_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metas_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       perfis: {
         Row: {
           created_at: string

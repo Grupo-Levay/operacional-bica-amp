@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { KanbanSquare } from "lucide-react"
+import { KanbanSquare, Target } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentCasa } from "@/lib/tenant"
 import { UsuariosTable } from "@/components/admin/usuarios-table"
@@ -62,13 +62,22 @@ export default async function AdminPage() {
         badge={`${total} ${total === 1 ? 'usuário' : 'usuários'}`}
       />
 
-      <Link
-        href="/admin/tarefas"
-        className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-      >
-        <KanbanSquare size={16} className="text-primary" aria-hidden="true" />
-        Distribuição de tarefas (Kanban)
-      </Link>
+      <div className="grid grid-cols-2 gap-3">
+        <Link
+          href="/admin/tarefas"
+          className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+        >
+          <KanbanSquare size={16} className="text-primary" aria-hidden="true" />
+          Tarefas (Kanban)
+        </Link>
+        <Link
+          href="/admin/metas"
+          className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+        >
+          <Target size={16} className="text-primary" aria-hidden="true" />
+          Metas & evolução
+        </Link>
+      </div>
 
       <UsuariosTable perfis={perfis} equipe={equipe} currentUserId={user.id} />
     </main>

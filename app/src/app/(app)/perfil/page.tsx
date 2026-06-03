@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { rotuloRole, responsabilidadesRole, rotasPermitidas, type Role } from '@/lib/roles'
 import { MinhasTarefas } from '@/components/tarefas/minhas-tarefas'
+import { MetasList } from '@/components/metas/metas-list'
 
 const TURNO_LABEL: Record<string, string> = {
   AB: 'Abertura',
@@ -88,6 +89,15 @@ export default async function PerfilPage() {
         .order('created_at', { ascending: false })
         .limit(20)
     : { data: [] }
+
+  // Metas individuais ativas atribuídas ao usuário + metas de equipe desta casa
+  const { data: metas } = await supabase
+    .from('metas')
+    .select('id, titulo, descricao, escopo, alvo, atual, unidade, periodo, periodo_ref')
+    .eq('casa', casa)
+    .eq('ativa', true)
+    .or(`perfil_id.eq.${user.id},escopo.eq.equipe`)
+    .order('created_at', { ascending: false })
 
   const responsabilidades = responsabilidadesRole(role)
   const modulos = rotasPermitidas(role).filter((r) => r !== '/perfil')
@@ -179,12 +189,14 @@ export default async function PerfilPage() {
       {/* Minhas tarefas */}
       <MinhasTarefas tarefas={tarefas ?? []} />
 
-      {/* Teaser Metas */}
-      <div className="rounded-lg border border-dashed border-border p-3 text-center">
-        <Target size={18} className="mx-auto text-muted-foreground/60" aria-hidden="true" />
-        <p className="mt-1 text-xs font-medium text-foreground">Metas & evolução</p>
-        <p className="text-[10px] text-muted-foreground">Em breve</p>
-      </div>
+      {/* Metas & evolução */}
+      <section className="space-y-2">
+        <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          <Target size={15} className="text-primary" aria-hidden="true" />
+          Metas & evolução
+        </h3>
+        <MetasList metas={metas ?? []} />
+      </section>
     </main>
   )
 }
