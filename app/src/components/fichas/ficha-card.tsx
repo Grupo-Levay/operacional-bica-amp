@@ -14,8 +14,8 @@ type FichaTecnica = Tables<"fichas_tecnicas">
 
 function getCmvToken(pct: number | null): { text: string; bar: string } {
   if (!pct) return { text: 'text-b3', bar: 'bg-b3' }
-  if (pct <= 25) return { text: 'text-success', bar: 'bg-success' }
-  if (pct <= 35) return { text: 'text-warning', bar: 'bg-warning' }
+  if (pct <= 30) return { text: 'text-success', bar: 'bg-success' }
+  if (pct <= 40) return { text: 'text-warning', bar: 'bg-warning' }
   return { text: 'text-danger', bar: 'bg-danger' }
 }
 
@@ -30,11 +30,11 @@ export function FichaCard({ ficha }: FichaCardProps) {
   const cmvPercent = ficha.cmv_pct != null ? Math.min(100, ficha.cmv_pct) : 0
 
   return (
-    <Card size="sm" className="rounded-lg border shadow-sm">
+    <Card size="sm" variant="interactive">
       <CardHeader className="pb-1">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <CardTitle className="font-bold text-sm leading-tight">{ficha.nome}</CardTitle>
+            <CardTitle className="font-bold text-sm leading-tight text-b1">{ficha.nome}</CardTitle>
             {ficha.rendimento != null && (
               <p className="text-xs text-b3 mt-0.5">
                 Rende {ficha.rendimento} {ficha.unidade_rendimento ?? 'un'}
@@ -43,7 +43,7 @@ export function FichaCard({ ficha }: FichaCardProps) {
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
             {ficha.categoria && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="neutral">
                 {ficha.categoria}
               </Badge>
             )}
@@ -51,9 +51,9 @@ export function FichaCard({ ficha }: FichaCardProps) {
               ficha={ficha}
               trigger={
                 <Button
-                  size="icon-xs"
+                  size="icon-sm"
                   variant="ghost"
-                  className="size-7 text-b4 hover:text-foreground"
+                  className="text-b4 hover:text-foreground"
                   aria-label={`Editar ${ficha.nome}`}
                 >
                   <Pencil className="size-3.5" />
@@ -63,9 +63,9 @@ export function FichaCard({ ficha }: FichaCardProps) {
             <ConfirmDialog
               trigger={
                 <Button
-                  size="icon-xs"
+                  size="icon-sm"
                   variant="ghost"
-                  className="size-7 text-b4 hover:text-danger"
+                  className="text-b4 hover:text-danger"
                   aria-label={`Arquivar ${ficha.nome}`}
                 >
                   <Archive className="size-3.5" />
@@ -81,19 +81,22 @@ export function FichaCard({ ficha }: FichaCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 pt-1">
-        {/* CMV com barra visual */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-b3">CMV</span>
-            <span className={cn("text-sm font-semibold tabular-nums", cmvTokens.text)}>
+      <CardContent className="space-y-3 pt-1">
+        {/* CMV em destaque — número grande com cor semântica + barra de severidade */}
+        <div className="space-y-1.5 rounded-lg bg-gradient-surface-raised p-3 shadow-inner-hairline ring-1 ring-foreground/5">
+          <div className="flex items-baseline justify-between">
+            <span className="text-[0.7rem] font-medium uppercase tracking-wide text-b3">CMV</span>
+            <span className={cn("text-2xl font-bold leading-none tabular-nums", cmvTokens.text)}>
               {ficha.cmv_pct != null ? `${ficha.cmv_pct.toFixed(1)}%` : "—"}
             </span>
           </div>
           {ficha.cmv_pct != null && (
-            <div className="h-1.5 rounded-full bg-ink4 overflow-hidden">
+            <div className="h-1.5 overflow-hidden rounded-full bg-ink/60">
               <div
-                className={cn("h-full rounded-full", cmvTokens.bar)}
+                className={cn(
+                  "h-full rounded-full transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                  cmvTokens.bar
+                )}
                 style={{ width: `${cmvPercent}%` }}
               />
             </div>
@@ -101,17 +104,17 @@ export function FichaCard({ ficha }: FichaCardProps) {
         </div>
 
         {/* Custo e Venda lado a lado */}
-        <div className="flex gap-4">
+        <div className="flex gap-6">
           {ficha.custo_total != null && (
             <div>
-              <p className="text-xs text-b3">Custo</p>
-              <p className="text-sm font-medium text-b1 tabular-nums">{brl.format(ficha.custo_total)}</p>
+              <p className="text-[0.7rem] uppercase tracking-wide text-b3">Custo</p>
+              <p className="text-sm font-semibold text-b2 tabular-nums">{brl.format(ficha.custo_total)}</p>
             </div>
           )}
           {ficha.preco_venda != null && (
             <div>
-              <p className="text-xs text-b3">Venda</p>
-              <p className="text-sm font-medium text-b1 tabular-nums">{brl.format(ficha.preco_venda)}</p>
+              <p className="text-[0.7rem] uppercase tracking-wide text-b3">Venda</p>
+              <p className="text-sm font-semibold text-primary tabular-nums">{brl.format(ficha.preco_venda)}</p>
             </div>
           )}
         </div>

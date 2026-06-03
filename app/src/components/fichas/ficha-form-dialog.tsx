@@ -25,7 +25,7 @@ function parseNum(v: string): number | null {
 }
 
 const cmvColor = (cmv: number) =>
-  cmv <= 25 ? "text-success" : cmv <= 35 ? "text-warning" : "text-danger"
+  cmv <= 30 ? "text-success" : cmv <= 40 ? "text-warning" : "text-danger"
 
 export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
   const editing = Boolean(ficha?.id)
@@ -82,8 +82,8 @@ export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
   })
 
   const field =
-    "w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-  const labelCls = "flex flex-col gap-1 text-xs font-medium text-muted-foreground"
+    "w-full rounded-md bg-gradient-surface ring-1 ring-foreground/10 shadow-inner-hairline px-3 py-2.5 text-sm text-b1 transition-shadow duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:shadow-glow-brand-sm"
+  const labelCls = "flex flex-col gap-1.5 text-xs font-medium text-muted-foreground"
 
   return (
     <>
@@ -101,7 +101,7 @@ export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
             role="dialog"
             aria-modal="true"
             aria-label={editing ? "Editar ficha" : "Nova ficha"}
-            className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-card p-4 ring-1 ring-foreground/10 sm:max-w-md sm:rounded-xl"
+            className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-card bg-gradient-surface p-5 shadow-xl shadow-inner-hairline ring-1 ring-foreground/10 sm:max-w-md sm:rounded-2xl"
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl text-primary">
@@ -167,13 +167,13 @@ export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between rounded-md bg-ink2 px-3 py-2">
+              <div className="flex items-center justify-between rounded-lg bg-gradient-surface-raised px-4 py-3 ring-1 ring-foreground/10 shadow-inner-hairline">
                 <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   CMV calculado
                 </span>
                 <span
                   className={cn(
-                    "font-mono text-base font-semibold tabular-nums",
+                    "font-mono text-xl font-bold tabular-nums leading-none transition-colors duration-200",
                     cmvPreview != null ? cmvColor(cmvPreview) : "text-muted-foreground"
                   )}
                 >
@@ -217,7 +217,7 @@ export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
                 </Button>
                 <Button
                   type="submit"
-                  variant="brand"
+                  variant="gradient"
                   className="flex-1"
                   disabled={pending}
                 >
