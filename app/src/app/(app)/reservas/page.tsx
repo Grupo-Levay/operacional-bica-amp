@@ -68,31 +68,46 @@ export default async function ReservasPage({
   }
 
   return (
-    <main className="p-4 space-y-4 pb-24">
+    <main className="min-h-screen bg-background p-4 md:p-6 space-y-6 pb-24">
       <PageHeader title="Reservas" />
 
       <DateNav currentDate={dataAlvo} />
 
       {reservas.length > 0 && (
-        <ReservaCounters
-          pendente={contagens.pendente}
-          confirmada={contagens.confirmada}
-          presente={contagens.presente}
-          concluida={contagens.concluida}
-          cancelada={contagens.cancelada}
-          naoCompareceu={contagens.naoCompareceu}
-        />
+        <section>
+          <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Status do Dia
+          </h2>
+          <ReservaCounters
+            pendente={contagens.pendente}
+            confirmada={contagens.confirmada}
+            presente={contagens.presente}
+            concluida={contagens.concluida}
+            cancelada={contagens.cancelada}
+            naoCompareceu={contagens.naoCompareceu}
+          />
+        </section>
       )}
 
-      <NovaReservaForm tables={mesas} reservasDoDia={reservas} defaultDate={dataAlvo} />
+      <section className="space-y-2">
+        <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+          Nova Reserva
+        </h2>
+        <NovaReservaForm tables={mesas} reservasDoDia={reservas} defaultDate={dataAlvo} />
+      </section>
 
-      <ReservasView
-        reservas={reservas}
-        mesas={mesas}
-        dataAlvo={dataAlvo}
-        nomeCasa={nomeCasa}
-        casa={casa}
-      />
+      <section className="space-y-2">
+        <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+          Reservas do Dia
+        </h2>
+        <ReservasView
+          reservas={reservas}
+          mesas={mesas}
+          dataAlvo={dataAlvo}
+          nomeCasa={nomeCasa}
+          casa={casa}
+        />
+      </section>
     </main>
   )
 }
