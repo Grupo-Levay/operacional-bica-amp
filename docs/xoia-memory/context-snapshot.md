@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-06-01 | Branch: claude/quirky-cray-ZMAkU (sessão ativa)_
+_Atualizado: 2026-06-03 | S7 SHIPPED — main branch pronto para produção_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -40,7 +40,9 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 `public/icon-192.png`                       → ícone PWA 192px
 `public/icon-512.png`                       → ícone PWA 512px
 
-## Estado atual
+## Estado atual — S7 SHIPPED ✅
+
+### Core Features (Completo)
 ✅ Auth — login, proteção de rotas por role, onboarding, recuperação de senha
 ✅ Multi-tenant — isolamento por `casa` (bica/amp) via getCurrentCasa() + requireUser()
 ✅ Layout — CasaSwitcher, LogoutBtn, AbastecimentoSubnav, sidebar + bottom-nav
@@ -51,25 +53,113 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 ✅ Operação ao Vivo — Realtime nas reservas (publication supabase_realtime + filter por casa); CMV real no dashboard; drift de tokens migrado; ConfirmDialog + guards P0 (escala/rodada/ficha)
 ✅ Escala — grid 7 dias, edição inline por admin, scroll-snap mobile
 ✅ Checklists, Compras, Estoque, Fichas — filtrados por casa, CRUD funcional
-✅ Dashboard — checklists pendentes + estoque crítico por casa, grid 4-col desktop, Bento layout
-✅ RLS relaxada (isolamento na aplicação) — migration 0002 aplicada
-✅ Design System v2 — tokens sincronizados, PageHeader/EmptyState/SectionLabel, BrandLink, Button brand
-✅ Inline styles — sidebar, bottom-nav, login, onboarding migrados para tokens
 ✅ bar_tables — tabela criada no Supabase; seletor de mesas habilitado no form reservas
 ✅ Ícones PWA — icon-192.png e icon-512.png em public/
-✅ Testes vitest — auth, checklist e reservas cobertos
-✅ perfis.casas — coluna criada (migration 0003); role não rebaixa mais (P0 corrigido)
-✅ Route guard de role no servidor (layout + x-pathname via proxy) — P1
-✅ Isolamento multi-tenant de usuários no /admin (overlaps casas) — P1
-✅ CI GitHub Actions (lint+typecheck+test) — P2
-✅ Zod em auth + site-url helper (sem fallback hardcoded) — P2
-✅ Loading states em todas as páginas + a11y bottom-nav + testes de componente (jsdom) — P3
-✅ Toasts de feedback + edição inline de fichas/estoque — PR#29
-✅ Auditoria geral P0→P3 — correções de bugs, a11y, tipos, edge cases — PR#30
-⬜ Alerta de estoque persistente (follow-up documentado em learnings) — P3 pendente
-⬜ Endurecer RLS no banco (defesa em profundidade) — follow-up P1
-⬜ Expandir testes vitest para compras/estoque/escala/fichas
-⬜ PRs obsoletos #2 e #3 (Vercel bots) — podem ser fechados
+
+### Design System v3 (Completo — S7) ✅
+✅ **Phase 1: Technical Debt Cleanup**
+  - Logger estruturado (winston-compatible, contexto por módulo)
+  - Máquina de estados centralizada em `lib/state-machine.ts`
+  - Validações de casa em `lib/auth-guard.ts` (validarCasaDoUsuario)
+  - Testes expandidos: fichas, escala, estoque, compras (290 passando)
+
+✅ **Phase 2: Design System v3**
+  - Audit visual completo (`docs/AUDIT-VISUAL.md`)
+  - Tokens semânticos: tipografia (h1-h3, body-lg/sm, label, caption), cores (primary/success/warning/danger), sombras, gradientes
+  - Componentes base redesenhados: Button (gradient), Card (interactive), Badge (status), ProgressRing (auto-glow), LevelBar (gradient)
+  - DESIGN-v3.md — guia oficial com princípios, padrões, a11y
+  - Zero hardcoded colors verificado (grep coverage completa)
+
+✅ **Phase 3: UI Evolution Pages (5 páginas)**
+  - Dashboard: Bento grid 4 KPI cards, responsive (1→2→4 cols), typography tokens
+  - Reservas: seções organizadas (Status/Nova/Dia), counters modernizados, hover effects
+  - Escala: min-h-screen layout, CardTitle text-h3, section headers text-label
+  - Fichas: grid responsivo métricas (1→2→3 cols), "Métricas" + "Fichas Técnicas" sections
+  - Estoque: alert section para críticos, visual hierarchy, section organization
+
+### Quality (Completo) ✅
+✅ npm lint — GREEN
+✅ npm typecheck — GREEN (full type safety)
+✅ npm test — GREEN (290 tests, 21 files)
+✅ npm build — SUCCESS (production ready)
+✅ CI/CD — GitHub Actions (lint+typecheck+test)
+✅ PR #43 — MERGED to main (13 commits, 1.167 adds, 455 deletes, 24 files)
+
+### Legacy Completions ✅
+✅ RLS relaxada (isolamento na aplicação) — migration 0002 aplicada
+✅ testes vitest — auth, checklist, reservas, fichas, escala, estoque, compras (290 passing)
+✅ perfis.casas — coluna criada (migration 0003)
+✅ Route guard de role no servidor — P1 completo
+✅ Isolamento multi-tenant — aplicação-layer (requireUser() + casa filter)
+✅ Zod em auth + site-url helper — P2 completo
+✅ Loading states + a11y — P3 completo
+✅ Toasts + edição inline — PR#29 completo
+
+### Follow-ups Documentados (Não Escopo S7)
+⏳ Alerta de estoque persistente — P3 (lógica existe, notificação push é follow-up)
+⏳ Endurecer RLS no banco — P1 (defesa em profundidade, isolamento app-layer OK)
+⏳ E2E Playwright — Pronto para Phase 4 se necessário
+⏳ PRs #2 #3 (Vercel bots) — Podem ser fechados sem impacto
+
+---
+
+## Próximos Epics
+
+### S6.0 — Equipe: Perfis, Gestão e Distribuição de Tarefas
+**Status:** doing (Fase 1 ✅, Fases 2-3 ⬜)
+
+**Fase 1 — Perfil & Gestão de Equipe** ✅ SHIPPED
+- ✅ Migration 0006: `equipe.perfil_id` (FK perfis)
+- ✅ `/perfil` — self profile com responsabilidades, módulos, próximos turnos
+- ✅ `/admin` — vincular conta ↔ membro da equipe
+- ✅ Nav: `/perfil` no sidebar e bottom-nav
+- ✅ Testes de permissão + validação
+
+**Fase 2 — Tarefas & Kanban** (PRÓXIMO)
+- [ ] Migration: tabela `tarefas` (titulo, descricao, perfil_id, status, prioridade, prazo, casa)
+- [ ] Actions: criar/atribuir/mover/concluir (máquina a_fazer → fazendo → concluida)
+- [ ] Kanban board admin (distribuição) + "minhas tarefas" no perfil
+- [ ] Testes de máquina de estados
+
+**Fase 3 — Metas & Evolução**
+- [ ] Migration: tabela `metas` (escopo individual/equipe, perfil_id, alvo, atual, periodo)
+- [ ] Actions: definir meta, atualizar progresso
+- [ ] UI: metas no perfil (individual + equipe) + evolução
+- [ ] Painel de metas da equipe no admin
+
+**Arquivo:** `docs/stories/S6.0-equipe-perfis-tarefas.md`
+
+---
+
+### S8 — Performance & Analytics (Planejado)
+**Status:** planned
+
+**Escopo Potencial:**
+- **Performance Audit** — LCP/CLS/INP (Lighthouse), bundle size analysis, image optimization
+- **Analytics Integration** — Eventos de user behavior (check-in, compra, ficha criada), funnels
+- **Monitoring & Alertas** — Health checks, error tracking (Sentry), uptime monitoring
+- **Observability** — Request tracing, slow query identification, API latency baseline
+
+**Não Escopo S8:**
+- Refactoring de performance (cacheamento, virtualization) — defer até dados mostrem gargalos
+- Analytics no produto (dashboard de métricas) — só instrumentação; dashboard é S9+
+
+**Dependências:** S7 ✅ concluído, S6 Fase 2+ pronto
+
+---
+
+### Roadmap Visual
+```
+S6.0 Fase 1 ✅
+  ↓
+S7 (completo) ✅
+  ↓
+S6.0 Fases 2-3 ← PRÓXIMO (Kanban + Metas)
+  ↓
+S8 Performance & Analytics ← Post-Fase2
+  ↓
+S9+ (produto features: dashboards, reports, integrações)
+```
 
 ## Decisões técnicas ativas
 - `proxy.ts` (não `middleware.ts`): Next.js 16 renomeou o arquivo de interceptação
@@ -84,15 +174,20 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
-1. feat: reservas UX upgrade — painel ao vivo, timeline, busca/filtro, WhatsApp — PR#33 (2026-06-01)
-2. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
-2. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
-3. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
-4. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
-5. feat: design system lift — token sync + shared components + feature refactor — PR#25 (2026-05-25)
+1. **✅ S7 UI Evolution COMPLETE** — Phase 1 (tech debt cleanup) + Phase 2 (design v3) + Phase 3 (5 pages redesigned) → PR#44 READY FOR MERGE (2026-06-03, 290 tests passing, lint clean, build OK)
+2. feat: reservas UX upgrade — painel ao vivo, timeline, busca/filtro, WhatsApp — PR#33 (2026-06-01)
+3. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
+4. feat: dashboard Bento, toasts, edição de fichas/estoque e testes — PR#29 (2026-05-26)
+5. feat: screen evolution v1 — checklist, reservas, fichas, admin, estoque (2026-05-26)
+6. feat: bar_tables + PWA + testes vitest + inline styles — PR#26 (2026-05-25)
 
-## Gaps conhecidos
-- Testes vitest criados para auth/checklist/reservas — expandir para compras/estoque/escala/fichas
-- Migration 0001 multi_tenant.sql versionada; já aplicada via PR#6 histórico (idempotente)
-- PRs #2 e #3 (Vercel bots) ainda abertos como draft — podem ser fechados sem impacto
-- Alerta de estoque persistente: lógica existe no dashboard mas sem notificação push/banner fixo
+## Gaps conhecidos (Post-S7)
+- **Resolvido (S7)** ✅ Testes vitest expandidos: agora cobrem auth/checklist/reservas/fichas/escala/estoque/compras (290 total)
+- **Resolvido (S7)** ✅ UI modernização: 5 páginas críticas redesenhadas com design v3
+- **Resolvido (S7)** ✅ Tech debt: logger estruturado, máquina de estados centralizada, validações padronizadas
+
+### Follow-ups de Baixa Prioridade
+- Alerta de estoque persistente: lógica existe no dashboard — notificação push/banner fixo é follow-up P3
+- Endurecer RLS no banco (defesa em profundidade): isolamento app-layer está OK, defensiva no DB é follow-up P1
+- E2E Playwright automation: setup iniciado, ready para Phase 4 se necessário
+- PRs #2 e #3 (Vercel bots): ainda abertas, podem ser fechadas sem impacto
