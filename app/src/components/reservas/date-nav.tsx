@@ -54,7 +54,7 @@ export function DateNav({ currentDate }: DateNavProps) {
         type="button"
         aria-label="Dia anterior"
         onClick={() => navegar(shiftDate(currentDate, -1))}
-        className="flex items-center justify-center rounded-lg border border-border bg-background transition-colors hover:bg-muted min-w-[52px] min-h-[52px]"
+        className="flex items-center justify-center rounded-lg bg-gradient-surface-raised text-b2 ring-1 ring-foreground/10 shadow-sm shadow-inner-hairline transition-[background-color,box-shadow,transform] ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand min-w-[52px] min-h-[52px] [@media(hover:hover)]:hover:shadow-glow-brand-sm [@media(hover:hover)]:hover:ring-primary/30 [@media(hover:hover)]:hover:text-primary active:translate-y-px"
       >
         <ChevronLeft size={20} aria-hidden="true" />
       </button>
@@ -63,7 +63,9 @@ export function DateNav({ currentDate }: DateNavProps) {
         <span className="text-xs text-b3 capitalize">{formatarDiaSemana(currentDate)}</span>
         <span className="text-sm font-semibold text-b1">{formatarDataLonga(currentDate)}</span>
         {isHoje ? (
-          <span className="text-xs font-semibold text-primary">Hoje</span>
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary ring-1 ring-primary/25">
+            Hoje
+          </span>
         ) : (
           <button
             type="button"
@@ -79,7 +81,7 @@ export function DateNav({ currentDate }: DateNavProps) {
         type="button"
         aria-label="Próximo dia"
         onClick={() => navegar(shiftDate(currentDate, 1))}
-        className="flex items-center justify-center rounded-lg border border-border bg-background transition-colors hover:bg-muted min-w-[52px] min-h-[52px]"
+        className="flex items-center justify-center rounded-lg bg-gradient-surface-raised text-b2 ring-1 ring-foreground/10 shadow-sm shadow-inner-hairline transition-[background-color,box-shadow,transform] ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand min-w-[52px] min-h-[52px] [@media(hover:hover)]:hover:shadow-glow-brand-sm [@media(hover:hover)]:hover:ring-primary/30 [@media(hover:hover)]:hover:text-primary active:translate-y-px"
       >
         <ChevronRight size={20} aria-hidden="true" />
       </button>

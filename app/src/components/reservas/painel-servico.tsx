@@ -28,8 +28,8 @@ export function PainelServico({ reservas, agora, isHoje }: PainelServicoProps) {
     <div className="space-y-3">
       {/* Linha de KPIs */}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
-        {/* Capas esperadas — sempre visível */}
-        <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 text-primary">
+        {/* Capas esperadas — KPI herói, glow âmbar */}
+        <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 text-primary ring-1 ring-primary/25 shadow-glow-brand-sm">
           <span className="text-base font-bold tabular-nums leading-none">
             {kpis.capasEsperadas}
           </span>
@@ -38,7 +38,7 @@ export function PainelServico({ reservas, agora, isHoje }: PainelServicoProps) {
 
         {/* Na casa — só hoje */}
         {isHoje && (
-          <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-success-bg text-success">
+          <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-success-bg text-success ring-1 ring-success/20 shadow-sm shadow-inner-hairline">
             <span className="text-base font-bold tabular-nums leading-none">{kpis.naCasa}</span>
             <span className="text-xs opacity-80 leading-tight">Na casa</span>
           </div>
@@ -46,7 +46,7 @@ export function PainelServico({ reservas, agora, isHoje }: PainelServicoProps) {
 
         {/* Próximas chegadas — só hoje */}
         {isHoje && (
-          <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-warning-bg text-warning">
+          <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-warning-bg text-warning ring-1 ring-warning/20 shadow-sm shadow-inner-hairline">
             <span className="text-base font-bold tabular-nums leading-none">
               {kpis.proximasChegadas}
             </span>
@@ -55,7 +55,7 @@ export function PainelServico({ reservas, agora, isHoje }: PainelServicoProps) {
         )}
 
         {/* No-shows — sempre visível */}
-        <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted text-b3">
+        <div className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-surface text-b3 ring-1 ring-foreground/10 shadow-sm shadow-inner-hairline">
           <span className="text-base font-bold tabular-nums leading-none">{kpis.noShows}</span>
           <span className="text-xs opacity-80 leading-tight">No-shows</span>
         </div>
@@ -63,7 +63,7 @@ export function PainelServico({ reservas, agora, isHoje }: PainelServicoProps) {
 
       {/* Faixa de alerta — atrasadas */}
       {isHoje && atrasadas.length > 0 && (
-        <div className="flex items-start gap-2 bg-danger-bg text-danger rounded-lg px-3 py-2">
+        <div className="flex items-start gap-2 bg-danger-bg text-danger rounded-lg px-3 py-2 ring-1 ring-destructive/25 shadow-sm">
           <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
           <p className="text-xs font-medium leading-snug">
             {atrasadas.length} {atrasadas.length === 1 ? 'atrasada' : 'atrasadas'}:{' '}

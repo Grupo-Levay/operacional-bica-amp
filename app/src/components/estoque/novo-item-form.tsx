@@ -69,7 +69,7 @@ export function NovoItemForm({ categorias, trigger }: NovoItemFormProps) {
   }
 
   const field =
-    'w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary'
+    'w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-shadow focus-ring-brand focus:border-primary/40'
   const labelCls = 'flex flex-col gap-1 text-xs font-medium text-muted-foreground'
 
   return (
@@ -88,7 +88,7 @@ export function NovoItemForm({ categorias, trigger }: NovoItemFormProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Novo item de estoque"
-            className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-card p-4 ring-1 ring-foreground/10 sm:max-w-md sm:rounded-xl"
+            className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-gradient-surface-raised p-4 shadow-xl shadow-inner-hairline ring-1 ring-foreground/10 sm:max-w-md sm:rounded-xl"
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl text-primary">Novo item</h2>
@@ -172,7 +172,7 @@ export function NovoItemForm({ categorias, trigger }: NovoItemFormProps) {
 
               <Button
                 type="submit"
-                variant="brand"
+                variant="gradient"
                 size="cta"
                 disabled={pending}
                 className="mt-1"

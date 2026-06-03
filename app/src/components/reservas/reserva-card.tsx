@@ -43,11 +43,11 @@ const STATUS_BORDER: Record<Status, string> = {
 }
 
 const STATUS_BADGE: Record<Status, React.ComponentProps<typeof Badge>['variant']> = {
-  pendente: 'secondary',
-  confirmada: 'outline',
-  presente: 'default',
-  concluida: 'success',
-  cancelada: 'destructive',
+  pendente: 'warning',
+  confirmada: 'default',
+  presente: 'success',
+  concluida: 'neutral',
+  cancelada: 'danger',
   nao_compareceu: 'warning',
 }
 
@@ -111,8 +111,9 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
   return (
     <Card
       size="sm"
+      variant="interactive"
       className={cn(
-        'rounded-lg border-l-4 transition-opacity',
+        'border-l-4 transition-[transform,box-shadow,opacity]',
         STATUS_BORDER[status],
         cancelada && 'opacity-60',
       )}
@@ -181,11 +182,11 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
           <div className="flex flex-col gap-2 pt-1">
             <div className="flex items-center gap-2">
               <Button
-                variant="brand"
-                size="sm"
+                variant="gradient"
+                size="cta"
                 disabled={isPending}
                 onClick={() => mudarStatus('confirmada')}
-                className="min-h-[52px] flex-1"
+                className="flex-1"
               >
                 {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Confirmar'}
               </Button>
@@ -207,11 +208,11 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
           <div className="space-y-2 pt-1">
             <div className="flex items-center gap-2">
               <Button
-                size="sm"
+                size="cta"
                 variant="success"
                 disabled={isPending}
                 onClick={() => mudarStatus('presente')}
-                className="min-h-[52px] flex-1"
+                className="flex-1"
               >
                 {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Cliente chegou'}
               </Button>
@@ -240,11 +241,11 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
         {status === 'presente' && (
           <div className="flex items-center gap-2 pt-1">
             <Button
-              size="sm"
+              size="cta"
               variant="success"
               disabled={isPending}
               onClick={() => mudarStatus('concluida')}
-              className="min-h-[52px] flex-1"
+              className="flex-1"
             >
               {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Concluir'}
             </Button>

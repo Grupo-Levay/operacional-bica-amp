@@ -27,7 +27,7 @@ interface ReservaFormProps {
 }
 
 const inputClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary'
+  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:border-foreground/20 focus:outline-none focus-ring-brand'
 
 export function ReservaForm({
   tables,
@@ -119,7 +119,7 @@ export function ReservaForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-lg border border-border bg-card p-4"
+      className="space-y-3 rounded-xl bg-card bg-gradient-surface p-4 shadow-md shadow-inner-hairline ring-1 ring-foreground/10"
     >
       <div className="space-y-1">
         <label className="text-b3 text-xs font-medium">Nome do cliente</label>
@@ -212,7 +212,7 @@ export function ReservaForm({
         <button
           type="button"
           onClick={() => setMesa(mesaSugerida.id)}
-          className="flex w-full items-center gap-1.5 rounded-md bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/15"
+          className="flex w-full items-center gap-1.5 rounded-md bg-primary/10 px-3 py-2 text-xs font-medium text-primary ring-1 ring-primary/20 transition-[background-color,box-shadow] ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-primary/15 [@media(hover:hover)]:hover:shadow-glow-brand-sm"
         >
           <Sparkles size={14} aria-hidden="true" />
           Sugestão: Mesa {mesaSugerida.number} ({mesaSugerida.capacity} lug.) — melhor
@@ -234,7 +234,7 @@ export function ReservaForm({
       {erro && <p className="text-xs text-danger">{erro}</p>}
 
       <div className="flex items-center gap-2 pt-1">
-        <Button type="submit" variant="brand" size="cta" disabled={isPending}>
+        <Button type="submit" variant="gradient" size="cta" disabled={isPending}>
           {isPending
             ? 'Salvando...'
             : editando

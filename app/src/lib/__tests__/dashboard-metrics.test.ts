@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mediaCmv } from '../dashboard-metrics'
+import { mediaCmv, cmvSeveridade } from '../dashboard-metrics'
 
 describe('mediaCmv', () => {
   it('calcula a média do CMV de fichas válidas', () => {
@@ -44,5 +44,26 @@ describe('mediaCmv', () => {
         { custo_total: 2, preco_venda: 3 },
       ]),
     ).toBe(50)
+  })
+})
+
+describe('cmvSeveridade', () => {
+  it('classifica null como muted', () => {
+    expect(cmvSeveridade(null)).toBe('muted')
+  })
+
+  it('classifica ≤30% como ok', () => {
+    expect(cmvSeveridade(30)).toBe('ok')
+    expect(cmvSeveridade(12.5)).toBe('ok')
+  })
+
+  it('classifica entre 30% e 40% como warning', () => {
+    expect(cmvSeveridade(30.1)).toBe('warning')
+    expect(cmvSeveridade(40)).toBe('warning')
+  })
+
+  it('classifica acima de 40% como danger', () => {
+    expect(cmvSeveridade(40.1)).toBe('danger')
+    expect(cmvSeveridade(75)).toBe('danger')
   })
 })

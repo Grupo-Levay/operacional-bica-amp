@@ -4,6 +4,9 @@ import { useState, useTransition, useRef } from 'react'
 import { Plus, Minus, SlidersHorizontal, Archive } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { LevelBar } from '@/components/ui/level-bar'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { toast } from '@/components/ui/toast'
 import { atualizarQuantidade, atualizarItemEstoque, arquivarItemEstoque } from '@/app/actions/estoque'
@@ -16,10 +19,15 @@ type ItemEstoqueProps = {
   minimo: number
 }
 
-function getItemStatus(atual: number, minimo: number) {
-  if (atual >= minimo) return { label: 'OK', color: 'success' as const }
-  if (atual >= minimo * 0.5) return { label: 'BAIXO', color: 'warning' as const }
-  return { label: 'CRÍTICO', color: 'danger' as const }
+type StatusBadgeVariant = 'success' | 'warning' | 'danger'
+
+function getItemStatus(
+  atual: number,
+  minimo: number
+): { label: string; variant: StatusBadgeVariant } {
+  if (atual >= minimo) return { label: 'OK', variant: 'success' }
+  if (atual >= minimo * 0.5) return { label: 'BAIXO', variant: 'warning' }
+  return { label: 'CRÍTICO', variant: 'danger' }
 }
 
 export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoqueProps) {
@@ -35,18 +43,8 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
   const inputRef = useRef<HTMLInputElement>(null)
 
   const status = getItemStatus(quantidade, minimoState)
-  const percent =
-    minimoState > 0 ? Math.min(100, Math.round((quantidade / minimoState) * 100)) : 100
 
-  const isCritico = status.color === 'danger'
-  const isBaixo = status.color === 'warning'
-
-  const barClass = isCritico ? 'bg-danger' : isBaixo ? 'bg-warning' : 'bg-success'
-  const badgeClass = isCritico
-    ? 'bg-danger-bg text-danger'
-    : isBaixo
-    ? 'bg-warning-bg text-warning'
-    : 'bg-success-bg text-success'
+  const isCritico = status.variant === 'danger'
 
   const unidadeLabel = unidadeState
 
@@ -107,20 +105,34 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
     })
   }
 
+  const fieldCls =
+    'rounded-md border border-border bg-background px-2 py-1 text-sm tabular-nums transition-shadow focus-ring-brand focus:border-primary/40'
+
   return (
-    <div className="space-y-2 py-3">
-      {/* Row 1: nome + badge + ajustes */}
+    <Card
+      size="sm"
+      variant="default"
+      className={cn(
+        'relative gap-3 px-3.5',
+        // acento lateral âmbar/vermelho para itens em ruptura — leitura imediata de severidade
+        'before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-l-xl',
+        isCritico
+          ? 'before:bg-danger/70 ring-destructive/20'
+          : 'before:bg-transparent'
+      )}
+    >
+      {/* Row 1: nome + badge de status + ajustes */}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-medium leading-tight">
+        <span className="text-sm font-medium leading-tight text-foreground">
           {nome}
           {unidadeLabel && (
             <span className="ml-1 text-xs font-normal text-muted-foreground">({unidadeLabel})</span>
           )}
         </span>
         <div className="flex shrink-0 items-center gap-1.5">
-          <span className={cn('rounded-full px-2 py-0.5 text-xs font-semibold', badgeClass)}>
+          <Badge variant={status.variant} className="font-semibold">
             {status.label}
-          </span>
+          </Badge>
           <Button
             type="button"
             size="icon-xs"
@@ -137,7 +149,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
 
       {/* Config: mínimo + unidade */}
       {editConfig && (
-        <div className="flex flex-wrap items-end gap-2 rounded-md bg-ink2 p-2.5">
+        <div className="flex flex-wrap items-end gap-2 rounded-lg bg-gradient-surface-raised p-2.5 shadow-inner-hairline ring-1 ring-foreground/10">
           <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
             Mínimo
             <input
@@ -146,7 +158,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
               step="0.5"
               value={minimoVal}
               onChange={(e) => setMinimoVal(e.target.value)}
-              className="w-20 rounded border border-border bg-background px-2 py-1 text-sm tabular-nums focus:outline-none focus:ring-1 focus:ring-primary"
+              className={cn(fieldCls, 'w-20')}
             />
           </label>
           <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
@@ -156,7 +168,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
               value={unidadeVal}
               onChange={(e) => setUnidadeVal(e.target.value)}
               placeholder="un, kg, L…"
-              className="w-24 rounded border border-border bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+              className={cn(fieldCls, 'w-24')}
             />
           </label>
           <Button type="button" size="sm" variant="brand" onClick={salvarConfig}>
@@ -184,13 +196,8 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
         </div>
       )}
 
-      {/* Row 2: barra de nível */}
-      <div className="h-2 overflow-hidden rounded-full bg-muted">
-        <div
-          className={cn('h-full rounded-full transition-all', barClass)}
-          style={{ width: `${percent}%` }}
-        />
-      </div>
+      {/* Row 2: barra de nível (componente compartilhado, colorido por severidade) */}
+      <LevelBar atual={quantidade} minimo={minimoState} className="h-2" />
 
       {/* Row 3: valores + edição + step buttons */}
       <div className="flex items-center justify-between gap-2">
@@ -206,16 +213,17 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
               onKeyDown={handleKeyDown}
               onBlur={handleConfirmar}
               autoFocus
-              className="w-20 rounded border border-border bg-background px-2 py-0.5 text-sm tabular-nums focus:outline-none focus:ring-1 focus:ring-primary"
+              className={cn(fieldCls, 'w-20 py-0.5')}
             />
             <span className="text-xs text-muted-foreground">{unidadeLabel}</span>
-            <button
+            <Button
               type="button"
+              size="sm"
+              variant="brand"
               onClick={handleConfirmar}
-              className="rounded bg-primary px-2 py-0.5 text-xs font-semibold text-bica-fg"
             >
               OK
-            </button>
+            </Button>
           </div>
         ) : (
           <>
@@ -225,9 +233,9 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
                 setEditando(true)
                 setTimeout(() => inputRef.current?.select(), 50)
               }}
-              className="text-left text-xs text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-md text-left text-xs text-muted-foreground transition-colors hover:text-foreground focus-ring-brand"
             >
-              <span className="font-medium text-foreground">{quantidade}</span>
+              <span className="text-sm font-semibold tabular-nums text-foreground">{quantidade}</span>
               {unidadeLabel && ` ${unidadeLabel}`}
               &nbsp;/&nbsp;mín: {minimoState} {unidadeLabel}
             </button>
@@ -256,6 +264,6 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
           </>
         )}
       </div>
-    </div>
+    </Card>
   )
 }

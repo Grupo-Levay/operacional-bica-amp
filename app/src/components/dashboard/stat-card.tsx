@@ -68,7 +68,7 @@ export function StatCard({
       className={cn(
         "glass-card min-h-[110px] relative overflow-hidden transition-all duration-300 border hover:border-white/10 flex flex-col justify-between",
         glowEffect,
-        href && "group-hover/stat:-translate-y-0.5 group-hover/stat:ring-primary/30",
+        href && "group-hover/stat:-translate-y-0.5 group-hover/stat:ring-primary/30 [@media(hover:hover)]:group-hover/stat:shadow-glow-brand-sm",
         className
       )}
     >

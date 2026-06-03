@@ -56,7 +56,7 @@ export default async function FichasPage() {
         action={
           <FichaFormDialog
             trigger={
-              <Button variant="brand" size="sm">
+              <Button variant="gradient" size="sm">
                 <Plus className="size-4" />
                 Nova
               </Button>
@@ -90,6 +90,15 @@ export default async function FichasPage() {
           />
         </div>
       )}
+
+      <FichaFormDialog
+        trigger={
+          <Button variant="gradient" size="cta">
+            <Plus className="size-5" />
+            Nova ficha técnica
+          </Button>
+        }
+      />
 
       <FichasList fichas={fichas} categorias={categorias} />
     </main>

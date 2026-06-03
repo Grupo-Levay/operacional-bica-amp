@@ -5,14 +5,31 @@ import { cn } from "@/lib/utils"
 function Card({
   className,
   size = "default",
+  variant = "default",
   ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+}: React.ComponentProps<"div"> & {
+  size?: "default" | "sm"
+  /**
+   * default     — superfície com gradiente sutil + sombra dark + hairline.
+   * interactive — adiciona hover lift + glow âmbar (use em cards clicáveis).
+   * flat        — sem gradiente/sombra (legado / cards aninhados).
+   */
+  variant?: "default" | "interactive" | "flat"
+}) {
   return (
     <div
       data-slot="card"
       data-size={size}
+      data-variant={variant}
       className={cn(
-        "group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        // v3: profundidade real — gradiente ink2→ink3, sombra dark densa, ring + hairline interno.
+        "group/card flex flex-col gap-4 overflow-hidden rounded-xl text-sm text-card-foreground transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "py-4 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0",
+        // default + interactive compartilham a base com profundidade
+        "data-[variant=default]:bg-card data-[variant=default]:bg-gradient-surface data-[variant=default]:shadow-md data-[variant=default]:shadow-inner-hairline data-[variant=default]:ring-1 data-[variant=default]:ring-foreground/10",
+        "data-[variant=interactive]:bg-card data-[variant=interactive]:bg-gradient-surface data-[variant=interactive]:shadow-md data-[variant=interactive]:ring-1 data-[variant=interactive]:ring-foreground/10 data-[variant=interactive]:cursor-pointer [@media(hover:hover)]:data-[variant=interactive]:hover:-translate-y-0.5 [@media(hover:hover)]:data-[variant=interactive]:hover:shadow-glow-brand-sm [@media(hover:hover)]:data-[variant=interactive]:hover:ring-primary/30 motion-reduce:data-[variant=interactive]:hover:translate-y-0",
+        // flat = comportamento legado (sem gradiente/sombra)
+        "data-[variant=flat]:bg-card data-[variant=flat]:ring-1 data-[variant=flat]:ring-foreground/10",
         className
       )}
       {...props}

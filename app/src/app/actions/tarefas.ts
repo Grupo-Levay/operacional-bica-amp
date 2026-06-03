@@ -3,16 +3,17 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { requireUser } from '@/lib/auth-guard'
+import { criarMaquinaEstados } from '@/lib/state-machine'
 
 // Status válidos e transições permitidas (máquina de estados)
 export type TarefaStatus = 'a_fazer' | 'fazendo' | 'concluida'
 export type TarefaPrioridade = 'baixa' | 'media' | 'alta'
 
-const TRANSICOES: Record<TarefaStatus, TarefaStatus[]> = {
+const tarefaFsm = criarMaquinaEstados<TarefaStatus>({
   a_fazer: ['fazendo'],
   fazendo: ['a_fazer', 'concluida'],
   concluida: ['fazendo'],
-}
+})
 
 const criarSchema = z.object({
   titulo: z.string().min(1).max(200),
@@ -72,7 +73,7 @@ export async function moverTarefa(id: string, novoStatus: TarefaStatus) {
   if (!tarefa) return { error: 'Tarefa não encontrada.' }
 
   const statusAtual = tarefa.status as TarefaStatus
-  if (!TRANSICOES[statusAtual].includes(novoStatus)) {
+  if (!tarefaFsm.podeTransicionar(statusAtual, novoStatus)) {
     return { error: `Transição ${statusAtual} → ${novoStatus} não permitida.` }
   }
 

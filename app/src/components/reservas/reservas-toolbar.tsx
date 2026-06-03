@@ -49,7 +49,7 @@ export function ReservasToolbar({
           value={busca}
           onChange={(e) => onBuscaChange(e.target.value)}
           placeholder="Buscar por nome ou telefone"
-          className="w-full rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm transition-colors hover:border-foreground/20 focus:outline-none focus-ring-brand"
         />
       </div>
 
@@ -67,10 +67,10 @@ export function ReservasToolbar({
               type="button"
               onClick={() => onStatusChange(valor)}
               className={[
-                'shrink-0 min-h-[40px] rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+                'shrink-0 min-h-[40px] rounded-lg px-3 py-1.5 text-xs font-medium transition-[background-color,box-shadow,color] ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand',
                 ativo
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-b3 hover:bg-muted/80',
+                  ? 'bg-gradient-brand text-primary-foreground shadow-glow-brand-sm'
+                  : 'bg-muted text-b3 ring-1 ring-foreground/5 hover:bg-muted/80 hover:text-b2',
               ].join(' ')}
             >
               {label}

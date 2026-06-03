@@ -90,7 +90,13 @@ export default async function EscalaPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Próximos 7 dias</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className="inline-block h-4 w-1 rounded-full bg-gradient-brand shadow-glow-brand-sm"
+            />
+            Próximos 7 dias
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <EscalaGrid membros={membros} escala={escala} dias={dias} canEdit={canEdit} />

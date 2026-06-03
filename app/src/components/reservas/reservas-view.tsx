@@ -99,10 +99,10 @@ export function ReservasView({ reservas, mesas, dataAlvo, nomeCasa, casa }: Rese
             type="button"
             onClick={() => setModoTimeline((v) => !v)}
             className={[
-              'shrink-0 mt-0.5 flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium min-h-[40px] transition-colors',
+              'shrink-0 mt-0.5 flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium min-h-[40px] transition-[background-color,box-shadow,color] ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand',
               modoTimeline
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-b3 hover:bg-muted/80',
+                ? 'bg-gradient-brand text-primary-foreground shadow-glow-brand-sm'
+                : 'bg-muted text-b3 ring-1 ring-foreground/5 hover:bg-muted/80 hover:text-b2',
             ].join(' ')}
             aria-label={modoTimeline ? 'Ver lista' : 'Ver timeline'}
           >

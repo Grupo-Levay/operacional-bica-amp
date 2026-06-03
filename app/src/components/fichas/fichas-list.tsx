@@ -46,7 +46,7 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Buscar ficha..."
-          className="w-full rounded-lg border bg-muted/50 pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-lg bg-gradient-surface ring-1 ring-foreground/10 shadow-inner-hairline pl-9 pr-3 py-2.5 text-sm placeholder:text-muted-foreground transition-shadow duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:shadow-glow-brand-sm"
         />
       </div>
 
@@ -57,10 +57,10 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
             type="button"
             onClick={() => setFiltroCategoria(null)}
             className={cn(
-              "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent transition-colors",
+              "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
               filtroCategoria === null
-                ? "bg-primary text-bica-fg"
-                : "bg-transparent text-b3 border-ink4"
+                ? "bg-gradient-brand text-bica-fg border-transparent shadow-glow-brand-sm"
+                : "bg-transparent text-b3 border-ink4 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-b2"
             )}
           >
             Todas
@@ -71,10 +71,10 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
               type="button"
               onClick={() => setFiltroCategoria(filtroCategoria === cat ? null : cat)}
               className={cn(
-                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
+                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 filtroCategoria === cat
-                  ? "bg-primary text-bica-fg border-transparent"
-                  : "bg-transparent text-b3 border-ink4"
+                  ? "bg-gradient-brand text-bica-fg border-transparent shadow-glow-brand-sm"
+                  : "bg-transparent text-b3 border-ink4 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-b2"
               )}
             >
               {cat}
@@ -85,8 +85,10 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
 
       {/* Lista */}
       {fichasFiltradas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
-          <ChefHat className="size-12 opacity-40" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-surface ring-1 ring-foreground/10 shadow-inner-hairline py-16 text-muted-foreground">
+          <div className="flex size-16 items-center justify-center rounded-full bg-gradient-surface-raised ring-1 ring-foreground/10">
+            <ChefHat className="size-8 text-primary/70" />
+          </div>
           <p className="text-sm">{query ? "Nenhuma ficha encontrada" : "Nenhuma ficha cadastrada"}</p>
         </div>
       ) : (

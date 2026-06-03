@@ -51,7 +51,11 @@ export function ReservasTimeline({ reservas, mesas }: ReservasTimelineProps) {
   if (linhas.length === 0) return null
 
   return (
-    <div className="overflow-x-auto -mx-4 px-4 pb-2" role="region" aria-label="Timeline de mesas">
+    <div
+      className="overflow-x-auto rounded-xl bg-card bg-gradient-surface p-3 shadow-md shadow-inner-hairline ring-1 ring-foreground/10"
+      role="region"
+      aria-label="Timeline de mesas"
+    >
       <div style={{ minWidth: 560 }}>
         {/* Eixo de horas */}
         <div className="flex mb-1 ml-24 pr-1 relative">
@@ -73,7 +77,7 @@ export function ReservasTimeline({ reservas, mesas }: ReservasTimelineProps) {
               <div className="w-24 shrink-0 text-xs text-b3 truncate text-right pr-2">{label}</div>
 
               {/* Faixa de blocos */}
-              <div className="relative flex-1 h-8 bg-muted rounded overflow-hidden">
+              <div className="relative flex-1 h-8 bg-muted/60 rounded-md overflow-hidden ring-1 ring-inset ring-foreground/5">
                 {rs.map((r) => {
                   const bloco = calcularBloco(r)
                   if (!bloco.visivel) return null
@@ -83,7 +87,7 @@ export function ReservasTimeline({ reservas, mesas }: ReservasTimelineProps) {
                     <div
                       key={r.id}
                       title={`${r.customer_name} · ${r.start_time.slice(0, 5)}–${r.end_time?.slice(0, 5) ?? '?'} · ${r.guest_count}p`}
-                      className={`absolute top-1 bottom-1 rounded border text-[10px] font-medium flex items-center px-1 overflow-hidden ${cor}`}
+                      className={`absolute top-1 bottom-1 rounded-md border text-[10px] font-medium flex items-center px-1 overflow-hidden shadow-sm transition-shadow ${cor}`}
                       style={{
                         left: `${bloco.leftPct}%`,
                         width: `${bloco.widthPct}%`,
