@@ -19,8 +19,10 @@ const cmvText: Record<CmvSeveridade, string> = {
   muted: 'text-muted-foreground',
 }
 
+// v3: profundidade real (gradiente de superfície + sombra dark + hairline + ring)
+// com lift e glow âmbar dinâmico no hover; respeita ponteiro fino e reduced-motion.
 const cardClass =
-  'group relative flex flex-col justify-between p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all hover:scale-[1.02] hover:-translate-y-0.5 active:scale-95 duration-200'
+  'group relative flex flex-col justify-between p-4 rounded-xl bg-gradient-surface shadow-md shadow-inner-hairline ring-1 ring-foreground/10 transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-glow-brand-sm [@media(hover:hover)]:hover:ring-primary/30 active:translate-y-0 motion-reduce:hover:translate-y-0'
 
 interface Acao {
   href: string
