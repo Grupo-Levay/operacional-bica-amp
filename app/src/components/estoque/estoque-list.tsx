@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Package, AlertTriangle, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { ItemEstoque } from "@/components/estoque/item-estoque"
 import { NovoItemForm } from "@/components/estoque/novo-item-form"
 import type { Database } from "@/types/database.types"
@@ -30,7 +31,11 @@ function AlertasEstoque({ itens }: { itens: Item[] }) {
   if (criticos.length === 0 && baixos.length === 0) return null
 
   return (
-    <section className="rounded-lg p-3 space-y-2 bg-danger-bg">
+    <Card
+      variant="flat"
+      size="sm"
+      className="gap-2 bg-danger-bg px-3.5 shadow-sm ring-destructive/20"
+    >
       <div className="flex items-center gap-2">
         <AlertTriangle size={14} className="text-danger" />
         <span className="text-xs font-semibold uppercase tracking-wide text-danger">
@@ -63,7 +68,7 @@ function AlertasEstoque({ itens }: { itens: Item[] }) {
           </span>
         </div>
       ))}
-    </section>
+    </Card>
   )
 }
 
@@ -92,7 +97,7 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
       <NovoItemForm
         categorias={categorias}
         trigger={
-          <Button variant="brand" size="cta" className="justify-center">
+          <Button variant="gradient" size="cta" className="justify-center">
             <Plus className="size-4" />
             Novo item
           </Button>
@@ -109,10 +114,10 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
             type="button"
             onClick={() => setFiltro(null)}
             className={cn(
-              "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-transparent transition-colors",
+              "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand",
               filtro === null
-                ? "bg-primary text-bica-fg"
-                : "bg-ink4 text-b3 border-ink4"
+                ? "border-transparent bg-gradient-brand text-primary-foreground shadow-glow-brand-sm"
+                : "border-ink4 bg-ink4 text-b3 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-foreground"
             )}
           >
             Todos
@@ -123,10 +128,10 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
               type="button"
               onClick={() => setFiltro(filtro === cat.id ? null : cat.id)}
               className={cn(
-                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
+                "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand",
                 filtro === cat.id
-                  ? "bg-primary text-bica-fg border-transparent"
-                  : "bg-transparent text-b3 border-ink4"
+                  ? "border-transparent bg-gradient-brand text-primary-foreground shadow-glow-brand-sm"
+                  : "border-ink4 bg-transparent text-b3 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-foreground"
               )}
             >
               {cat.emoji ? `${cat.emoji} ` : ""}{cat.nome}
@@ -147,18 +152,18 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
       {categoriasComItens.map(categoria => {
         const itensCategoria = itensPorCategoria.get(categoria.id) ?? []
         return (
-          <section key={categoria.id}>
-            <div className="sticky top-0 bg-background z-10 pb-1 mb-1">
-              <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+          <section key={categoria.id} className="space-y-2">
+            <div className="sticky top-0 z-10 -mx-1 bg-background/90 px-1 pb-2 pt-1 backdrop-blur-sm">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
                 {categoria.emoji && <span>{categoria.emoji}</span>}
                 {categoria.nome}
-                <span className="text-xs font-normal text-muted-foreground ml-1">
+                <span className="ml-1 text-xs font-normal text-muted-foreground">
                   ({itensCategoria.length})
                 </span>
               </h2>
-              <div className="h-px bg-border mt-1" />
+              <div className="mt-1.5 h-px bg-gradient-to-r from-border to-transparent" />
             </div>
-            <div className="divide-y divide-border">
+            <div className="space-y-2">
               {itensCategoria.map(item => (
                 <ItemEstoque
                   key={item.id}
@@ -176,17 +181,17 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
 
       {/* Sem categoria */}
       {semCategoria.length > 0 && (
-        <section>
-          <div className="sticky top-0 bg-background z-10 pb-1 mb-1">
-            <h2 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+        <section className="space-y-2">
+          <div className="sticky top-0 z-10 -mx-1 bg-background/90 px-1 pb-2 pt-1 backdrop-blur-sm">
+            <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
               Outros
-              <span className="text-xs font-normal text-muted-foreground ml-1">
+              <span className="ml-1 text-xs font-normal text-muted-foreground">
                 ({semCategoria.length})
               </span>
             </h2>
-            <div className="h-px bg-border mt-1" />
+            <div className="mt-1.5 h-px bg-gradient-to-r from-border to-transparent" />
           </div>
-          <div className="divide-y divide-border">
+          <div className="space-y-2">
             {semCategoria.map(item => (
               <ItemEstoque
                 key={item.id}
