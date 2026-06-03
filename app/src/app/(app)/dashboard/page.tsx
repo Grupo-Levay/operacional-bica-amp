@@ -1,5 +1,6 @@
 import { DashboardContent } from "@/components/dashboard/dashboard-content"
 import { mediaCmv } from "@/lib/dashboard-metrics"
+import { logger } from "@/lib/logger"
 
 interface CriticoItem {
   nome: string
@@ -123,7 +124,7 @@ async function getDashboardData(): Promise<DashboardData> {
       mediaCmv: mediaCmv(fichasData ?? []),
     }
   } catch (e) {
-    console.error("[dashboard] getDashboardData error:", e)
+    logger.error("[dashboard] getDashboardData error", e)
     return EMPTY
   }
 }

@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { TriangleAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { logger } from "@/lib/logger"
 
 export default function AppError({
   error,
@@ -12,7 +13,7 @@ export default function AppError({
   unstable_retry: () => void
 }) {
   useEffect(() => {
-    console.error("[app] segment error:", error)
+    logger.error("[app] segment error", error)
   }, [error])
 
   return (

@@ -5,6 +5,7 @@ import { NovaReservaForm } from '@/components/reservas/nova-reserva-form'
 import { ReservaCounters } from '@/components/reservas/reserva-counters'
 import { ReservasView } from '@/components/reservas/reservas-view'
 import { PageHeader } from '@/components/shared/page-header'
+import { logger } from '@/lib/logger'
 import type { Tables } from '@/types/database.types'
 
 type Reserva = Tables<'reservations'>
@@ -35,7 +36,7 @@ async function getReservasData(
       mesas: (mesas as Mesa[]) ?? [],
     }
   } catch (e) {
-    console.error('[reservas] getReservasData error:', e)
+    logger.error('[reservas] getReservasData error', e)
     return { reservas: [], mesas: [] }
   }
 }

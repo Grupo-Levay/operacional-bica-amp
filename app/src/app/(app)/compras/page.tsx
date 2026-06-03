@@ -2,6 +2,7 @@ import { RodadaCard } from "@/components/compras/rodada-card"
 import { NovaRodadaButton } from "@/components/compras/nova-rodada-button"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
+import { logger } from "@/lib/logger"
 import { Tables } from "@/types/database.types"
 
 type ComprasCategoria = Tables<"compras_categorias"> & {
@@ -37,7 +38,7 @@ async function getComprasData(): Promise<{
       categorias: (categorias as ComprasCategoria[]) ?? [],
     }
   } catch (e) {
-    console.error('[compras] getComprasData error:', e)
+    logger.error('[compras] getComprasData error', e)
     return { rodadas: [], categorias: [] }
   }
 }

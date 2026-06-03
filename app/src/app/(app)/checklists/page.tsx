@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { ChecklistCard } from '@/components/checklists/checklist-card'
 import { PageHeader } from '@/components/shared/page-header'
 import { SectionLabel } from '@/components/shared/section-label'
+import { logger } from '@/lib/logger'
 import type { Database } from '@/types/database.types'
 
 type Checklist = Database['public']['Tables']['checklists']['Row']
@@ -30,7 +31,7 @@ async function getChecklists(): Promise<{ checklists: Checklist[]; registros: Re
 
     return { checklists: checklists ?? [], registros: registros ?? [] }
   } catch (e) {
-    console.error('[checklists] getChecklists error:', e)
+    logger.error('[checklists] getChecklists error', e)
     return { checklists: [], registros: [] }
   }
 }

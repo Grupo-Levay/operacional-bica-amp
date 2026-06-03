@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { EstoqueList } from '@/components/estoque/estoque-list'
 import { PageHeader } from '@/components/shared/page-header'
+import { logger } from '@/lib/logger'
 import type { Database } from '@/types/database.types'
 
 type Categoria = Database['public']['Tables']['estoque_categorias']['Row']
@@ -18,7 +19,7 @@ async function getEstoqueData(): Promise<{ categorias: Categoria[]; itens: Item[
     ])
     return { categorias: categorias ?? [], itens: itens ?? [] }
   } catch (e) {
-    console.error('[estoque] getEstoqueData error:', e)
+    logger.error('[estoque] getEstoqueData error', e)
     return { categorias: [], itens: [] }
   }
 }

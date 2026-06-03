@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EscalaGrid } from "@/components/escala/escala-grid"
 import { PageHeader } from "@/components/shared/page-header"
+import { logger } from "@/lib/logger"
 
 async function getEscalaData() {
   try {
@@ -48,7 +49,7 @@ async function getEscalaData() {
       canEdit,
     }
   } catch (e) {
-    console.error('[escala] getEscalaData error:', e)
+    logger.error('[escala] getEscalaData error', e)
     return { membros: [], escala: [], inicioStr: "", fimStr: "", canEdit: false }
   }
 }

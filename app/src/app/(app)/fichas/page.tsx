@@ -5,6 +5,7 @@ import { FichaFormDialog } from "@/components/fichas/ficha-form-dialog"
 import { PageHeader } from "@/components/shared/page-header"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { Button } from "@/components/ui/button"
+import { logger } from "@/lib/logger"
 
 type FichaTecnica = Tables<"fichas_tecnicas">
 
@@ -22,7 +23,7 @@ async function getFichasData() {
       .order("nome")
     return { fichas: fichas ?? [] }
   } catch (e) {
-    console.error('[fichas] getFichasData error:', e)
+    logger.error('[fichas] getFichasData error', e)
     return { fichas: [] }
   }
 }

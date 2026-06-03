@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { setCurrentCasa, type Casa } from '@/lib/tenant'
 import { getSiteUrl } from '@/lib/site-url'
 import { credentialsSchema, emailSchema, passwordUpdateSchema } from '@/lib/schemas/auth'
+import { logger } from '@/lib/logger'
 
 export async function signIn(
   _prevState: { error: string } | null,
@@ -40,7 +41,7 @@ export async function setCasaAction(casa: Casa) {
     await setCurrentCasa(casa)
     revalidatePath('/', 'layout')
   } catch (e) {
-    console.error('[auth] setCasaAction error:', e)
+    logger.error('[auth] setCasaAction error', e)
     throw new Error('Não foi possível trocar de casa.')
   }
 }
