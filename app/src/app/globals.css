@@ -52,6 +52,39 @@
   --color-primary-dynamic: var(--color-bica);
   --color-primary-dynamic-hover: var(--color-bica-dark);
   --color-primary-dynamic-rgb: 201, 163, 104; /* RGB for #C9A368 */
+
+  /* ── v3 Elevation / Shadows (dark-theme reais) ────────────────── */
+  /* Preto denso que aparece sobre ink; as antigas /0.1 sumiam no dark. */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.45);
+  --shadow-md: 0 4px 10px -2px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 12px 28px -6px rgb(0 0 0 / 0.6), 0 4px 8px -4px rgb(0 0 0 / 0.45);
+  --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.7), 0 8px 16px -8px rgb(0 0 0 / 0.5);
+  /* Hairline interno: dá volume a superfícies elevadas (highlight no topo) */
+  --shadow-inner-hairline: inset 0 1px 0 0 rgba(244, 236, 220, 0.04);
+
+  /* ── v3 Glow (tint âmbar para profundidade premium) ───────────── */
+  /* glow-bica/amp fixos + glow-brand dinâmico (segue a casa ativa) */
+  --shadow-glow-bica:    0 0 0 1px rgba(201, 163, 104, 0.18), 0 8px 24px -6px rgba(201, 163, 104, 0.30);
+  --shadow-glow-bica-sm: 0 0 0 1px rgba(201, 163, 104, 0.16), 0 4px 14px -4px rgba(201, 163, 104, 0.28);
+  --shadow-glow-amp:     0 0 0 1px rgba(185, 28, 28, 0.20), 0 8px 24px -6px rgba(185, 28, 28, 0.32);
+  /* Dinâmico: usa o RGB da casa ativa (Bica por padrão, AMP via [data-casa]) */
+  --shadow-glow-brand:    0 0 0 1px rgba(var(--color-primary-dynamic-rgb), 0.18), 0 8px 24px -6px rgba(var(--color-primary-dynamic-rgb), 0.30);
+  --shadow-glow-brand-sm: 0 0 0 1px rgba(var(--color-primary-dynamic-rgb), 0.16), 0 4px 14px -4px rgba(var(--color-primary-dynamic-rgb), 0.28);
+
+  /* ── v3 Gradientes (background-image; sutis para dar profundidade) ── */
+  --gradient-surface:        linear-gradient(180deg, var(--color-ink2) 0%, var(--color-ink3) 100%);
+  --gradient-surface-raised: linear-gradient(180deg, var(--color-ink3) 0%, var(--color-ink4) 100%);
+  --gradient-brand-bica:     linear-gradient(135deg, var(--color-bica) 0%, var(--color-bica-dark) 100%);
+  --gradient-brand-amp:      linear-gradient(135deg, var(--color-amp) 0%, var(--color-amp-dark) 100%);
+  /* Dinâmico: CTA premium segue a casa ativa */
+  --gradient-brand:          linear-gradient(135deg, var(--color-primary-dynamic) 0%, var(--color-primary-dynamic-hover) 100%);
+  /* Sheen: brilho diagonal sobreposto a CTAs */
+  --gradient-sheen:          linear-gradient(135deg, rgba(244,236,220,0.16) 0%, rgba(244,236,220,0) 55%);
+
+  /* ── v3 Focus ring acessível (âmbar, com offset para o dark) ──── */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring: 0 0 0 var(--focus-ring-offset) var(--color-ink), 0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--color-primary-dynamic);
 }
 
 /* Override variables for AMP 213 tenant dynamic branding */
@@ -142,6 +175,18 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* ── v3 Shadows → utilities shadow-* (Tailwind v4) ───────────── */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  /* Glow âmbar: shadow-glow-bica, shadow-glow-brand, etc. */
+  --shadow-glow-bica:    var(--shadow-glow-bica);
+  --shadow-glow-bica-sm: var(--shadow-glow-bica-sm);
+  --shadow-glow-amp:     var(--shadow-glow-amp);
+  --shadow-glow-brand:   var(--shadow-glow-brand);
+  --shadow-glow-brand-sm:var(--shadow-glow-brand-sm);
+  --shadow-inner-hairline: var(--shadow-inner-hairline);
 }
 
 /* ── Dark theme como padrão (app operacional noturno) ────────── */
@@ -221,6 +266,21 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-right: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* ── v3 Gradiente de superfície/marca (background-image utilities) ── */
+  .bg-gradient-surface        { background-image: var(--gradient-surface); }
+  .bg-gradient-surface-raised { background-image: var(--gradient-surface-raised); }
+  .bg-gradient-brand          { background-image: var(--gradient-brand); }
+  .bg-gradient-brand-bica     { background-image: var(--gradient-brand-bica); }
+  .bg-gradient-brand-amp      { background-image: var(--gradient-brand-amp); }
+  /* Sheen como overlay (use em ::before/::after ou elemento sobreposto) */
+  .bg-gradient-sheen          { background-image: var(--gradient-sheen); }
+
+  /* ── v3 Focus ring acessível (âmbar com offset no dark) ──────── */
+  .focus-ring-brand:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 
   .glow-primary {
