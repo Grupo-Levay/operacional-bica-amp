@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth-guard'
 import { STATUS_OCUPA_MESA } from '@/lib/reservas-availability'
+import { criarMaquinaEstados } from '@/lib/state-machine'
 import type { Enums } from '@/types/database.types'
 
 interface CriarReservaInput {
@@ -22,18 +23,18 @@ interface EditarReservaInput extends CriarReservaInput {
 
 type Status = Enums<'reservation_status'>
 
-/** Transições de status permitidas. Estados terminais não permitem saída.
+/** Máquina de estados das reservas. Estados terminais não permitem saída.
  *  pendente   → confirmada | cancelada
  *  confirmada → presente | nao_compareceu | cancelada
  *  presente   → concluida | cancelada */
-const TRANSICOES: Record<Status, Status[]> = {
+const reservaFsm = criarMaquinaEstados<Status>({
   pendente: ['confirmada', 'cancelada'],
   confirmada: ['presente', 'nao_compareceu', 'cancelada'],
   presente: ['concluida', 'cancelada'],
   concluida: [],
   cancelada: [],
   nao_compareceu: [],
-}
+})
 
 /** Reservas ativas (não-terminais) podem ser editadas. */
 const STATUS_EDITAVEL: ReadonlySet<Status> = new Set<Status>([
@@ -217,8 +218,7 @@ export async function atualizarStatusReserva(id: string, novoStatus: Status) {
     throw new Error('Reserva não encontrada')
   }
 
-  const permitidas = TRANSICOES[atual.status] ?? []
-  if (!permitidas.includes(novoStatus)) {
+  if (!reservaFsm.podeTransicionar(atual.status, novoStatus)) {
     throw new Error(`Transição de "${atual.status}" para "${novoStatus}" não permitida`)
   }
 

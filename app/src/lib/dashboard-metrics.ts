@@ -20,3 +20,17 @@ export function mediaCmv(fichas: FichaCusto[]): number | null {
   const soma = valores.reduce((acc, v) => acc + v, 0)
   return Math.round((soma / valores.length) * 10) / 10
 }
+
+/** Meta de CMV (%) — abaixo disso é saudável. */
+export const META_CMV = 30
+
+export type CmvSeveridade = 'ok' | 'warning' | 'danger' | 'muted'
+
+/** Severidade do CMV frente à meta: ≤30% ok, ≤40% atenção, acima disso alto.
+ *  `null` (sem fichas calculáveis) → 'muted'. */
+export function cmvSeveridade(cmv: number | null): CmvSeveridade {
+  if (cmv === null) return 'muted'
+  if (cmv <= META_CMV) return 'ok'
+  if (cmv <= 40) return 'warning'
+  return 'danger'
+}
