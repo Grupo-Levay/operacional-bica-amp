@@ -23,3 +23,30 @@ export async function requireUser(): Promise<{
   const casa = await getCurrentCasa()
   return { supabase, userId: user.id, casa }
 }
+
+/**
+ * Valida que a casa fornecida na request corresponde à casa do usuário.
+ * Previne que um usuário mude de casa em uma request malformada.
+ *
+ * @param userId - ID do usuário (de requireUser)
+ * @param requestedCasa - Casa fornecida na request (pode ser undefined)
+ * @returns casa validada (string, nunca undefined)
+ * @throws Error se mismatch ou requestedCasa for undefined
+ */
+export async function validarCasaDoUsuario(
+  userId: string,
+  requestedCasa: Casa | undefined,
+): Promise<Casa> {
+  const supabase = (await createClient()) as AppClient
+  const userCasa = await getCurrentCasa()
+
+  if (!requestedCasa) {
+    throw new Error("Casa não fornecida na request")
+  }
+
+  if (requestedCasa !== userCasa) {
+    throw new Error(`Casa inválida: usuário pertence a ${userCasa}, mas forneceu ${requestedCasa}`)
+  }
+
+  return userCasa
+}
