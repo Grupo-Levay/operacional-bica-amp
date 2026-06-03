@@ -1,6 +1,6 @@
 # Context Snapshot — Bica Operacional
 
-_Atualizado: 2026-06-03 | S6.0 (3 fases) + S7 SHIPPED em main — produção. main == origin/main == branch atual_
+_Atualizado: 2026-06-03 | S6.0 + S7 + S8.0 (3 fases, observability self-hosted) SHIPPED. Fase 3 em branch `claude/xoia-master-resume-5ldM4` → PR_
 
 ## Projeto
 App: Painel operacional do bar BiCA/AMP — checklists, estoque, escala, compras, fichas técnicas e reservas
@@ -132,30 +132,35 @@ Ambiente: Container remoto Claude Code; deploy automático Vercel (projeto `bica
 
 ---
 
-### S8 — Performance & Analytics (Planejado)
-**Status:** planned
+### S8.0 — Performance & Observability (Self-Hosted)
+**Status:** done ✅ (3 fases SHIPPED — decisão "zero SaaS": tudo no Supabase)
 
-**Escopo Potencial:**
-- **Performance Audit** — LCP/CLS/INP (Lighthouse), bundle size analysis, image optimization
-- **Analytics Integration** — Eventos de user behavior (check-in, compra, ficha criada), funnels
-- **Monitoring & Alertas** — Health checks, error tracking (Sentry), uptime monitoring
-- **Observability** — Request tracing, slow query identification, API latency baseline
+**Fase 1 — Observability Foundation** ✅ (PR #46 · `aa3d511`)
+- Migration 0009 `analytics_events` (casa/user_id/action/status/duration_ms/value/error_message/metadata)
+- `lib/analytics.ts` `trackEvent()` (fire-and-forget, nunca lança) + `actions/instrumented.ts` `withAnalytics()`
+- Logger estruturado (JSON: ts/level/msg/context + `logger.child()`)
+- Proto em 3 ações: reserva.criar, ficha.criar/editar, checklist.marcar_item
 
-**Não Escopo S8:**
-- Refactoring de performance (cacheamento, virtualization) — defer até dados mostrem gargalos
-- Analytics no produto (dashboard de métricas) — só instrumentação; dashboard é S9+
+**Fase 2 — Performance & Web Vitals** ✅ (`c301e1d`)
+- `components/observability/web-vitals-reporter.tsx` (useReportWebVitals → action `registrarWebVital`) montado no layout
+- `next.config.ts` image avif/webp + `@next/bundle-analyzer` (`npm run analyze`)
+- `@lhci/cli` + `.lighthouserc.json` (raiz) + workflow `lighthouse.yml`
 
-**Dependências:** S7 ✅ concluído, S6 Fase 2+ pronto
+**Fase 3 — Error Tracking & Painel de Saúde** ✅ (`171453a`)
+- Painel `/admin/saude` (role guard, design v3): KPIs, Web Vitals P75, volume diário, ações lentas, erros
+- `lib/analytics-queries.ts`: getErrosRecentes/getAcoesLentas/getWebVitalsP75/getResumoDiario + `percentil`/`ratingWebVital` (puras, testadas)
+- Instrumentação ampliada a 8 ações (tarefas/metas/estoque/compras/escala)
+
+**Arquivo:** `docs/stories/S8.0-performance-observability.md`
+**Follow-ups (S9+):** alerting push (Edge Function + pg_cron); `get_advisors`/`get_logs` como rotina; dashboards de produto.
 
 ---
 
 ### Roadmap Visual
 ```
-S6.0 Fase 1 ✅ → S6.0 Fases 2-3 ✅ (Kanban + Metas) → S7 (completo) ✅
+S6.0 (Perfis+Kanban+Metas) ✅ → S7 (Design v3) ✅ → S8.0 (Performance & Observability self-hosted) ✅
   ↓
-S8 Performance & Analytics ← PRÓXIMO
-  ↓
-S9+ (produto features: dashboards, reports, integrações)
+S9+ ← PRÓXIMO (produto: dashboards de negócio, reports, alerting push, integrações)
 ```
 
 ## Decisões técnicas ativas

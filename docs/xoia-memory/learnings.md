@@ -82,3 +82,15 @@ Resultado: 0 hardcoded colors detectável via grep, visual hierarchy 100% consis
 **Aprendizado:** A integração Supabase↔GitHub só dispara branching/aplicação quando há mudança no diretório configurado (`app/supabase`). Migrations versionadas na raiz NÃO são aplicadas automaticamente em preview/prod — precisam ser aplicadas manualmente via MCP `execute_sql`/`apply_migration`. Por isso verificar `list_tables` no DB é obrigatório após merge de migration.
 **Aplicar quando:** Adicionar migration ao repo; validar se schema de produção reflete o SQL versionado.
 ---
+
+## [2026-06-03] — withAnalytics só marca erro em throw, não em `return {error}`
+**Contexto:** S8 Fase 3 — instrumentar tarefas/metas/estoque/compras/escala. Metade das actions retorna `{error: '...'}` (validação) em vez de lançar; a outra metade lança `throw new Error()`.
+**Aprendizado:** `withAnalytics(action, fn)` captura `status='error'` apenas no caminho `catch` (throws). Actions que retornam `{error}` para falhas de negócio são gravadas como `success` — o que é correto: foram invocações válidas que retornaram mensagem de validação, não falhas de sistema. Para o painel `/admin/saude`, `status='error'` = erro inesperado real (throw). Não tentar "normalizar" tudo para throw só pela telemetria.
+**Aplicar quando:** instrumentar Server Actions; interpretar taxa de erro no painel de saúde (erro = exceção, não rejeição de validação).
+---
+
+## [2026-06-03] — Story stale reincide: Fase shipada marcada ⬜ (verificar git antes de "construir")
+**Contexto:** "Go" para S8 — story dizia Fase 2 `⬜` mas commit `c301e1d` já a entregara (web-vitals-reporter, next.config, lighthouse). Mesmo padrão da S6.
+**Aprendizado:** Reincidência confirma sistemicidade: marcadores de story/snapshot atrasam atrás dos commits. Ao retomar, SEMPRE `git log --oneline` + `ls` dos arquivos esperados ANTES de implementar — arquivos untracked (ex.: `analytics-queries.ts`) sinalizam WIP da fase atual. Reconciliar marcadores faz parte do ship, não é overhead.
+**Aplicar quando:** qualquer retomada com "Go"/"continue" — auditar realidade (git+arquivos+DB) antes de codar.
+---
