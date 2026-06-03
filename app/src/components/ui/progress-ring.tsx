@@ -33,9 +33,13 @@ export function ProgressRing({
   const pct = clampPct(value)
   const { radius, circumference, dashoffset } = ringGeometry(pct, size, strokeWidth)
 
+  // Glow effect quando progresso > 70% (animação suave)
+  const shouldGlow = pct > 70
+  const glowClass = shouldGlow ? 'shadow-glow-brand pulse-glow-primary' : ''
+
   return (
     <div
-      className={cn('relative flex items-center justify-center', className)}
+      className={cn('relative flex items-center justify-center rounded-full transition-shadow', glowClass, className)}
       style={{ width: size, height: size }}
       role="img"
       aria-label={label ?? `${pct}%`}

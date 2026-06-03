@@ -25,7 +25,7 @@ export function LevelBar({ atual, minimo, className }: LevelBarProps) {
 
   return (
     <div
-      className={cn('h-1.5 w-full overflow-hidden rounded-full bg-ink4', className)}
+      className={cn('h-1.5 w-full overflow-hidden rounded-full bg-gradient-surface', className)}
       role="progressbar"
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
