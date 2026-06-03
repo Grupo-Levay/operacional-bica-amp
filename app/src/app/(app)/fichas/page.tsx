@@ -51,7 +51,7 @@ export default async function FichasPage() {
   const cmvDanger = cmvMedio != null && cmvMedio > 30
 
   return (
-    <main className="p-4 space-y-6">
+    <main className="min-h-screen bg-background p-4 md:p-6 space-y-6 pb-24">
       <PageHeader
         title="Ficha Técnica / CMV"
         action={
@@ -67,41 +67,53 @@ export default async function FichasPage() {
       />
 
       {fichas.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          <StatCard
-            label="CMV Médio"
-            value={cmvMedio != null ? `${cmvMedio.toFixed(1)}%` : '—'}
-            sub={cmvDanger ? 'acima da meta' : 'dentro da meta'}
-            accent={cmvMedio == null ? undefined : cmvDanger ? 'danger' : 'success'}
-            icon={<TrendingUp size={14} />}
-          />
-          <StatCard
-            label="Custo Médio"
-            value={custoMedio != null ? brl.format(custoMedio) : '—'}
-            sub="por ficha"
-            accent="primary"
-            icon={<Banknote size={14} />}
-          />
-          <StatCard
-            label="Total"
-            value={total}
-            sub="fichas ativas"
-            accent="primary"
-            icon={<BookOpen size={14} />}
-          />
-        </div>
+        <section className="space-y-2">
+          <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+            Métricas
+          </h2>
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <StatCard
+              label="CMV Médio"
+              value={cmvMedio != null ? `${cmvMedio.toFixed(1)}%` : '—'}
+              sub={cmvDanger ? 'acima da meta' : 'dentro da meta'}
+              accent={cmvMedio == null ? undefined : cmvDanger ? 'danger' : 'success'}
+              icon={<TrendingUp size={14} />}
+            />
+            <StatCard
+              label="Custo Médio"
+              value={custoMedio != null ? brl.format(custoMedio) : '—'}
+              sub="por ficha"
+              accent="primary"
+              icon={<Banknote size={14} />}
+            />
+            <StatCard
+              label="Total"
+              value={total}
+              sub="fichas ativas"
+              accent="primary"
+              icon={<BookOpen size={14} />}
+            />
+          </div>
+        </section>
       )}
 
-      <FichaFormDialog
-        trigger={
-          <Button variant="gradient" size="cta">
-            <Plus className="size-5" />
-            Nova ficha técnica
-          </Button>
-        }
-      />
-
-      <FichasList fichas={fichas} categorias={categorias} />
+      <section className="space-y-2">
+        <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+          Fichas Técnicas
+        </h2>
+        {fichas.length === 0 ? (
+          <FichaFormDialog
+            trigger={
+              <Button variant="gradient" size="cta">
+                <Plus className="size-5" />
+                Nova ficha técnica
+              </Button>
+            }
+          />
+        ) : (
+          <FichasList fichas={fichas} categorias={categorias} />
+        )}
+      </section>
     </main>
   )
 }
