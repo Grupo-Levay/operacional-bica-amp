@@ -21,7 +21,7 @@ export function NovaReservaForm({
 
   if (!aberto) {
     return (
-      <Button variant="brand" size="cta" onClick={() => setAberto(true)}>
+      <Button variant="gradient" size="cta" onClick={() => setAberto(true)}>
         Nova reserva
       </Button>
     )
