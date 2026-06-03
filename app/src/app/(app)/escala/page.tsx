@@ -58,12 +58,8 @@ function formatRangeLabel(inicioStr: string, fimStr: string): string {
   if (!inicioStr || !fimStr) return ""
   const inicio = new Date(inicioStr + "T12:00:00")
   const fim = new Date(fimStr + "T12:00:00")
-  const diaInicio = inicio.getDate()
-  const diaFim = fim.getDate()
-  const mesInicio = new Intl.DateTimeFormat("pt-BR", { month: "short" }).format(inicio)
-  const mesFim = new Intl.DateTimeFormat("pt-BR", { month: "short" }).format(fim)
-  if (mesInicio === mesFim) return `${diaInicio}–${diaFim} ${mesInicio}`
-  return `${diaInicio} ${mesInicio} – ${diaFim} ${mesFim}`
+  const formatter = new Intl.DateTimeFormat("pt-BR", { month: "short", day: "numeric" })
+  return `${formatter.format(inicio)} – ${formatter.format(fim)}`
 }
 
 function buildDias(inicioStr: string): Date[] {
@@ -83,26 +79,31 @@ export default async function EscalaPage() {
   const dias = buildDias(inicioStr)
 
   return (
-    <main className="p-4 space-y-4">
+    <main className="min-h-screen bg-background p-4 md:p-6 space-y-6 pb-24">
       <PageHeader
         title="Escala"
-        subtitle={`${rangeLabel}${canEdit ? ' · modo edição' : ''}`}
+        subtitle={`${rangeLabel}${canEdit ? ' · Modo Edição' : ''}`}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className="inline-block h-4 w-1 rounded-full bg-gradient-brand shadow-glow-brand-sm"
-            />
-            Próximos 7 dias
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EscalaGrid membros={membros} escala={escala} dias={dias} canEdit={canEdit} />
-        </CardContent>
-      </Card>
+      <section className="space-y-2">
+        <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+          Próximos 7 Dias
+        </h2>
+        <Card className="border-primary/20">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-h3 flex items-center gap-2">
+              <span
+                aria-hidden
+                className="inline-block h-3 w-1 rounded-full bg-gradient-brand shadow-glow-brand-sm"
+              />
+              {membros.length} Membros · {dias.length} Dias
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EscalaGrid membros={membros} escala={escala} dias={dias} canEdit={canEdit} />
+          </CardContent>
+        </Card>
+      </section>
     </main>
   )
 }

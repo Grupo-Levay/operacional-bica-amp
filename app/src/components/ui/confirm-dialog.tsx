@@ -72,7 +72,7 @@ export function ConfirmDialog({
             role="alertdialog"
             aria-modal="true"
             aria-label={title}
-            className="relative w-full space-y-4 rounded-t-2xl bg-card p-5 ring-1 ring-foreground/10 sm:max-w-sm sm:rounded-xl"
+            className="relative w-full space-y-4 rounded-t-2xl bg-card p-5 shadow-xl shadow-glow-brand ring-1 ring-primary/20 sm:max-w-sm sm:rounded-xl"
           >
             <div className="space-y-1.5">
               <h2 className="text-lg font-semibold text-foreground">{title}</h2>

@@ -29,7 +29,7 @@ export default async function EstoquePage() {
   const criticos = itens.filter(i => (i.minimo ?? 0) > 0 && (i.atual ?? 0) < (i.minimo ?? 0))
 
   return (
-    <main className="p-4 space-y-6 pb-24">
+    <main className="min-h-screen bg-background p-4 md:p-6 space-y-6 pb-24">
       <PageHeader
         title="Estoque"
         subtitle={`${itens.length} ${itens.length === 1 ? 'item cadastrado' : 'itens cadastrados'}`}
@@ -40,7 +40,25 @@ export default async function EstoquePage() {
         ) : undefined}
       />
 
-      <EstoqueList categorias={categorias} itens={itens} />
+      {criticos.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+            Aviso de Estoque
+          </h2>
+          <div className="rounded-lg border border-danger/20 bg-danger/5 p-4">
+            <p className="text-body-sm text-danger font-medium">
+              {criticos.length} {criticos.length === 1 ? 'item' : 'itens'} abaixo do nível mínimo
+            </p>
+          </div>
+        </section>
+      )}
+
+      <section className="space-y-2">
+        <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">
+          Itens
+        </h2>
+        <EstoqueList categorias={categorias} itens={itens} />
+      </section>
     </main>
   )
 }
