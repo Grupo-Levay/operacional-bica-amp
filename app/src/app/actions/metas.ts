@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { requireUser } from '@/lib/auth-guard'
+import { withAnalytics } from './instrumented'
 
 const criarSchema = z.object({
   titulo: z.string().min(1).max(200),
@@ -21,62 +22,66 @@ const progressoSchema = z.object({
 })
 
 export async function criarMeta(formData: FormData) {
-  const { supabase, casa, userId } = await requireUser()
+  return withAnalytics('meta.criar', async () => {
+    const { supabase, casa, userId } = await requireUser()
 
-  const raw = {
-    titulo: formData.get('titulo'),
-    descricao: formData.get('descricao') || undefined,
-    escopo: formData.get('escopo') || 'individual',
-    perfil_id: formData.get('perfil_id') || undefined,
-    alvo: formData.get('alvo'),
-    unidade: formData.get('unidade') || 'un',
-    periodo: formData.get('periodo') || 'mensal',
-    periodo_ref: formData.get('periodo_ref'),
-  }
+    const raw = {
+      titulo: formData.get('titulo'),
+      descricao: formData.get('descricao') || undefined,
+      escopo: formData.get('escopo') || 'individual',
+      perfil_id: formData.get('perfil_id') || undefined,
+      alvo: formData.get('alvo'),
+      unidade: formData.get('unidade') || 'un',
+      periodo: formData.get('periodo') || 'mensal',
+      periodo_ref: formData.get('periodo_ref'),
+    }
 
-  const parsed = criarSchema.safeParse(raw)
-  if (!parsed.success) return { error: 'Dados inválidos.' }
+    const parsed = criarSchema.safeParse(raw)
+    if (!parsed.success) return { error: 'Dados inválidos.' }
 
-  // escopo individual sem perfil_id → error
-  if (parsed.data.escopo === 'individual' && !parsed.data.perfil_id) {
-    return { error: 'Selecione um membro para meta individual.' }
-  }
+    // escopo individual sem perfil_id → error
+    if (parsed.data.escopo === 'individual' && !parsed.data.perfil_id) {
+      return { error: 'Selecione um membro para meta individual.' }
+    }
 
-  const { error } = await supabase.from('metas').insert({
-    casa,
-    titulo: parsed.data.titulo,
-    descricao: parsed.data.descricao ?? null,
-    escopo: parsed.data.escopo,
-    perfil_id: parsed.data.escopo === 'equipe' ? null : (parsed.data.perfil_id ?? null),
-    alvo: parsed.data.alvo,
-    unidade: parsed.data.unidade,
-    periodo: parsed.data.periodo,
-    periodo_ref: parsed.data.periodo_ref,
-    created_by: userId,
+    const { error } = await supabase.from('metas').insert({
+      casa,
+      titulo: parsed.data.titulo,
+      descricao: parsed.data.descricao ?? null,
+      escopo: parsed.data.escopo,
+      perfil_id: parsed.data.escopo === 'equipe' ? null : (parsed.data.perfil_id ?? null),
+      alvo: parsed.data.alvo,
+      unidade: parsed.data.unidade,
+      periodo: parsed.data.periodo,
+      periodo_ref: parsed.data.periodo_ref,
+      created_by: userId,
+    })
+
+    if (error) return { error: 'Erro ao criar meta.' }
+    revalidatePath('/admin/metas')
+    revalidatePath('/perfil')
+    return { ok: true }
   })
-
-  if (error) return { error: 'Erro ao criar meta.' }
-  revalidatePath('/admin/metas')
-  revalidatePath('/perfil')
-  return { ok: true }
 }
 
 export async function atualizarProgresso(id: string, atual: number) {
-  const { supabase, casa } = await requireUser()
+  return withAnalytics('meta.atualizar_progresso', async () => {
+    const { supabase, casa } = await requireUser()
 
-  const parsed = progressoSchema.safeParse({ id, atual })
-  if (!parsed.success) return { error: 'Dados inválidos.' }
+    const parsed = progressoSchema.safeParse({ id, atual })
+    if (!parsed.success) return { error: 'Dados inválidos.' }
 
-  const { error } = await supabase
-    .from('metas')
-    .update({ atual: parsed.data.atual })
-    .eq('id', id)
-    .eq('casa', casa)
+    const { error } = await supabase
+      .from('metas')
+      .update({ atual: parsed.data.atual })
+      .eq('id', id)
+      .eq('casa', casa)
 
-  if (error) return { error: 'Erro ao atualizar progresso.' }
-  revalidatePath('/admin/metas')
-  revalidatePath('/perfil')
-  return { ok: true }
+    if (error) return { error: 'Erro ao atualizar progresso.' }
+    revalidatePath('/admin/metas')
+    revalidatePath('/perfil')
+    return { ok: true }
+  })
 }
 
 export async function arquivarMeta(id: string) {

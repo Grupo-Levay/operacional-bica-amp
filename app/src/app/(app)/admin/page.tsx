@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { KanbanSquare, Target } from "lucide-react"
+import { Activity, KanbanSquare, Target } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentCasa } from "@/lib/tenant"
 import { UsuariosTable } from "@/components/admin/usuarios-table"
@@ -76,6 +76,13 @@ export default async function AdminPage() {
         >
           <Target size={16} className="text-primary" aria-hidden="true" />
           Metas & evolução
+        </Link>
+        <Link
+          href="/admin/saude"
+          className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+        >
+          <Activity size={16} className="text-primary" aria-hidden="true" />
+          Saúde da operação
         </Link>
       </div>
 

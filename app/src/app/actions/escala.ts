@@ -2,35 +2,42 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth-guard'
+import { withAnalytics } from './instrumented'
 
 export async function salvarEscala(membroId: string, data: string, turno: string) {
-  if (!membroId?.trim()) throw new Error('Membro inválido')
-  if (!data?.trim()) throw new Error('Data inválida')
-  if (!turno?.trim()) throw new Error('Turno inválido')
+  return withAnalytics(
+    'escala.salvar',
+    async () => {
+      if (!membroId?.trim()) throw new Error('Membro inválido')
+      if (!data?.trim()) throw new Error('Data inválida')
+      if (!turno?.trim()) throw new Error('Turno inválido')
 
-  const { supabase, casa } = await requireUser()
+      const { supabase, casa } = await requireUser()
 
-  const { data: existing } = await supabase
-    .from('escala')
-    .select('id')
-    .eq('membro_id', membroId)
-    .eq('data', data)
-    .eq('casa', casa)
-    .maybeSingle()
+      const { data: existing } = await supabase
+        .from('escala')
+        .select('id')
+        .eq('membro_id', membroId)
+        .eq('data', data)
+        .eq('casa', casa)
+        .maybeSingle()
 
-  if (existing) {
-    await supabase
-      .from('escala')
-      .update({ turno, confirmado: false })
-      .eq('id', existing.id)
-      .eq('casa', casa)
-  } else {
-    await supabase
-      .from('escala')
-      .insert({ membro_id: membroId, data, turno, confirmado: false, casa })
-  }
+      if (existing) {
+        await supabase
+          .from('escala')
+          .update({ turno, confirmado: false })
+          .eq('id', existing.id)
+          .eq('casa', casa)
+      } else {
+        await supabase
+          .from('escala')
+          .insert({ membro_id: membroId, data, turno, confirmado: false, casa })
+      }
 
-  revalidatePath('/escala')
+      revalidatePath('/escala')
+    },
+    { turno },
+  )
 }
 
 export async function removerEscala(id: string) {

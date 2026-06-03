@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { requireUser } from '@/lib/auth-guard'
 import { criarMaquinaEstados } from '@/lib/state-machine'
+import { withAnalytics } from './instrumented'
 
 // Status válidos e transições permitidas (máquina de estados)
 export type TarefaStatus = 'a_fazer' | 'fazendo' | 'concluida'
@@ -29,64 +30,72 @@ const moverSchema = z.object({
 })
 
 export async function criarTarefa(formData: FormData) {
-  const { supabase, casa, userId } = await requireUser()
+  return withAnalytics('tarefa.criar', async () => {
+    const { supabase, casa, userId } = await requireUser()
 
-  const parsed = criarSchema.safeParse({
-    titulo: formData.get('titulo'),
-    descricao: formData.get('descricao') || undefined,
-    perfil_id: formData.get('perfil_id') || undefined,
-    prioridade: formData.get('prioridade') || 'media',
-    prazo: formData.get('prazo') || undefined,
+    const parsed = criarSchema.safeParse({
+      titulo: formData.get('titulo'),
+      descricao: formData.get('descricao') || undefined,
+      perfil_id: formData.get('perfil_id') || undefined,
+      prioridade: formData.get('prioridade') || 'media',
+      prazo: formData.get('prazo') || undefined,
+    })
+    if (!parsed.success) return { error: 'Dados inválidos.' }
+
+    const { error } = await supabase.from('tarefas').insert({
+      casa,
+      titulo: parsed.data.titulo,
+      descricao: parsed.data.descricao ?? null,
+      perfil_id: parsed.data.perfil_id ?? null,
+      prioridade: parsed.data.prioridade,
+      prazo: parsed.data.prazo ?? null,
+      created_by: userId,
+    })
+
+    if (error) return { error: 'Erro ao criar tarefa.' }
+    revalidatePath('/admin/tarefas')
+    revalidatePath('/perfil')
+    return { ok: true }
   })
-  if (!parsed.success) return { error: 'Dados inválidos.' }
-
-  const { error } = await supabase.from('tarefas').insert({
-    casa,
-    titulo: parsed.data.titulo,
-    descricao: parsed.data.descricao ?? null,
-    perfil_id: parsed.data.perfil_id ?? null,
-    prioridade: parsed.data.prioridade,
-    prazo: parsed.data.prazo ?? null,
-    created_by: userId,
-  })
-
-  if (error) return { error: 'Erro ao criar tarefa.' }
-  revalidatePath('/admin/tarefas')
-  revalidatePath('/perfil')
-  return { ok: true }
 }
 
 export async function moverTarefa(id: string, novoStatus: TarefaStatus) {
-  const { supabase, casa } = await requireUser()
+  return withAnalytics(
+    'tarefa.mover',
+    async () => {
+      const { supabase, casa } = await requireUser()
 
-  const parsed = moverSchema.safeParse({ id, status: novoStatus })
-  if (!parsed.success) return { error: 'Dados inválidos.' }
+      const parsed = moverSchema.safeParse({ id, status: novoStatus })
+      if (!parsed.success) return { error: 'Dados inválidos.' }
 
-  // Busca status atual
-  const { data: tarefa } = await supabase
-    .from('tarefas')
-    .select('status')
-    .eq('id', id)
-    .eq('casa', casa)
-    .single()
+      // Busca status atual
+      const { data: tarefa } = await supabase
+        .from('tarefas')
+        .select('status')
+        .eq('id', id)
+        .eq('casa', casa)
+        .single()
 
-  if (!tarefa) return { error: 'Tarefa não encontrada.' }
+      if (!tarefa) return { error: 'Tarefa não encontrada.' }
 
-  const statusAtual = tarefa.status as TarefaStatus
-  if (!tarefaFsm.podeTransicionar(statusAtual, novoStatus)) {
-    return { error: `Transição ${statusAtual} → ${novoStatus} não permitida.` }
-  }
+      const statusAtual = tarefa.status as TarefaStatus
+      if (!tarefaFsm.podeTransicionar(statusAtual, novoStatus)) {
+        return { error: `Transição ${statusAtual} → ${novoStatus} não permitida.` }
+      }
 
-  const { error } = await supabase
-    .from('tarefas')
-    .update({ status: novoStatus })
-    .eq('id', id)
-    .eq('casa', casa)
+      const { error } = await supabase
+        .from('tarefas')
+        .update({ status: novoStatus })
+        .eq('id', id)
+        .eq('casa', casa)
 
-  if (error) return { error: 'Erro ao mover tarefa.' }
-  revalidatePath('/admin/tarefas')
-  revalidatePath('/perfil')
-  return { ok: true }
+      if (error) return { error: 'Erro ao mover tarefa.' }
+      revalidatePath('/admin/tarefas')
+      revalidatePath('/perfil')
+      return { ok: true }
+    },
+    { novo_status: novoStatus },
+  )
 }
 
 export async function atribuirTarefa(id: string, perfil_id: string | null) {
