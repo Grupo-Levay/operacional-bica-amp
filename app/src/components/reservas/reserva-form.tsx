@@ -236,7 +236,7 @@ export function ReservaForm({
 
       {erro && <p className="text-xs text-danger">{erro}</p>}
 
-      <div className="flex items-center gap-2 pt-1">
+      <div className="flex flex-col gap-2 pt-1">
         <Button type="submit" variant="gradient" size="cta" disabled={isPending}>
           {isPending
             ? 'Salvando...'
@@ -246,11 +246,10 @@ export function ReservaForm({
         </Button>
         <Button
           type="button"
-          size="sm"
           variant="ghost"
           onClick={onCancel}
           disabled={isPending}
-          className="min-h-[52px]"
+          className="min-h-[44px] w-full"
         >
           Cancelar
         </Button>
