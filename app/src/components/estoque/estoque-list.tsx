@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Package, AlertTriangle, Plus } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { ItemEstoque } from "@/components/estoque/item-estoque"
 import { NovoItemForm } from "@/components/estoque/novo-item-form"
 import type { Database } from "@/types/database.types"
@@ -107,36 +107,27 @@ export function EstoqueList({ categorias, itens }: EstoqueListProps) {
       {/* Alertas */}
       <AlertasEstoque itens={itens} />
 
-      {/* Filtro por categoria */}
+      {/* Filtro por categoria — segmented control (ToggleGroup) */}
       {categorias.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setFiltro(null)}
-            className={cn(
-              "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand",
-              filtro === null
-                ? "border-transparent bg-gradient-brand text-primary-foreground shadow-glow-brand-sm"
-                : "border-ink4 bg-ink4 text-b3 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-foreground"
-            )}
+        <div className="-mx-4 overflow-x-auto px-4 pb-1 scrollbar-none">
+          <ToggleGroup
+            value={[filtro ?? "todos"]}
+            onValueChange={(vals) => {
+              // Seleção única: "todos" (ou seleção vazia) limpa o filtro.
+              const next = vals[0]
+              setFiltro(!next || next === "todos" ? null : next)
+            }}
+            className="w-max"
           >
-            Todos
-          </button>
-          {categorias.map(cat => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => setFiltro(filtro === cat.id ? null : cat.id)}
-              className={cn(
-                "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-ring-brand",
-                filtro === cat.id
-                  ? "border-transparent bg-gradient-brand text-primary-foreground shadow-glow-brand-sm"
-                  : "border-ink4 bg-transparent text-b3 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-foreground"
-              )}
-            >
-              {cat.emoji ? `${cat.emoji} ` : ""}{cat.nome}
-            </button>
-          ))}
+            <ToggleGroupItem value="todos" className="shrink-0 whitespace-nowrap">
+              Todos
+            </ToggleGroupItem>
+            {categorias.map(cat => (
+              <ToggleGroupItem key={cat.id} value={cat.id} className="shrink-0 whitespace-nowrap">
+                {cat.emoji ? `${cat.emoji} ` : ""}{cat.nome}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       )}
 

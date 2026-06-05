@@ -3,6 +3,16 @@
 import { useRef, useState, useTransition } from 'react'
 import { Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select'
 import { criarTarefa } from '@/app/actions/tarefas'
 
 interface Perfil {
@@ -20,6 +30,12 @@ export function NovaTarefaForm({ perfis }: Props) {
   const [erro, setErro] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
+  // Selects do Base UI são controlados: o `name` emite o hidden input para o
+  // FormData, mas o estado precisa ser resetado manualmente (não respondem ao
+  // form.reset() nativo como inputs/textarea).
+  const [prioridade, setPrioridade] = useState('media')
+  const [perfilId, setPerfilId] = useState('')
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
@@ -30,6 +46,8 @@ export function NovaTarefaForm({ perfis }: Props) {
         setErro(res.error)
       } else {
         formRef.current?.reset()
+        setPrioridade('media')
+        setPerfilId('')
         setOpen(false)
       }
     })
@@ -52,87 +70,81 @@ export function NovaTarefaForm({ perfis }: Props) {
 
       {open && (
         <form ref={formRef} onSubmit={handleSubmit} className="border-t border-border p-4 space-y-3">
-          <div className="space-y-1">
-            <label htmlFor="titulo" className="text-xs font-medium text-foreground">
-              Título *
-            </label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="titulo" required>
+              Título
+            </FieldLabel>
+            <Input
               id="titulo"
               name="titulo"
               required
               maxLength={200}
               placeholder="Descreva a tarefa…"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-          </div>
+          </Field>
 
-          <div className="space-y-1">
-            <label htmlFor="descricao" className="text-xs font-medium text-foreground">
-              Detalhes
-            </label>
-            <textarea
+          <Field>
+            <FieldLabel htmlFor="descricao">Detalhes</FieldLabel>
+            <Textarea
               id="descricao"
               name="descricao"
               rows={2}
               maxLength={1000}
               placeholder="Contexto adicional (opcional)…"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             />
-          </div>
+          </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label htmlFor="prioridade" className="text-xs font-medium text-foreground">
-                Prioridade
-              </label>
-              <select
-                id="prioridade"
+            <Field>
+              <FieldLabel>Prioridade</FieldLabel>
+              <Select
                 name="prioridade"
-                defaultValue="media"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                value={prioridade}
+                onValueChange={(v) => setPrioridade((v as string) ?? 'media')}
               >
-                <option value="baixa">Baixa</option>
-                <option value="media">Média</option>
-                <option value="alta">Alta</option>
-              </select>
-            </div>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="baixa">Baixa</SelectItem>
+                  <SelectItem value="media">Média</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
 
-            <div className="space-y-1">
-              <label htmlFor="prazo" className="text-xs font-medium text-foreground">
-                Prazo
-              </label>
-              <input
-                id="prazo"
-                name="prazo"
-                type="date"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
+            <Field>
+              <FieldLabel htmlFor="prazo">Prazo</FieldLabel>
+              <Input id="prazo" name="prazo" type="date" />
+            </Field>
           </div>
 
           {perfis.length > 0 && (
-            <div className="space-y-1">
-              <label htmlFor="perfil_id" className="text-xs font-medium text-foreground">
-                Atribuir a
-              </label>
-              <select
-                id="perfil_id"
+            <Field>
+              <FieldLabel>Atribuir a</FieldLabel>
+              <Select
                 name="perfil_id"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                value={perfilId}
+                onValueChange={(v) => setPerfilId((v as string) ?? '')}
               >
-                <option value="">Sem atribuição</option>
-                {perfis.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nome ?? p.id}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sem atribuição" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Sem atribuição</SelectItem>
+                  {perfis.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.nome ?? p.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
           )}
 
           {erro && <p className="text-xs text-danger">{erro}</p>}
 
-          <Button type="submit" disabled={pending} className="w-full" size="sm">
+          <Button type="submit" variant="gradient" size="cta" disabled={pending}>
             {pending ? 'Criando…' : 'Criar tarefa'}
           </Button>
         </form>

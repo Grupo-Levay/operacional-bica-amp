@@ -4,6 +4,16 @@ import { useTransition, useOptimistic } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  TableContainer,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"
 import { Tables } from "@/types/database.types"
 import { marcarItemComprado, fecharRodada } from "@/app/actions/compras"
 import { toast } from "@/components/ui/toast"
@@ -39,8 +49,7 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
   const total =
     rodada.total ?? itens.reduce((acc, item) => acc + (item.total ?? 0), 0)
 
-  function handleToggle(item: RodadaItem) {
-    const novoComprado = !(item.comprado ?? false)
+  function handleToggle(item: RodadaItem, novoComprado: boolean) {
     startTransition(async () => {
       setItens({ id: item.id, comprado: novoComprado })
       try {
@@ -70,37 +79,59 @@ function RodadaAberta({ rodada }: { rodada: Rodada }) {
         {itens.length === 0 ? (
           <p className="text-sm text-muted-foreground italic">Nenhum item nesta rodada</p>
         ) : (
-          <ul className="divide-y divide-border">
-            {itens.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => handleToggle(item)}
-                  className={cn("w-full flex items-center gap-3 py-2.5 text-sm text-left", "min-h-[52px]")}
-                >
-                  <input
-                    type="checkbox"
-                    checked={item.comprado ?? false}
-                    readOnly
-                    className="accent-bica h-4 w-4 shrink-0 pointer-events-none"
-                  />
-                  <span
-                    className={`flex-1 ${item.comprado ? "line-through text-muted-foreground" : ""}`}
-                  >
-                    {item.nome}
-                  </span>
-                  <span className="text-muted-foreground text-xs shrink-0">
-                    {item.quantidade ?? 1} {item.unidade ?? "un"}
-                  </span>
-                  {item.preco_unit != null && (
-                    <span className="text-xs font-medium shrink-0">
-                      {formatarMoeda(item.preco_unit)}
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <TableContainer>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {/* Coluna do checkbox — sem rótulo visível */}
+                  <TableHead className="w-10" />
+                  <TableHead>Item</TableHead>
+                  <TableHead className="text-right">Qtd</TableHead>
+                  <TableHead className="text-right">Preço</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {itens.map((item) => {
+                  const comprado = item.comprado ?? false
+                  // Linha inteira clicável; checkbox reflete e controla o estado.
+                  return (
+                    <TableRow
+                      key={item.id}
+                      data-state={comprado ? "selected" : undefined}
+                      onClick={() => handleToggle(item, !comprado)}
+                      className="cursor-pointer"
+                    >
+                      <TableCell className="w-10">
+                        <Checkbox
+                          checked={comprado}
+                          aria-label={`Marcar ${item.nome} como comprado`}
+                          onCheckedChange={(checked) =>
+                            handleToggle(item, checked)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          comprado && "line-through text-muted-foreground",
+                        )}
+                      >
+                        {item.nome}
+                      </TableCell>
+                      <TableCell className="text-right text-xs text-muted-foreground whitespace-nowrap">
+                        {item.quantidade ?? 1} {item.unidade ?? "un"}
+                      </TableCell>
+                      <TableCell className="text-right text-xs font-medium whitespace-nowrap">
+                        {item.preco_unit != null
+                          ? formatarMoeda(item.preco_unit)
+                          : "—"}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
 
         <div className="flex items-center justify-between border-t pt-2">

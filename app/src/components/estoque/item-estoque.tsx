@@ -1,13 +1,20 @@
 'use client'
 
 import { useState, useTransition, useRef } from 'react'
-import { Plus, Minus, SlidersHorizontal, Archive } from 'lucide-react'
+import { Plus, Minus, MoreVertical, SlidersHorizontal, Archive } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { LevelBar } from '@/components/ui/level-bar'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 import { toast } from '@/components/ui/toast'
 import { atualizarQuantidade, atualizarItemEstoque, arquivarItemEstoque } from '@/app/actions/estoque'
 
@@ -133,17 +140,38 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
           <Badge variant={status.variant} className="font-semibold">
             {status.label}
           </Badge>
-          <Button
-            type="button"
-            size="icon-xs"
-            variant="ghost"
-            onClick={() => setEditConfig((v) => !v)}
-            className="size-7 text-b4 hover:text-foreground"
-            aria-label="Ajustar mínimo e unidade"
-            aria-expanded={editConfig}
-          >
-            <SlidersHorizontal className="size-3.5" />
-          </Button>
+          {/* Ações secundárias agrupadas. Os +/- de ajuste rápido ficam diretos
+              no card (ação primária de toque). O item destrutivo "Arquivar" usa
+              o ConfirmDialog via `render`, preservando estado e server action. */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label={`Ações de ${nome}`}
+              className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-b4 outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:bg-muted aria-expanded:text-foreground"
+            >
+              <MoreVertical className="size-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setEditConfig((v) => !v)}>
+                <SlidersHorizontal className="size-4" />
+                Ajustar mínimo e unidade
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <ConfirmDialog
+                trigger={
+                  <DropdownMenuItem variant="destructive" render={<button type="button" />}>
+                    <Archive className="size-4" />
+                    Arquivar
+                  </DropdownMenuItem>
+                }
+                title="Arquivar item?"
+                description={`"${nome}" deixará de aparecer no estoque. Você pode recriá-lo depois.`}
+                confirmLabel="Arquivar"
+                destructive
+                successMessage="Item arquivado"
+                onConfirm={() => arquivarItemEstoque(id)}
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -174,25 +202,6 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
           <Button type="button" size="sm" variant="brand" onClick={salvarConfig}>
             Salvar
           </Button>
-          <ConfirmDialog
-            trigger={
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="text-danger hover:bg-danger-bg hover:text-danger"
-              >
-                <Archive className="size-3.5" />
-                Arquivar
-              </Button>
-            }
-            title="Arquivar item?"
-            description={`"${nome}" deixará de aparecer no estoque. Você pode recriá-lo depois.`}
-            confirmLabel="Arquivar"
-            destructive
-            successMessage="Item arquivado"
-            onConfirm={() => arquivarItemEstoque(id)}
-          />
         </div>
       )}
 

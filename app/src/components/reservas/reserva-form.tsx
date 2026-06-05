@@ -3,6 +3,17 @@
 import { useMemo, useState, useTransition } from 'react'
 import { Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select'
+import { NumberField, NumberFieldGroup } from '@/components/ui/number-field'
+import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/toast'
 import { criarReserva, editarReserva } from '@/app/actions/reservas'
 import {
@@ -26,9 +37,6 @@ interface ReservaFormProps {
   onSuccess: () => void
 }
 
-const inputClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:border-foreground/20 focus:outline-none focus-ring-brand'
-
 export function ReservaForm({
   tables,
   reservasDoDia,
@@ -46,11 +54,12 @@ export function ReservaForm({
   const [data, setData] = useState(reserva?.reservation_date ?? defaultDate)
   const [inicio, setInicio] = useState(reserva?.start_time?.slice(0, 5) ?? '')
   const [fim, setFim] = useState(reserva?.end_time?.slice(0, 5) ?? '')
-  const [pessoas, setPessoas] = useState(String(reserva?.guest_count ?? 2))
+  // NumberField trabalha com `number | null`.
+  const [pessoas, setPessoas] = useState<number | null>(reserva?.guest_count ?? 2)
   const [mesa, setMesa] = useState(reserva?.table_id ?? '')
   const [obs, setObs] = useState(reserva?.notes ?? '')
 
-  const pessoasNum = Number(pessoas) || 1
+  const pessoasNum = pessoas ?? 1
 
   // Ids de mesas ocupadas no período escolhido (exclui a própria reserva ao editar).
   const ocupadas = useMemo(
@@ -121,91 +130,86 @@ export function ReservaForm({
       onSubmit={handleSubmit}
       className="space-y-3 rounded-xl bg-card bg-gradient-surface p-4 shadow-md shadow-inner-hairline ring-1 ring-foreground/10"
     >
-      <div className="space-y-1">
-        <label className="text-b3 text-xs font-medium">Nome do cliente</label>
-        <input
+      <Field>
+        <FieldLabel required>Nome do cliente</FieldLabel>
+        <Input
           type="text"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           autoFocus
           placeholder="Nome"
-          className={inputClass}
         />
-      </div>
+      </Field>
 
-      <div className="space-y-1">
-        <label className="text-b3 text-xs font-medium">Telefone</label>
-        <input
+      <Field>
+        <FieldLabel>Telefone</FieldLabel>
+        <Input
           type="tel"
           value={telefone}
           onChange={(e) => setTelefone(e.target.value)}
           placeholder="(opcional)"
-          className={inputClass}
         />
-      </div>
+      </Field>
 
-      <div className="space-y-1">
-        <label className="text-b3 text-xs font-medium">Data</label>
-        <input
+      <Field>
+        <FieldLabel required>Data</FieldLabel>
+        <Input
           type="date"
           value={data}
           onChange={(e) => setData(e.target.value)}
-          className={inputClass}
         />
-      </div>
+      </Field>
 
       <div className="flex gap-3">
-        <div className="flex-1 space-y-1">
-          <label className="text-b3 text-xs font-medium">Início</label>
-          <input
+        <Field className="flex-1">
+          <FieldLabel required>Início</FieldLabel>
+          <Input
             type="time"
             value={inicio}
             onChange={(e) => setInicio(e.target.value)}
-            className={inputClass}
           />
-        </div>
-        <div className="flex-1 space-y-1">
-          <label className="text-b3 text-xs font-medium">Fim</label>
-          <input
+        </Field>
+        <Field className="flex-1">
+          <FieldLabel required>Fim</FieldLabel>
+          <Input
             type="time"
             value={fim}
             onChange={(e) => setFim(e.target.value)}
-            className={inputClass}
           />
-        </div>
+        </Field>
       </div>
 
       <div className="flex gap-3">
-        <div className="w-24 space-y-1">
-          <label className="text-b3 text-xs font-medium">Pessoas</label>
-          <input
-            type="number"
-            min={1}
-            value={pessoas}
-            onChange={(e) => setPessoas(e.target.value)}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex-1 space-y-1">
-          <label className="text-b3 text-xs font-medium">Mesa</label>
-          <select
+        <Field className="w-fit">
+          <FieldLabel>Pessoas</FieldLabel>
+          <NumberField value={pessoas} onValueChange={setPessoas} min={1} step={1}>
+            <NumberFieldGroup />
+          </NumberField>
+        </Field>
+        <Field className="flex-1">
+          <FieldLabel>Mesa</FieldLabel>
+          <Select
             value={mesa}
-            onChange={(e) => setMesa(e.target.value)}
-            className={inputClass}
+            onValueChange={(v) => setMesa((v as string) ?? '')}
           >
-            <option value="">Sem mesa</option>
-            {tables.map((t) => {
-              const ocupada = ocupadas.has(t.id)
-              return (
-                <option key={t.id} value={t.id} disabled={ocupada}>
-                  Mesa {t.number}
-                  {t.location ? ` · ${t.location}` : ''} · {t.capacity} lug.
-                  {ocupada ? ' — ocupada' : ''}
-                </option>
-              )
-            })}
-          </select>
-        </div>
+            <SelectTrigger>
+              <SelectValue placeholder="Sem mesa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Sem mesa</SelectItem>
+              {tables.map((t) => {
+                const ocupada = ocupadas.has(t.id)
+                return (
+                  <SelectItem key={t.id} value={t.id} disabled={ocupada}>
+                    Mesa {t.number}
+                    {t.location ? ` · ${t.location}` : ''} · {t.capacity} lug.
+                    {ocupada ? ' — ocupada' : ''}
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
+        </Field>
       </div>
 
       {mostrarSugestao && (
@@ -220,16 +224,15 @@ export function ReservaForm({
         </button>
       )}
 
-      <div className="space-y-1">
-        <label className="text-b3 text-xs font-medium">Observações</label>
-        <textarea
+      <Field>
+        <FieldLabel>Observações</FieldLabel>
+        <Textarea
           value={obs}
           onChange={(e) => setObs(e.target.value)}
           rows={2}
           placeholder="(opcional)"
-          className={inputClass}
         />
-      </div>
+      </Field>
 
       {erro && <p className="text-xs text-danger">{erro}</p>}
 

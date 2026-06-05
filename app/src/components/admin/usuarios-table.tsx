@@ -3,6 +3,15 @@
 import { useTransition } from "react"
 import { atualizarRole, vincularPerfilEquipe } from "@/app/actions/admin"
 import { toast } from "@/components/ui/toast"
+import {
+  TableContainer,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import type { Role } from "@/lib/roles"
 
@@ -79,83 +88,96 @@ export function UsuariosTable({ perfis, equipe, currentUserId }: Props) {
   }
 
   return (
-    <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
-      {perfis.map((perfil) => {
-        const isSelf = perfil.id === currentUserId
-        const role = perfil.role as Role
-        return (
-          <div
-            key={perfil.id}
-            className="flex items-center gap-3 px-4 py-3 bg-ink2"
-          >
-            {/* Avatar */}
-            <div className="shrink-0 w-8 h-8 rounded-full bg-ink4 flex items-center justify-center text-xs font-semibold text-b2 select-none">
-              {getInitials(perfil.nome)}
-            </div>
+    <TableContainer>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Usuário</TableHead>
+            <TableHead>Permissão</TableHead>
+            <TableHead>Vínculo de equipe</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {perfis.map((perfil) => {
+            const isSelf = perfil.id === currentUserId
+            const role = perfil.role as Role
+            return (
+              <TableRow key={perfil.id}>
+                {/* Usuário: avatar + nome + badge de role + id */}
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-ink4 flex items-center justify-center text-xs font-semibold text-b2 select-none">
+                      {getInitials(perfil.nome)}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-medium leading-tight truncate">
+                          {perfil.nome ?? "Sem nome"}
+                        </p>
+                        {isSelf && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-bica-light text-bica shrink-0">
+                            você
+                          </span>
+                        )}
+                        <span
+                          className={cn(
+                            "text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0",
+                            ROLE_BADGE[role] ?? "bg-ink4 text-b3 border border-b3/20"
+                          )}
+                        >
+                          {ROLE_LABEL[role] ?? role}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
+                        {perfil.id.slice(0, 8)}…
+                      </p>
+                    </div>
+                  </div>
+                </TableCell>
 
-            {/* Nome + role badge */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-medium leading-tight truncate">
-                  {perfil.nome ?? "Sem nome"}
-                </p>
-                {isSelf && (
-                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-bica-light text-bica shrink-0">
-                    você
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    "text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0",
-                    ROLE_BADGE[role] ?? "bg-ink4 text-b3 border border-b3/20"
-                  )}
-                >
-                  {ROLE_LABEL[role] ?? role}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5 font-mono truncate">
-                {perfil.id.slice(0, 8)}…
-              </p>
-            </div>
+                {/* Permissão: select de role */}
+                <TableCell>
+                  <select
+                    disabled={isPending || isSelf}
+                    value={perfil.role}
+                    onChange={(e) => handleRoleChange(perfil.id, e.target.value as Role)}
+                    className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`Permissão de ${perfil.nome ?? 'usuário'}`}
+                  >
+                    {ROLES.map((r) => (
+                      <option key={r} value={r}>
+                        {ROLE_LABEL[r]}
+                      </option>
+                    ))}
+                  </select>
+                </TableCell>
 
-            {/* Selects: role + vínculo de equipe */}
-            <div className="flex shrink-0 flex-col gap-1">
-              <select
-                disabled={isPending || isSelf}
-                value={perfil.role}
-                onChange={(e) => handleRoleChange(perfil.id, e.target.value as Role)}
-                className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={`Permissão de ${perfil.nome ?? 'usuário'}`}
-              >
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {ROLE_LABEL[r]}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                disabled={isPending}
-                value={equipe.find((m) => m.perfil_id === perfil.id)?.id ?? ""}
-                onChange={(e) => handleVincular(perfil.id, e.target.value)}
-                className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={`Vincular ${perfil.nome ?? 'usuário'} à equipe`}
-              >
-                <option value="">Sem vínculo de equipe</option>
-                {equipe.map((m) => {
-                  const ocupadoPorOutro = m.perfil_id != null && m.perfil_id !== perfil.id
-                  return (
-                    <option key={m.id} value={m.id} disabled={ocupadoPorOutro}>
-                      {m.nome} · {m.funcao}
-                      {ocupadoPorOutro ? " (já vinculado)" : ""}
-                    </option>
-                  )
-                })}
-              </select>
-            </div>
-          </div>
-        )
-      })}
-    </div>
+                {/* Vínculo de equipe: select de membro */}
+                <TableCell>
+                  <select
+                    disabled={isPending}
+                    value={equipe.find((m) => m.perfil_id === perfil.id)?.id ?? ""}
+                    onChange={(e) => handleVincular(perfil.id, e.target.value)}
+                    className="text-xs rounded border border-border bg-background px-2 py-1.5 text-b2 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`Vincular ${perfil.nome ?? 'usuário'} à equipe`}
+                  >
+                    <option value="">Sem vínculo de equipe</option>
+                    {equipe.map((m) => {
+                      const ocupadoPorOutro = m.perfil_id != null && m.perfil_id !== perfil.id
+                      return (
+                        <option key={m.id} value={m.id} disabled={ocupadoPorOutro}>
+                          {m.nome} · {m.funcao}
+                          {ocupadoPorOutro ? " (já vinculado)" : ""}
+                        </option>
+                      )
+                    })}
+                  </select>
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }

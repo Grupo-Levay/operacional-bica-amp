@@ -171,6 +171,7 @@ S9+ (produto features: dashboards, reports, integrações)
 - CTAs de ação usam `BrandLink` ou `Button variant="brand" size="cta"`
 
 ## Últimos ships
+0. **✅ UI v3.1 Foundation + Sweep (Nova, orquestrado)** — 20 componentes novos em `src/components/ui/` sobre `@base-ui/react` (field, input, textarea, select, combobox, number-field, switch, checkbox, dialog, sheet, dropdown-menu, popover, tooltip, separator, scroll-area, table, tabs, toggle-group, stat-card, meter) + confirm-dialog refatorado sobre alert-dialog. Aplicado em forms (estoque/reservas/fichas-sheet/metas/tarefas), tabs lista↔timeline, ToggleGroup filtros, DropdownMenu nos cards, StatCards no dashboard, Table em usuários/compras (escala manteve grid 7×N por design). 4 commits → **PR #47 draft**. 290 testes GREEN. (2026-06-05)
 1. **✅ S7 UI Evolution COMPLETE** — Phase 1 (tech debt cleanup) + Phase 2 (design v3) + Phase 3 (5 pages redesigned) → PR#44 READY FOR MERGE (2026-06-03, 290 tests passing, lint clean, build OK)
 2. feat: reservas UX upgrade — painel ao vivo, timeline, busca/filtro, WhatsApp — PR#33 (2026-06-01)
 3. feat: auditoria geral + correções P0→P3 — PR#30 (2026-06-01)
