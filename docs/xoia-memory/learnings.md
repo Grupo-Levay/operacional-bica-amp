@@ -77,6 +77,18 @@ Resultado: 0 hardcoded colors detectável via grep, visual hierarchy 100% consis
 **Aplicar quando:** Resume de projeto onde snapshot e estado git/DB podem divergir.
 ---
 
+## [2026-06-05] — Foundation de componentes sobre @base-ui/react: orquestração paralela por arquivo
+**Contexto:** UI das features parecia "primitiva" (forms `<input>/<select>` crus, modais reinventados). Base-base já era boa; faltava camada de primitivos ricos. Sweep A→E em 4 waves.
+**Aprendizado:** (1) `@base-ui/react@1.4.1` é rico (combobox/autocomplete/meter/toggle-group/drawer nativo/number-field) — confirmar partes EXATAS lendo `node_modules/@base-ui/react/<sub>/index.d.ts` (ex.: Tab ativo = `data-active` não `data-selected`; ToggleGroup flag = `multiple` não `toggleMultiple`). (2) Orquestração paralela funciona quando arquivos NÃO se sobrepõem (componentes novos em ui/, depois 1 agente por feature). Orquestrador faz CHECK+commit; agentes só constroem. (3) `Select`/`NumberField` do Base UI emitem hidden input automático com `name` → forms via FormData (`<form action>`) continuam funcionando só passando `name`; mas NÃO respondem a `form.reset()` → resetar estado manual no sucesso. (4) Base UI usa `render={el}` (não `cloneElement`/`asChild`).
+**Aplicar quando:** criar biblioteca de UI sobre Base UI; refatorar forms para primitivos; orquestrar trabalho multi-arquivo.
+---
+
+## [2026-06-05] — Nem todo grid vira `<table>`: escala 7×N é o contra-exemplo
+**Contexto:** Wave 4 (tabelas) — converter escala-grid (7 dias × N membros, edição inline) para Table semântica.
+**Aprendizado:** Grade calendário com `gridTemplateColumns: 180px repeat(N,1fr)` + scroll-snap + editor inline que cresce a célula NÃO deve virar `<table border-collapse>`: exigiria `table-fixed`+colgroup, a equalização de altura de linha distorceria células vizinhas no modo edição, e o snap-x mobile (header/body como linhas-grid separadas) quebraria. Decisão correta: manter CSS Grid e aplicar só polish de tokens. "Tabular" semântico ≠ "toda grade deve ser <table>".
+**Aplicar quando:** migrar grids editáveis/calendário para primitivos de tabela — avaliar antes de converter.
+---
+
 ## [2026-06-03] — Supabase GitHub integration ignora migrations fora de `app/supabase`
 **Contexto:** PR da S6 fase2/3 — bot Supabase comentou "ignored because no changes detected in `app/supabase` directory". Migrations do repo ficam em `supabase/migrations/` (raiz), não em `app/supabase`.
 **Aprendizado:** A integração Supabase↔GitHub só dispara branching/aplicação quando há mudança no diretório configurado (`app/supabase`). Migrations versionadas na raiz NÃO são aplicadas automaticamente em preview/prod — precisam ser aplicadas manualmente via MCP `execute_sql`/`apply_migration`. Por isso verificar `list_tables` no DB é obrigatório após merge de migration.
