@@ -1,8 +1,17 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { criarMeta } from '@/app/actions/metas'
 
 interface Perfil {
@@ -17,22 +26,33 @@ interface Props {
 
 export function NovaMetaForm({ perfis, periodoRefDefault }: Props) {
   const [open, setOpen] = useState(false)
+  // Selects do Base UI não respondem a form.reset(); mantemos controlados e
+  // resetamos manualmente no sucesso. O `name` em Select.Root emite o hidden
+  // input que alimenta o FormData lido pela server action.
   const [escopo, setEscopo] = useState<'individual' | 'equipe'>('individual')
+  const [periodo, setPeriodo] = useState('mensal')
+  const [perfilId, setPerfilId] = useState('')
   const [pending, startTransition] = useTransition()
   const [erro, setErro] = useState<string | null>(null)
-  const formRef = useRef<HTMLFormElement>(null)
+
+  function resetCampos() {
+    setEscopo('individual')
+    setPeriodo('mensal')
+    setPerfilId('')
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const fd = new FormData(e.currentTarget)
+    const form = e.currentTarget
+    const fd = new FormData(form)
     setErro(null)
     startTransition(async () => {
       const res = await criarMeta(fd)
       if (res?.error) {
         setErro(res.error)
       } else {
-        formRef.current?.reset()
-        setEscopo('individual')
+        form.reset()
+        resetCampos()
         setOpen(false)
       }
     })
@@ -54,70 +74,82 @@ export function NovaMetaForm({ perfis, periodoRefDefault }: Props) {
       </button>
 
       {open && (
-        <form ref={formRef} onSubmit={handleSubmit} className="border-t border-border p-4 space-y-3">
-          <div className="space-y-1">
-            <label htmlFor="titulo-meta" className="text-xs font-medium text-foreground">Título *</label>
-            <input
+        <form onSubmit={handleSubmit} className="border-t border-border p-4 space-y-3">
+          <Field>
+            <FieldLabel htmlFor="titulo-meta" required>
+              Título
+            </FieldLabel>
+            <Input
               id="titulo-meta"
               name="titulo"
               required
               maxLength={200}
               placeholder="Ex: Vendas do mês…"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-          </div>
+          </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label htmlFor="escopo" className="text-xs font-medium text-foreground">Escopo</label>
-              <select
-                id="escopo"
+            <Field>
+              <FieldLabel>Escopo</FieldLabel>
+              <Select
                 name="escopo"
                 value={escopo}
-                onChange={(e) => setEscopo(e.target.value as 'individual' | 'equipe')}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                onValueChange={(v) => setEscopo(v as 'individual' | 'equipe')}
               >
-                <option value="individual">Individual</option>
-                <option value="equipe">Equipe</option>
-              </select>
-            </div>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="individual">Individual</SelectItem>
+                  <SelectItem value="equipe">Equipe</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
 
-            <div className="space-y-1">
-              <label htmlFor="periodo" className="text-xs font-medium text-foreground">Período</label>
-              <select
-                id="periodo"
-                name="periodo"
-                defaultValue="mensal"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="semanal">Semanal</option>
-                <option value="mensal">Mensal</option>
-                <option value="trimestral">Trimestral</option>
-              </select>
-            </div>
+            <Field>
+              <FieldLabel>Período</FieldLabel>
+              <Select name="periodo" value={periodo} onValueChange={(v) => setPeriodo(v as string)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="semanal">Semanal</SelectItem>
+                  <SelectItem value="mensal">Mensal</SelectItem>
+                  <SelectItem value="trimestral">Trimestral</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
           </div>
 
           {escopo === 'individual' && (
-            <div className="space-y-1">
-              <label htmlFor="perfil_id-meta" className="text-xs font-medium text-foreground">Membro *</label>
-              <select
-                id="perfil_id-meta"
+            <Field>
+              <FieldLabel required>Membro</FieldLabel>
+              <Select
                 name="perfil_id"
                 required
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                value={perfilId}
+                onValueChange={(v) => setPerfilId((v as string) ?? '')}
               >
-                <option value="">Selecione…</option>
-                {perfis.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nome ?? p.id}</option>
-                ))}
-              </select>
-            </div>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {perfis.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.nome ?? p.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
           )}
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2 space-y-1">
-              <label htmlFor="alvo" className="text-xs font-medium text-foreground">Alvo *</label>
-              <input
+            <Field className="col-span-2">
+              <FieldLabel htmlFor="alvo" required>
+                Alvo
+              </FieldLabel>
+              <Input
                 id="alvo"
                 name="alvo"
                 type="number"
@@ -125,38 +157,37 @@ export function NovaMetaForm({ perfis, periodoRefDefault }: Props) {
                 step="any"
                 required
                 placeholder="100"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
-            </div>
-            <div className="space-y-1">
-              <label htmlFor="unidade" className="text-xs font-medium text-foreground">Unidade</label>
-              <input
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="unidade">Unidade</FieldLabel>
+              <Input
                 id="unidade"
                 name="unidade"
                 maxLength={10}
                 defaultValue="un"
                 placeholder="un"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
-            </div>
+            </Field>
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="periodo_ref" className="text-xs font-medium text-foreground">Referência do período</label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="periodo_ref">Referência do período</FieldLabel>
+            <Input
               id="periodo_ref"
               name="periodo_ref"
               defaultValue={periodoRefDefault}
               maxLength={20}
               placeholder="2026-06"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <p className="text-[10px] text-muted-foreground">Mensal: 2026-06 · Semanal: 2026-W22 · Trimestral: 2026-Q2</p>
-          </div>
+            <FieldDescription className="text-[10px]">
+              Mensal: 2026-06 · Semanal: 2026-W22 · Trimestral: 2026-Q2
+            </FieldDescription>
+          </Field>
 
           {erro && <p className="text-xs text-danger">{erro}</p>}
 
-          <Button type="submit" disabled={pending} className="w-full" size="sm">
+          <Button type="submit" variant="gradient" size="cta" disabled={pending}>
             {pending ? 'Criando…' : 'Criar meta'}
           </Button>
         </form>
