@@ -3,9 +3,15 @@
 import { Pencil, Archive } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { FichaFormDialog } from "@/components/fichas/ficha-form-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { arquivarFicha } from "@/app/actions/fichas"
 import { cn } from "@/lib/utils"
 import type { Tables } from "@/types/database.types"
@@ -47,37 +53,38 @@ export function FichaCard({ ficha }: FichaCardProps) {
                 {ficha.categoria}
               </Badge>
             )}
-            <FichaFormDialog
-              ficha={ficha}
-              trigger={
-                <Button
-                  size="icon-sm"
-                  variant="ghost"
-                  className="text-b4 hover:text-foreground"
-                  aria-label={`Editar ${ficha.nome}`}
-                >
-                  <Pencil className="size-3.5" />
-                </Button>
-              }
-            />
-            <ConfirmDialog
-              trigger={
-                <Button
-                  size="icon-sm"
-                  variant="ghost"
-                  className="text-b4 hover:text-danger"
-                  aria-label={`Arquivar ${ficha.nome}`}
-                >
-                  <Archive className="size-3.5" />
-                </Button>
-              }
-              title="Arquivar ficha?"
-              description={`"${ficha.nome}" deixará de aparecer na lista. Você pode recriá-la depois.`}
-              confirmLabel="Arquivar"
-              destructive
-              successMessage="Ficha arquivada"
-              onConfirm={() => arquivarFicha(ficha.id)}
-            />
+            {/* Ações agrupadas: o item do menu renderiza-se como o trigger do
+                dialog (Base UI `render`), preservando ConfirmDialog/FichaFormDialog
+                com seus estados e server actions intactos. */}
+            <DropdownMenu>
+              <DropdownMenuTrigger aria-label={`Ações de ${ficha.nome}`} />
+              <DropdownMenuContent>
+                <FichaFormDialog
+                  ficha={ficha}
+                  trigger={
+                    <DropdownMenuItem render={<button type="button" />}>
+                      <Pencil className="size-4" />
+                      Editar
+                    </DropdownMenuItem>
+                  }
+                />
+                <DropdownMenuSeparator />
+                <ConfirmDialog
+                  trigger={
+                    <DropdownMenuItem variant="destructive" render={<button type="button" />}>
+                      <Archive className="size-4" />
+                      Arquivar
+                    </DropdownMenuItem>
+                  }
+                  title="Arquivar ficha?"
+                  description={`"${ficha.nome}" deixará de aparecer na lista. Você pode recriá-la depois.`}
+                  confirmLabel="Arquivar"
+                  destructive
+                  successMessage="Ficha arquivada"
+                  onConfirm={() => arquivarFicha(ficha.id)}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </CardHeader>

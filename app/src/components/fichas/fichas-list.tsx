@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ChefHat, Search } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { FichaCard } from "@/components/fichas/ficha-card"
 import type { Tables } from "@/types/database.types"
 
@@ -50,36 +50,27 @@ export function FichasList({ fichas, categorias }: FichasListProps) {
         />
       </div>
 
-      {/* Filtro por categoria */}
+      {/* Filtro por categoria — segmented control (ToggleGroup) */}
       {categorias.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setFiltroCategoria(null)}
-            className={cn(
-              "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-              filtroCategoria === null
-                ? "bg-gradient-brand text-bica-fg border-transparent shadow-glow-brand-sm"
-                : "bg-transparent text-b3 border-ink4 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-b2"
-            )}
+        <div className="-mx-4 overflow-x-auto px-4 pb-1 scrollbar-none">
+          <ToggleGroup
+            value={[filtroCategoria ?? "todas"]}
+            onValueChange={(vals) => {
+              // Seleção única: "todas" (ou seleção vazia) limpa o filtro.
+              const next = vals[0]
+              setFiltroCategoria(!next || next === "todas" ? null : next)
+            }}
+            className="w-max"
           >
-            Todas
-          </button>
-          {categorias.map(cat => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setFiltroCategoria(filtroCategoria === cat ? null : cat)}
-              className={cn(
-                "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                filtroCategoria === cat
-                  ? "bg-gradient-brand text-bica-fg border-transparent shadow-glow-brand-sm"
-                  : "bg-transparent text-b3 border-ink4 [@media(hover:hover)]:hover:border-foreground/20 [@media(hover:hover)]:hover:text-b2"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+            <ToggleGroupItem value="todas" className="shrink-0 whitespace-nowrap">
+              Todas
+            </ToggleGroupItem>
+            {categorias.map(cat => (
+              <ToggleGroupItem key={cat} value={cat} className="shrink-0 whitespace-nowrap">
+                {cat}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       )}
 

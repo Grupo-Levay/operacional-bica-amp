@@ -1,13 +1,20 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Users, Phone, MapPin, StickyNote, Loader2, Pencil } from 'lucide-react'
+import { Users, Phone, MapPin, StickyNote, Loader2, Pencil, MessageCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 import { ReservaForm } from '@/components/reservas/reserva-form'
-import { WhatsAppButton } from '@/components/reservas/whatsapp-button'
 import { atualizarStatusReserva } from '@/app/actions/reservas'
+import { montarLinkWhatsApp } from '@/lib/reservas-whatsapp'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 import type { ReservaSlot } from '@/lib/reservas-availability'
@@ -107,6 +114,9 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
 
   const cancelada = status === 'cancelada'
   const editavel = STATUS_EDITAVEL.has(status)
+  const linkWhatsApp = montarLinkWhatsApp(reserva, nomeCasa)
+  // Ações secundárias agrupadas no menu overflow (as CTAs de status seguem soltas).
+  const temAcoesMenu = editavel || Boolean(linkWhatsApp)
 
   return (
     <Card
@@ -133,18 +143,38 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
             </p>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
-            {editavel && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Editar reserva"
-                disabled={isPending}
-                onClick={() => setEditando(true)}
-              >
-                <Pencil size={14} aria-hidden="true" />
-              </Button>
-            )}
             <Badge variant={STATUS_BADGE[status]}>{STATUS_LABEL[status]}</Badge>
+            {temAcoesMenu && (
+              <DropdownMenu>
+                <DropdownMenuTrigger aria-label="Ações da reserva" disabled={isPending} />
+                <DropdownMenuContent>
+                  {editavel && (
+                    <DropdownMenuItem onClick={() => setEditando(true)}>
+                      <Pencil className="size-4" aria-hidden="true" />
+                      Editar
+                    </DropdownMenuItem>
+                  )}
+                  {linkWhatsApp && (
+                    <>
+                      {editavel && <DropdownMenuSeparator />}
+                      <DropdownMenuItem
+                        className="text-success data-[highlighted]:text-success"
+                        render={
+                          <a
+                            href={linkWhatsApp}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          />
+                        }
+                      >
+                        <MessageCircle className="size-4" aria-hidden="true" />
+                        Confirmar no WhatsApp
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
 
@@ -179,28 +209,25 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
         {erro && <p className="text-xs text-danger">{erro}</p>}
 
         {status === 'pendente' && (
-          <div className="flex flex-col gap-2 pt-1">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="gradient"
-                size="cta"
-                disabled={isPending}
-                onClick={() => mudarStatus('confirmada')}
-                className="flex-1"
-              >
-                {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Confirmar'}
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                disabled={isPending}
-                onClick={() => mudarStatus('cancelada')}
-                className="min-h-[52px]"
-              >
-                Cancelar
-              </Button>
-            </div>
-            <WhatsAppButton reserva={reserva} nomeCasa={nomeCasa} />
+          <div className="flex items-center gap-2 pt-1">
+            <Button
+              variant="gradient"
+              size="cta"
+              disabled={isPending}
+              onClick={() => mudarStatus('confirmada')}
+              className="flex-1"
+            >
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Confirmar'}
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={isPending}
+              onClick={() => mudarStatus('cancelada')}
+              className="min-h-[52px]"
+            >
+              Cancelar
+            </Button>
           </div>
         )}
 

@@ -1,10 +1,10 @@
 'use client'
 
-import { CheckSquare, Package, RefreshCw, Users, AlertTriangle } from 'lucide-react'
-import { BentoGrid, BentoItem } from './bento-grid'
-import { KPICard } from './kpi-card'
+import { CheckSquare, Package, RefreshCw, Users } from 'lucide-react'
+import { BentoGrid } from './bento-grid'
 import { QuickActions } from './quick-actions'
 import { ManagerFeed, type CriticalItem, type ScaleMember } from './manager-feed'
+import { StatCard } from '@/components/ui/stat-card'
 import { ProgressRing } from '@/components/ui/progress-ring'
 import { useBrand } from '@/hooks/use-brand'
 import { META_CMV, cmvSeveridade } from '@/lib/dashboard-metrics'
@@ -71,81 +71,49 @@ export function DashboardContent({ initialData, dataHoje }: DashboardContentProp
         <section className="space-y-2">
           <h2 className="text-label font-semibold text-muted-foreground uppercase tracking-wide">Métricas</h2>
           <BentoGrid>
-            <BentoItem>
-              <KPICard
-                label="Checklists Diários"
-                value={`${initialData.concluidosHoje}/${initialData.totalChecklists}`}
-                subtitle={
-                  pendentes === 0
-                    ? 'Todos concluídos'
-                    : `${pendentes} pendente${pendentes !== 1 ? 's' : ''}`
-                }
+            {/* Checklists — mantém o ProgressRing existente como mini-viz (children) */}
+            <StatCard
+              label="Checklists Diários"
+              value={`${initialData.concluidosHoje}/${initialData.totalChecklists}`}
+              icon={CheckSquare}
+              accent={pendentes > 0 ? 'warning' : 'success'}
+              hint={
+                pendentes === 0
+                  ? 'Todos concluídos'
+                  : `${pendentes} pendente${pendentes !== 1 ? 's' : ''}`
+              }
+            >
+              <ProgressRing
+                value={checklistPercentage}
+                size={48}
                 accent={pendentes > 0 ? 'warning' : 'success'}
-                icon={<CheckSquare />}
-                visual={
-                  <ProgressRing
-                    value={checklistPercentage}
-                    size={48}
-                    accent={pendentes > 0 ? 'warning' : 'success'}
-                  />
-                }
-                progress={checklistPercentage}
               />
-            </BentoItem>
+            </StatCard>
 
-            <BentoItem>
-              <KPICard
-                label="Estoque Crítico"
-                value={criticosCount}
-                subtitle={criticosCount === 0 ? 'Níveis OK' : 'Abaixo do mínimo'}
-                accent={criticosCount > 0 ? 'danger' : 'success'}
-                icon={<Package />}
-                visual={
-                  criticosCount > 0 ? (
-                    <div className="h-10 w-10 rounded-full bg-danger/10 flex items-center justify-center text-danger border border-danger/20">
-                      <AlertTriangle className="size-5" />
-                    </div>
-                  ) : (
-                    <div className="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center text-success border border-success/20">
-                      <CheckSquare className="size-5" />
-                    </div>
-                  )
-                }
-              />
-            </BentoItem>
+            {/* Estoque crítico → danger quando há itens abaixo do mínimo, senão success */}
+            <StatCard
+              label="Estoque Crítico"
+              value={criticosCount}
+              icon={Package}
+              accent={criticosCount > 0 ? 'danger' : 'success'}
+              hint={criticosCount === 0 ? 'Níveis OK' : 'Abaixo do mínimo'}
+            />
 
-            <BentoItem>
-              <KPICard
-                label="Compras Ativas"
-                value={initialData.rodadasCount > 0 ? initialData.rodadasCount : '—'}
-                subtitle={
-                  initialData.rodadasCount > 0 ? 'Rodada em andamento' : 'Nenhuma aberta'
-                }
-                accent={initialData.rodadasCount > 0 ? 'primary' : undefined}
-                icon={<RefreshCw />}
-                visual={
-                  initialData.rodadasCount > 0 ? (
-                    <div className="animate-spin text-primary">
-                      <RefreshCw className="size-5" />
-                    </div>
-                  ) : undefined
-                }
-              />
-            </BentoItem>
+            <StatCard
+              label="Compras Ativas"
+              value={initialData.rodadasCount > 0 ? initialData.rodadasCount : '—'}
+              icon={RefreshCw}
+              accent="primary"
+              hint={initialData.rodadasCount > 0 ? 'Rodada em andamento' : 'Nenhuma aberta'}
+            />
 
-            <BentoItem>
-              <KPICard
-                label="Equipe em Serviço"
-                value={initialData.equipeCount}
-                subtitle="Membros ativos"
-                icon={<Users />}
-                visual={
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-                    <Users className="size-5" />
-                  </div>
-                }
-              />
-            </BentoItem>
+            <StatCard
+              label="Equipe em Serviço"
+              value={initialData.equipeCount}
+              icon={Users}
+              accent="primary"
+              hint="Membros ativos"
+            />
           </BentoGrid>
         </section>
 
