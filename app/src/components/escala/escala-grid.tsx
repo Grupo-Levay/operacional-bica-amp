@@ -129,7 +129,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
             className="grid gap-1 mb-2"
             style={{ gridTemplateColumns: `180px repeat(${dias.length}, 1fr)` }}
           >
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground/70 font-semibold py-1 self-end">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground font-medium py-1 self-end">
               Membro
             </div>
             {dias.map((dia) => {
@@ -323,7 +323,7 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+      <div className="mt-4 border-t border-border pt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
         <span>
           <span className="font-semibold text-foreground/80">AB</span> = Abertura
         </span>
