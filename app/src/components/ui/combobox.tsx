@@ -51,7 +51,7 @@ function ComboboxContent({
 }) {
   return (
     <BaseCombobox.Portal>
-      <BaseCombobox.Positioner sideOffset={sideOffset} className="z-50">
+      <BaseCombobox.Positioner sideOffset={sideOffset} className="z-[160]">
         <BaseCombobox.Popup
           data-slot="combobox-content"
           className={cn(

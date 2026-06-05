@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from '@/components/ui/select'
 import { NumberField, NumberFieldGroup } from '@/components/ui/number-field'
+import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/toast'
 import { criarReserva, editarReserva } from '@/app/actions/reservas'
 import {
@@ -35,10 +36,6 @@ interface ReservaFormProps {
   onCancel: () => void
   onSuccess: () => void
 }
-
-// Textarea mantém estilo cru: não há primitivo equivalente nos novos componentes.
-const textareaClass =
-  'w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:border-foreground/20 focus:outline-none focus-ring-brand'
 
 export function ReservaForm({
   tables,
@@ -229,12 +226,11 @@ export function ReservaForm({
 
       <Field>
         <FieldLabel>Observações</FieldLabel>
-        <textarea
+        <Textarea
           value={obs}
           onChange={(e) => setObs(e.target.value)}
           rows={2}
           placeholder="(opcional)"
-          className={textareaClass}
         />
       </Field>
 

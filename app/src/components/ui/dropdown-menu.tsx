@@ -48,7 +48,7 @@ function DropdownMenuContent({
 }) {
   return (
     <Menu.Portal>
-      <Menu.Positioner sideOffset={sideOffset} align={align} className="z-[150]">
+      <Menu.Positioner sideOffset={sideOffset} align={align} className="z-[160]">
         <Menu.Popup
           data-slot="dropdown-menu-content"
           className={cn(

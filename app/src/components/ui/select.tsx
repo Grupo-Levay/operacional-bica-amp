@@ -61,7 +61,7 @@ function SelectContent({
 }) {
   return (
     <BaseSelect.Portal>
-      <BaseSelect.Positioner sideOffset={sideOffset} className="z-50">
+      <BaseSelect.Positioner sideOffset={sideOffset} className="z-[160]">
         <BaseSelect.ScrollUpArrow className="flex h-6 items-center justify-center text-muted-foreground" />
         <BaseSelect.Popup
           data-slot="select-content"

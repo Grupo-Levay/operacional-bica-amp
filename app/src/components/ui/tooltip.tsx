@@ -34,7 +34,7 @@ function TooltipContent({
 }) {
   return (
     <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Positioner sideOffset={sideOffset} className="z-[150]">
+      <TooltipPrimitive.Positioner sideOffset={sideOffset} className="z-[160]">
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"
           className={cn(
