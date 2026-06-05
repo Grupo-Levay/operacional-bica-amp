@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/layout/bottom-nav'
 import { Sidebar } from '@/components/layout/sidebar'
 import { OnboardingModal } from '@/components/onboarding/onboarding-modal'
 import { Toaster } from '@/components/ui/toast'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { rotasPermitidas, podeAcessarRota, type Role } from '@/lib/roles'
 import { getOnboardingConfig } from '@/lib/onboarding'
 import { getCurrentCasa, CASAS, type Casa } from '@/lib/tenant'
@@ -52,7 +53,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     rawCasas && rawCasas.length > 0 ? rawCasas : Array.from(CASAS)
 
   return (
-    <div className="flex min-h-screen">
+    <TooltipProvider>
+      <div className="flex min-h-screen">
       {/* Sidebar — desktop only */}
       <Sidebar role={role} currentCasa={currentCasa} availableCasas={availableCasas} />
 
@@ -73,6 +75,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       )}
 
       <Toaster />
-    </div>
+      </div>
+    </TooltipProvider>
   )
 }
