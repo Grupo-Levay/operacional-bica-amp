@@ -126,13 +126,13 @@ export function ReservasView({ reservas, mesas, dataAlvo, nomeCasa, casa }: Rese
           quando há mesas — sem mesas, renderiza só a lista direto. */}
       {mesas.length > 0 ? (
         <Tabs value={visao} onValueChange={(v) => setVisao(v as Visao)}>
-          <TabsList>
+          <TabsList className="w-full">
             <TabsIndicator />
-            <TabsTab value="lista" className="gap-1.5">
+            <TabsTab value="lista" className="flex-1 gap-1.5">
               <LayoutList className="size-4" aria-hidden="true" />
               Lista
             </TabsTab>
-            <TabsTab value="timeline" className="gap-1.5">
+            <TabsTab value="timeline" className="flex-1 gap-1.5">
               <GitBranch className="size-4" aria-hidden="true" />
               Timeline
             </TabsTab>

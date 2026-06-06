@@ -177,7 +177,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
 
       {/* Config: mínimo + unidade */}
       {editConfig && (
-        <div className="flex flex-wrap items-end gap-2 rounded-lg bg-gradient-surface-raised p-2.5 shadow-inner-hairline ring-1 ring-foreground/10">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-2 rounded-lg bg-gradient-surface-raised p-2.5 shadow-inner-hairline ring-1 ring-foreground/10">
           <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
             Mínimo
             <input
@@ -186,7 +186,7 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
               step="0.5"
               value={minimoVal}
               onChange={(e) => setMinimoVal(e.target.value)}
-              className={cn(fieldCls, 'w-20')}
+              className={cn(fieldCls, 'w-full sm:w-20')}
             />
           </label>
           <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
@@ -196,10 +196,10 @@ export function ItemEstoque({ id, nome, unidade, atual, minimo }: ItemEstoquePro
               value={unidadeVal}
               onChange={(e) => setUnidadeVal(e.target.value)}
               placeholder="un, kg, L…"
-              className={cn(fieldCls, 'w-24')}
+              className={cn(fieldCls, 'w-full sm:w-24')}
             />
           </label>
-          <Button type="button" size="sm" variant="brand" onClick={salvarConfig}>
+          <Button type="button" size="sm" variant="brand" onClick={salvarConfig} className="w-full sm:w-auto">
             Salvar
           </Button>
         </div>

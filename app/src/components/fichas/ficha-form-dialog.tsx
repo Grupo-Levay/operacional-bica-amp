@@ -109,7 +109,7 @@ export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field>
               <FieldLabel>Custo (R$)</FieldLabel>
               <NumberField value={custo} onValueChange={setCusto} min={0} step={0.01}>
@@ -138,7 +138,7 @@ export function FichaFormDialog({ ficha, trigger }: FichaFormDialogProps) {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field>
               <FieldLabel>Rendimento</FieldLabel>
               <NumberField
