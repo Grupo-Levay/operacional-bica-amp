@@ -88,7 +88,7 @@ export function NovaMetaForm({ perfis, periodoRefDefault }: Props) {
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field>
               <FieldLabel>Escopo</FieldLabel>
               <Select
@@ -144,8 +144,8 @@ export function NovaMetaForm({ perfis, periodoRefDefault }: Props) {
             </Field>
           )}
 
-          <div className="grid grid-cols-3 gap-3">
-            <Field className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Field className="sm:col-span-2">
               <FieldLabel htmlFor="alvo" required>
                 Alvo
               </FieldLabel>

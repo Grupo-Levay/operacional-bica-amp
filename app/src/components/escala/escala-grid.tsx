@@ -123,8 +123,13 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
         </p>
       )}
 
-      <div className="overflow-x-auto scroll-smooth snap-x snap-mandatory -mx-4 px-4">
-        <div className="min-w-[480px]">
+      <p className="text-[10px] text-muted-foreground sm:hidden mb-1.5 text-center" aria-hidden>
+        ← deslize →
+      </p>
+
+      <div className="relative -mx-4">
+        <div className="overflow-x-auto scroll-smooth snap-x snap-mandatory px-4">
+          <div className="min-w-[480px]">
           <div
             className="grid gap-1 mb-2"
             style={{ gridTemplateColumns: `180px repeat(${dias.length}, 1fr)` }}
@@ -320,7 +325,13 @@ export function EscalaGrid({ membros, escala, dias, canEdit = false }: Props) {
               </div>
             ))}
           </div>
+          </div>
         </div>
+        {/* Affordance de scroll: fade sutil na borda direita, só no mobile */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent sm:hidden"
+        />
       </div>
 
       <div className="mt-4 border-t border-border pt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">

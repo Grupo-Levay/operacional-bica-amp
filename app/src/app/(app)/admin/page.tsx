@@ -62,7 +62,7 @@ export default async function AdminPage() {
         badge={`${total} ${total === 1 ? 'usuário' : 'usuários'}`}
       />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link
           href="/admin/tarefas"
           className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"

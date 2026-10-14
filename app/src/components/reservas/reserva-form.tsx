@@ -179,8 +179,8 @@ export function ReservaForm({
         </Field>
       </div>
 
-      <div className="flex gap-3">
-        <Field className="w-fit">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Field className="w-full sm:w-fit">
           <FieldLabel>Pessoas</FieldLabel>
           <NumberField value={pessoas} onValueChange={setPessoas} min={1} step={1}>
             <NumberFieldGroup />

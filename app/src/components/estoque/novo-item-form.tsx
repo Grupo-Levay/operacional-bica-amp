@@ -123,20 +123,20 @@ export function NovoItemForm({ categorias, trigger }: NovoItemFormProps) {
             </Field>
           )}
 
-          <div className="flex flex-wrap gap-3">
-            <Field className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Field>
               <FieldLabel>Quantidade inicial</FieldLabel>
               <NumberField value={atual} onValueChange={setAtual} min={0} step={0.5}>
                 <NumberFieldGroup />
               </NumberField>
             </Field>
-            <Field className="flex-1">
+            <Field>
               <FieldLabel>Mínimo</FieldLabel>
               <NumberField value={minimo} onValueChange={setMinimo} min={0} step={0.5}>
                 <NumberFieldGroup />
               </NumberField>
             </Field>
-            <Field className="w-24">
+            <Field>
               <FieldLabel>Unidade</FieldLabel>
               <Input
                 value={unidade}

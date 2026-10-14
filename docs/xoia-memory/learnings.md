@@ -11,6 +11,12 @@ Formato de entrada:
 
 <!-- Aprendizados serão adicionados aqui via append durante os ciclos -->
 
+## [2026-06-05] — RLS recursiva em `perfis` rebaixa TODO admin para 'operacional' silenciosamente
+**Contexto:** Usuário super_admin "nunca conseguia ver o Admin". Bottom-nav mostrava 7 abas (conjunto operacional) em vez de 9.
+**Aprendizado:** Política RLS `perfil_admin_read` na tabela `perfis` fazia `EXISTS (SELECT 1 FROM perfis WHERE ... role IN ('super_admin','admin'))` — subquery na PRÓPRIA tabela da política → recursão infinita (Postgres 42P17). Toda leitura autenticada de `perfis` falha → `layout.tsx` `.select(...).single()` retorna null → `role = perfil?.role ?? 'operacional'` rebaixa todos. O service-role (MCP) NÃO vê o bug (bypassa RLS) — só reproduz simulando `set local role authenticated` + `request.jwt.claims`. Fix: função `SECURITY DEFINER is_admin()` que lê o role sem disparar RLS; políticas chamam a função. Validar com dry-run em transação revertida antes de aplicar em prod. Migration 0010.
+**Aplicar quando:** política RLS que referencia a própria tabela; role/permissão inesperada; "admin não aparece"; debugar fallback silencioso de role.
+---
+
 ## [2026-05-20] — Supabase RLS multi-tenant bloqueia leitura anon em app interno
 **Contexto:** App operacional bica-amp com dados no DB mas todas as pages retornando vazio
 **Aprendizado:** O projeto Supabase (`ducbzdfxzaifzqefolhy`) é compartilhado com sistema multi-tenant (Grupo Levay). As políticas SELECT usam `is_active_team_member() AND (is_admin() OR member_has_casa(casa))` — funções que checam `auth.uid()` na tabela `team_members`. App Next.js usa anon key sem JWT → `auth.uid()` = null → tudo retorna vazio SEM erro. Fix: `CREATE POLICY ... FOR SELECT USING (true)` nas tabelas do app.

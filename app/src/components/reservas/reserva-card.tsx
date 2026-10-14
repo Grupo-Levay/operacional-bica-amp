@@ -209,13 +209,13 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
         {erro && <p className="text-xs text-danger">{erro}</p>}
 
         {status === 'pendente' && (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1">
             <Button
               variant="gradient"
               size="cta"
               disabled={isPending}
               onClick={() => mudarStatus('confirmada')}
-              className="flex-1"
+              className="w-full sm:flex-1"
             >
               {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Confirmar'}
             </Button>
@@ -224,7 +224,7 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
               variant="destructive"
               disabled={isPending}
               onClick={() => mudarStatus('cancelada')}
-              className="min-h-[52px]"
+              className="w-full sm:w-auto min-h-[52px]"
             >
               Cancelar
             </Button>
@@ -233,13 +233,13 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
 
         {status === 'confirmada' && (
           <div className="space-y-2 pt-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Button
                 size="cta"
                 variant="success"
                 disabled={isPending}
                 onClick={() => mudarStatus('presente')}
-                className="flex-1"
+                className="w-full sm:flex-1"
               >
                 {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Cliente chegou'}
               </Button>
@@ -248,7 +248,7 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
                 variant="outline"
                 disabled={isPending}
                 onClick={() => mudarStatus('nao_compareceu')}
-                className="min-h-[52px]"
+                className="w-full sm:w-auto min-h-[52px]"
               >
                 Não veio
               </Button>
@@ -266,13 +266,13 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
         )}
 
         {status === 'presente' && (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1">
             <Button
               size="cta"
               variant="success"
               disabled={isPending}
               onClick={() => mudarStatus('concluida')}
-              className="flex-1"
+              className="w-full sm:flex-1"
             >
               {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Concluir'}
             </Button>
@@ -281,7 +281,7 @@ export function ReservaCard({ reserva, mesa, tables, reservasDoDia, nomeCasa = '
               variant="destructive"
               disabled={isPending}
               onClick={() => mudarStatus('cancelada')}
-              className="min-h-[52px]"
+              className="w-full sm:w-auto min-h-[52px]"
             >
               Cancelar
             </Button>
